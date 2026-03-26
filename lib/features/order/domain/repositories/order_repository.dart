@@ -51,10 +51,12 @@ class OrderRepository implements OrderRepositoryInterface {
   @override
   Future<List<OrderModel>?> getList() async {
     List<OrderModel>? currentOrderList;
-    Response response = await apiClient.getData(AppConstants.currentOrdersUri + _getUserToken());
+    Response response = await apiClient.getData('${AppConstants.currentOrdersUri}${_getUserToken()}&limit=50&offset=1');
     if(response.statusCode == 200) {
       currentOrderList = [];
-      response.body.forEach((order) => currentOrderList!.add(OrderModel.fromJson(order)));
+      final body = response.body;
+      final rawList = (body is Map && body.containsKey('orders')) ? body['orders'] : body;
+      (rawList as List).forEach((order) => currentOrderList!.add(OrderModel.fromJson(order)));
     }
     return currentOrderList;
   }
