@@ -13,8 +13,10 @@ workflows:
 
       - name: Install CocoaPods
         script: |
+          flutter pub get
           cd ios
-          pod install
+          rm -f Podfile.lock
+          pod install --repo-update
 
       - name: Build iOS (no code sign)
         script: |
