@@ -1,11 +1,14 @@
 import 'package:sixam_mart_delivery/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart_delivery/helper/date_converter_helper.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_image_widget.dart';
 import 'package:sixam_mart_delivery/features/order/screens/order_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../screens/order_status.dart';
 
 class HistoryOrderWidget extends StatelessWidget {
   final OrderModel orderModel;
@@ -29,61 +32,82 @@ class HistoryOrderWidget extends StatelessWidget {
         ),
         child: Row(children: [
 
-          Container(
-            height: 70, width: 70, alignment: Alignment.center,
-            decoration: parcel ? BoxDecoration(
-              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-              color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
-            ) : null,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-              child: CustomImageWidget(
-                image: parcel ? '${orderModel.parcelCategory != null ? orderModel.parcelCategory!.imageFullUrl : ''}' : orderModel.storeLogoFullUrl ?? '',
-                height: parcel ? 45 : 70, width: parcel ? 45 : 70, fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: Dimensions.paddingSizeSmall),
+          // Image of the card
+          // Container(
+          //   height: 70, width: 70, alignment: Alignment.center,
+          //   decoration: parcel ? BoxDecoration(
+          //     borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+          //     color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
+          //   ) : null,
+          //   child: ClipRRect(
+          //     borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+          //     child: CustomImageWidget(
+          //       image: parcel ? '${orderModel.parcelCategory != null ? orderModel.parcelCategory!.imageFullUrl : ''}' : orderModel.storeLogoFullUrl ?? '',
+          //       height: parcel ? 45 : 70, width: parcel ? 45 : 70, fit: BoxFit.cover,
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(width: Dimensions.paddingSizeSmall),
 
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
               Row(children: [
-                Text(
-                  '${parcel ? 'delivery_id'.tr : 'order_id'.tr}:',
-                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
-                ),
+                Text('order'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
                 const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                Expanded(child: Text(
-                  '#${orderModel.id}',
-                  style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
-                )),
-                parcel ? Container(
-                  padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+                Text('#${orderModel.id}', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                Expanded(
+                  child: (orderModel.detailsCount ?? 0) > 0 ? Text(' (${orderModel.detailsCount} ${ (orderModel.detailsCount ?? 0) > 1 ?'items'.tr : "item".tr})', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)) : SizedBox(),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: Dimensions.paddingSizeSmall),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    color: (orderModel.orderStatus == 'canceled' || orderModel.orderStatus == 'failed') ? Colors.red.withValues(alpha: 0.2) : orderModel.orderStatus == 'returned' ? Colors.orangeAccent.withValues(alpha: 0.2) : orderModel.orderStatus == 'handover' ? Colors.blueAccent.withValues(alpha: 0.2) :  Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   ),
-                  child: Text('parcel'.tr, style: robotoMedium.copyWith(
-                    fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor,
+                  child: Text(getOrderStatus(orderModel.orderStatus!),
+                      style: robotoMedium.copyWith(
+                    fontSize: Dimensions.fontSizeExtraSmall,
+                      color: (orderModel.orderStatus == 'canceled' || orderModel.orderStatus == 'failed') ? Colors.red : orderModel.orderStatus == 'returned' ? Colors.orangeAccent : orderModel.orderStatus == 'handover' ? Colors.blueAccent : Theme.of(context).primaryColor,
                   )),
-                ) : const SizedBox(),
+                ) ,
               ]),
               const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-              Text(
-                parcel ? orderModel.parcelCategory != null ? orderModel.parcelCategory!.name! : 'no_parcel_category_data_found'.tr : orderModel.storeName ?? 'no_store_data_found'.tr,
-                style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
-              ),
-              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-              Row(children: [
-                const Icon(Icons.access_time, size: 15),
-                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                 Text(
                   DateConverterHelper.dateTimeStringToDateTime(orderModel.createdAt!),
                   style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall),
                 ),
+              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+              Divider(thickness: 1, color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
+
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                parcel ? Row(
+                  children: [
+                    orderModel.parcelCategory!.name == 'Gifts' ? Image.asset(Images.giftIcon, width: 16) : Icon(Icons.store_mall_directory, size: 16, color:  Theme.of(context).disabledColor),
+                    SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                    Text(
+                       orderModel.parcelCategory != null ? orderModel.parcelCategory!.name! : 'no_parcel_category_data_found'.tr ,
+                      style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
+                    ),
+                  ],
+                ) : Row(
+                  children: [
+                    Icon(Icons.store_mall_directory, size: 16, color:  Theme.of(context).disabledColor),
+                    SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                    Text(orderModel.storeName ?? 'no_store_data_found'.tr,
+                    style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),),
+                  ],
+                ) ,
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                  ),
+                  child: Text(orderModel.moduleType == 'parcel' ? 'parcel'.tr : orderModel.moduleType == 'food' ? 'food'.tr : orderModel.moduleType == 'grocery' ? 'grocery'.tr : orderModel.moduleType == 'pharmacy' ? 'pharmacy'.tr : orderModel.moduleType!,
+                    style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor),
+                  ),
+                ),
+
               ]),
 
             ]),

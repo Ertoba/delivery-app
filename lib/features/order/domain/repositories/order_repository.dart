@@ -13,6 +13,8 @@ import 'package:sixam_mart_delivery/features/order/domain/models/update_status_b
 import 'package:sixam_mart_delivery/features/order/domain/repositories/order_repository_interface.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
 
+import '../models/order_count_model.dart';
+
 class OrderRepository implements OrderRepositoryInterface {
   final ApiClient apiClient;
   final SharedPreferences sharedPreferences;
@@ -39,27 +41,26 @@ class OrderRepository implements OrderRepositoryInterface {
   }
 
   @override
-  Future<PaginatedOrderModel?> getCompletedOrderList(int offset) async {
+  Future<PaginatedOrderModel?> getCompletedOrderList(int offset, {String orderStatus = 'all'}) async {
     PaginatedOrderModel? paginatedOrderModel;
-    Response response = await apiClient.getData('${AppConstants.allOrdersUri}?token=${_getUserToken()}&offset=$offset&limit=10');
+    Response response = await apiClient.getData(
+        '${AppConstants.allOrdersUri}?token=${_getUserToken()}&offset=$offset&limit=10&order_status=$orderStatus'
+    );
     if (response.statusCode == 200) {
       paginatedOrderModel = PaginatedOrderModel.fromJson(response.body);
     }
     return paginatedOrderModel;
   }
 
-  @override
-  Future<List<OrderModel>?> getList() async {
-    List<OrderModel>? currentOrderList;
-    Response response = await apiClient.getData('${AppConstants.currentOrdersUri}${_getUserToken()}&limit=50&offset=1');
-    if(response.statusCode == 200) {
-      currentOrderList = [];
-      final body = response.body;
-      final rawList = (body is Map && body.containsKey('orders')) ? body['orders'] : body;
-      (rawList as List).forEach((order) => currentOrderList!.add(OrderModel.fromJson(order)));
-    }
-    return currentOrderList;
-  }
+  // @override
+  // Future<PaginatedOrderModel?> getCompletedOrderList(int offset) async {
+  //   PaginatedOrderModel? paginatedOrderModel;
+  //   Response response = await apiClient.getData('${AppConstants.allOrdersUri}?token=${_getUserToken()}&offset=$offset&limit=10&');
+  //   if (response.statusCode == 200) {
+  //     paginatedOrderModel = PaginatedOrderModel.fromJson(response.body);
+  //   }
+  //   return paginatedOrderModel;
+  // }
 
   @override
   Future<List<OrderModel>?> getLatestOrders() async {
@@ -186,6 +187,26 @@ class OrderRepository implements OrderRepositoryInterface {
   }
 
   @override
+  Future<PaginatedOrderModel?> getCurrentOrders(int offset,  {String orderStatus = 'all'}) async {
+    PaginatedOrderModel? paginatedOrderModel;
+    Response response = await apiClient.getData('${AppConstants.currentOrdersUri + _getUserToken()}&offset=$offset&limit=10&order_status=$orderStatus');
+    if(response.statusCode == 200) {
+      paginatedOrderModel = PaginatedOrderModel.fromJson(response.body);
+    }
+    return paginatedOrderModel;
+  }
+
+  @override
+  Future<List<OrderCountModel>?> getOrderCount(String type) async {
+    List<OrderCountModel>? orderCountList;
+    Response response = await apiClient.getData('${AppConstants.orderCount}?type=$type&token=${_getUserToken()}');
+    if (response.statusCode == 200) {
+      orderCountList = (response.body as List).map((item) => OrderCountModel.fromJson(item)).toList();
+    }
+    return orderCountList;
+  }
+
+  @override
   Future add(value) {
     throw UnimplementedError();
   }
@@ -197,6 +218,11 @@ class OrderRepository implements OrderRepositoryInterface {
 
   @override
   Future update(Map<String, dynamic> body) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<dynamic> getList() {
     throw UnimplementedError();
   }
 

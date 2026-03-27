@@ -38,7 +38,7 @@ class WalletOverviewWidget extends StatelessWidget {
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(children: [
 
-                    isAdjust ? Container(
+                    isAdjust && !isPayable ? Container(
                       width: context.width,
                       padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
                       decoration: BoxDecoration(
@@ -144,7 +144,7 @@ class WalletOverviewWidget extends StatelessWidget {
                         Text(isPayable ? 'pay_able_balance'.tr : 'withdrawable_balance'.tr, style: robotoSemiBold),
                         const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                        Text('you_can_send_withdraw_request_to_admin'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
+                        Text(isPayable ? 'you_can_pay_the_amount_to_the_admin'.tr : 'you_can_send_withdraw_request_to_admin'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
                         const SizedBox(height: Dimensions.paddingSizeSmall),
 
                         Container(

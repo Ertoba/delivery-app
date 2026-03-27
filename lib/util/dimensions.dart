@@ -21,4 +21,8 @@ class Dimensions {
 
   static const int messageInputLength = 250;
   static const double webMaxWidth = 1170;
+  static const double limitOfPickedVideoSizeInMB = 50;
+  static const double maxSizeOfASingleFile = 10;
+  static const double maxLimitOfTotalFileSent = 5;
+  static const double maxLimitOfFileSentINConversation = 25;
 }

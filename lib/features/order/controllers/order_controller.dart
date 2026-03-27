@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
+import 'package:sixam_mart_delivery/features/order/domain/models/order_count_model.dart';
 import 'package:sixam_mart_delivery/features/order/domain/models/parcel_cancellation_reasons_model.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
@@ -90,6 +91,21 @@ class OrderController extends GetxController implements GetxService {
   final List<DateTime> _availableDates = [];
   List<DateTime> get availableDates => _availableDates;
 
+  List<OrderCountModel>? _currentOrderCountList;
+  List<OrderCountModel>? get currentOrderCountList => _currentOrderCountList;
+
+  List<OrderCountModel>? _historyOrderCountList;
+  List<OrderCountModel>? get historyOrderCountList => _historyOrderCountList;
+
+  String _selectedHistoryStatus = 'all';
+  String get selectedHistoryStatus => _selectedHistoryStatus;
+
+  String _selectedRunningStatus = 'all';
+  String get selectedRunningStatus => _selectedRunningStatus;
+
+  String _orderType = 'current';
+  String get orderType => _orderType;
+
   void changeDeliveryImageStatus({bool isUpdate = true}){
     _showDeliveryImageField = !_showDeliveryImageField;
     if(isUpdate) {
@@ -140,12 +156,14 @@ class OrderController extends GetxController implements GetxService {
       debugPrint(_orderModel.toString());
     }else {
       Navigator.pop(Get.context!);
-      await Get.find<OrderController>().getCurrentOrders();
+      await Get.find<OrderController>().getRunningOrders(offset);
     }
     update();
   }
 
-  Future<void> getCompletedOrders(int offset, {bool willUpdate = true}) async {
+  Future<void> getCompletedOrders(int offset, {bool willUpdate = true, String? status}) async {
+    String orderStatus = status ?? _selectedHistoryStatus;
+
     if(offset == 1) {
       _offsetList = [];
       _offset = 1;
@@ -156,7 +174,7 @@ class OrderController extends GetxController implements GetxService {
     }
     if (!_offsetList.contains(offset)) {
       _offsetList.add(offset);
-      PaginatedOrderModel? paginatedOrderModel = await orderServiceInterface.getCompletedOrderList(offset);
+      PaginatedOrderModel? paginatedOrderModel = await orderServiceInterface.getCompletedOrderList(offset, orderStatus: orderStatus);
       if (paginatedOrderModel != null) {
         if (offset == 1) {
           _completedOrderList = [];
@@ -183,13 +201,38 @@ class OrderController extends GetxController implements GetxService {
     _offset = offset;
   }
 
-  Future<void> getCurrentOrders() async {
-    List<OrderModel>? currentOrderList = await orderServiceInterface.getCurrentOrders();
-    if(currentOrderList != null) {
-      _currentOrderList = [];
-      _currentOrderList!.addAll(currentOrderList);
+  Future<void> getRunningOrders(int offset, {bool willUpdate = true, String? status}) async {
+    String orderStatus = status ?? _selectedRunningStatus;
+    if(status != null ){
+      _selectedRunningStatus = status;
     }
-    update();
+
+    if(offset == 1) {
+      _offsetList = [];
+      _offset = 1;
+      _completedOrderList = null;
+      if(willUpdate) {
+        update();
+      }
+    }
+    if (!_offsetList.contains(offset)) {
+      _offsetList.add(offset);
+      PaginatedOrderModel? paginatedOrderModel = await orderServiceInterface.getCurrentOrders(offset, orderStatus: orderStatus);
+      if (paginatedOrderModel != null) {
+        if (offset == 1) {
+          _currentOrderList = [];
+        }
+        _currentOrderList!.addAll(paginatedOrderModel.orders!);
+        _pageSize = paginatedOrderModel.totalSize;
+        _paginate = false;
+        update();
+      } else {
+        if (_paginate) {
+          _paginate = false;
+          update();
+        }
+      }
+    }
   }
 
   Future<void> getLatestOrders() async {
@@ -223,7 +266,15 @@ class OrderController extends GetxController implements GetxService {
       }
       if(!stopOtherDataCall){
         Get.find<ProfileController>().getProfile();
-        getCurrentOrders();
+        
+        // Auto-reset to 'all' for handover and post-handover status changes
+        List<String> autoResetStatuses = ['picked_up'];
+        if (autoResetStatuses.contains(currentOrder.orderStatus) && _selectedRunningStatus != 'all') {
+          _selectedRunningStatus = 'all';
+        }
+        
+        getRunningOrders(offset);
+        getOrderCount('current');
         currentOrder.orderStatus = status;
       }
       showCustomSnackBar(responseModel.message, isError: false, getXSnackBar: false);
@@ -456,5 +507,47 @@ class OrderController extends GetxController implements GetxService {
     _isLoading = false;
     update();
   }
-  
+
+  List<OrderCountModel> get filteredOrderCountList {
+    if (_currentOrderCountList == null) return [];
+    return _currentOrderCountList!.where((status) => (status.count ?? 0) > 0).toList();
+  }
+
+  List<OrderCountModel> get filteredHistoryOrderCountList {
+    if (_historyOrderCountList == null) return [];
+    return _historyOrderCountList!.where((status) => (status.count ?? 0) > 0).toList();
+  }
+
+  Future<void> getOrderCount(String type) async {
+    _isLoading = true;
+    _orderType = type;
+    List<OrderCountModel>? response = await orderServiceInterface.getOrderCount(type);
+    if (response != null && response.isNotEmpty) {
+      if (_orderType == 'current') {
+        _currentOrderCountList = response;
+      } else if (_orderType == 'history') {
+        _historyOrderCountList = response;
+      }
+    } else {
+      if (_orderType == 'current') {
+        _currentOrderCountList = [];
+      } else if (_orderType == 'history') {
+        _historyOrderCountList = [];
+      }
+    }
+    _isLoading = false;
+  }
+
+
+  void setHistoryOrderStatus(String status) {
+    _selectedHistoryStatus = status;
+    update();
+    getCompletedOrders(1, status: status);
+  }
+
+  void setRunningOrderStatus(String status) {
+    _selectedRunningStatus = status;
+    update();
+    getRunningOrders(1, status: status);
+  }
 }

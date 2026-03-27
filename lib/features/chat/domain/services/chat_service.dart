@@ -12,13 +12,13 @@ class ChatService implements ChatServiceInterface {
   ChatService({required this.chatRepositoryInterface});
 
   @override
-  Future<ConversationsModel?> getConversationList(int offset) async {
-    return await chatRepositoryInterface.getConversationList(offset);
+  Future<ConversationsModel?> getConversationList(int offset, String type) async {
+    return await chatRepositoryInterface.getConversationList(offset, type);
   }
 
   @override
-  Future<ConversationsModel?> searchConversationList(String name) async {
-    return await chatRepositoryInterface.searchConversationList(name);
+  Future<ConversationsModel?> searchConversationList(String name, String type) async {
+    return await chatRepositoryInterface.searchConversationList(name, type);
   }
 
   @override
@@ -60,6 +60,24 @@ class ChatService implements ChatServiceInterface {
       messageModel = await sendMessage(message, chatImage, conversationId, notificationBody.vendorId, AppConstants.vendor);
     }
     return messageModel;
+  }
+
+  @override
+  List<MultipartBody> processMultipartFiles(List<XFile> files) {
+    List<MultipartBody> multipartFiles = [];
+    for (var file in files) {
+      multipartFiles.add(MultipartBody('image[]', file));
+    }
+    return multipartFiles;
+  }
+
+  @override
+  List<MultipartBody> processMultipartVideo(XFile? video) {
+    List<MultipartBody> multipartVideo = [];
+    if(video != null) {
+      multipartVideo.add(MultipartBody('image[]', video));
+    }
+    return multipartVideo;
   }
 
 }

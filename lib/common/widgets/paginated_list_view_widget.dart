@@ -11,8 +11,9 @@ class PaginatedListViewWidget extends StatefulWidget {
   final int? offset;
   final Widget productView;
   final bool enabledPagination;
+  final bool showLoadingInUpper;
   const PaginatedListViewWidget({super.key, required this.scrollController, required this.onPaginate, required this.totalSize,
-    required this.offset, required this.productView, this.enabledPagination = true});
+    required this.offset, required this.productView, this.enabledPagination = true, this.showLoadingInUpper = false});
 
   @override
   State<PaginatedListViewWidget> createState() => _PaginatedListViewWidgetState();
@@ -75,11 +76,27 @@ class _PaginatedListViewWidgetState extends State<PaginatedListViewWidget> {
 
     return Column(children: [
 
+      (ResponsiveHelper.isDesktop(context) && (widget.totalSize == null || _offset! >= (widget.totalSize! / 10).ceil() || _offsetList.contains(_offset!+1))) ? const SizedBox() : Center(child: Padding(
+        padding: (_isLoading || ResponsiveHelper.isDesktop(context)) ? const EdgeInsets.all(Dimensions.paddingSizeSmall) : EdgeInsets.zero,
+        child: _isLoading && widget.showLoadingInUpper ? const CircularProgressIndicator() : (ResponsiveHelper.isDesktop(context) && widget.totalSize != null) ? InkWell(
+          onTap: _paginate,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeLarge),
+            margin: ResponsiveHelper.isDesktop(context) ? const EdgeInsets.only(top: Dimensions.paddingSizeSmall) : null,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+              color: Theme.of(context).primaryColor,
+            ),
+            child: Text('view_more'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.white)),
+          ),
+        ) : const SizedBox(),
+      )) ,
+
       widget.productView,
 
       (ResponsiveHelper.isDesktop(context) && (widget.totalSize == null || _offset! >= (widget.totalSize! / 10).ceil() || _offsetList.contains(_offset!+1))) ? const SizedBox() : Center(child: Padding(
         padding: (_isLoading || ResponsiveHelper.isDesktop(context)) ? const EdgeInsets.all(Dimensions.paddingSizeSmall) : EdgeInsets.zero,
-        child: _isLoading ? const CircularProgressIndicator() : (ResponsiveHelper.isDesktop(context) && widget.totalSize != null) ? InkWell(
+        child: _isLoading && !widget.showLoadingInUpper ? const CircularProgressIndicator() : (ResponsiveHelper.isDesktop(context) && widget.totalSize != null) ? InkWell(
           onTap: _paginate,
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeLarge),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
 import 'package:sixam_mart_delivery/api/api_checker.dart';
 import 'package:sixam_mart_delivery/common/models/error_response.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
@@ -96,6 +97,7 @@ class ApiClient extends GetxService {
     }
   }
 
+
   Future<Response> putData(String uri, dynamic body, {Map<String, String>? headers, bool handleError = true}) async {
     try {
       debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
@@ -143,7 +145,8 @@ class ApiClient extends GetxService {
     }else if(response0.statusCode != 200 && response0.body == null) {
       response0 = const Response(statusCode: 0, statusText: noInternetMessage);
     }
-    debugPrint('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
+    //debugPrint('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
+    debugPrint('====> API Response: [${response0.statusCode}] $uri}');
     if(handleError) {
       if(response0.statusCode == 200) {
         return response0;
@@ -162,4 +165,10 @@ class MultipartBody {
   XFile? file;
 
   MultipartBody(this.key, this.file);
+}
+
+class MultipartDocument {
+  String key;
+  FilePickerResult? file;
+  MultipartDocument(this.key, this.file);
 }

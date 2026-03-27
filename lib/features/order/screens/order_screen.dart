@@ -1,9 +1,13 @@
 import 'package:sixam_mart_delivery/features/order/controllers/order_controller.dart';
+import 'package:sixam_mart_delivery/features/order/screens/my_order_screen.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_app_bar_widget.dart';
 import 'package:sixam_mart_delivery/features/order/widgets/history_order_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../util/styles.dart';
+import 'running_order_screen.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});
@@ -12,65 +16,60 @@ class OrderScreen extends StatefulWidget {
   State<OrderScreen> createState() => _OrderScreenState();
 }
 
-class _OrderScreenState extends State<OrderScreen> {
-  final ScrollController scrollController = ScrollController();
+class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStateMixin {
 
-  @override
-  void initState() {
-    super.initState();
 
-    Get.find<OrderController>().getCompletedOrders(1, willUpdate: false);
-    scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent
-          && Get.find<OrderController>().completedOrderList != null
-          && !Get.find<OrderController>().paginate) {
-        int pageSize = (Get.find<OrderController>().pageSize! / 10).ceil();
-        if (Get.find<OrderController>().offset < pageSize) {
-          Get.find<OrderController>().setOffset(Get.find<OrderController>().offset+1);
-          debugPrint('end of the page');
-          Get.find<OrderController>().showBottomLoader();
-          Get.find<OrderController>().getCompletedOrders(Get.find<OrderController>().offset);
-        }
-      }
-    });
-  }
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-
-      appBar: CustomAppBarWidget(title: 'my_orders'.tr, isBackButtonExist: false),
-
-      body: GetBuilder<OrderController>(builder: (orderController) {
-
-        return orderController.completedOrderList != null ? orderController.completedOrderList!.isNotEmpty ? RefreshIndicator(
-          onRefresh: () async {
-            await orderController.getCompletedOrders(1);
-          },
-          child: SingleChildScrollView(
-            controller: scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Center(child: SizedBox(
-              width: 1170,
-              child: Column(children: [
-                ListView.builder(
-                  padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                  itemCount: orderController.completedOrderList!.length,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return HistoryOrderWidget(orderModel: orderController.completedOrderList![index], isRunning: false, index: index);
-                  },
-                ),
-                orderController.paginate ? const Center(child: Padding(
-                  padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
-                  child: CircularProgressIndicator(),
-                )) : const SizedBox(),
-              ]),
-            )),
-          ),
-        ) : Center(child: Text('no_order_found'.tr)) : const Center(child: CircularProgressIndicator());
-      }),
-    );
+    return DefaultTabController(length: 2, child: Scaffold(
+      backgroundColor: Theme.of(context).cardColor,
+      appBar: CustomAppBarWidget(title: 'my_orders'.tr, isBackButtonExist: false, bottom: _orderTabBar(context),),
+      body: TabBarView(children: [RunningOrderScreen(), MyOrderScreen()])
+    ));
   }
 }
+
+TabBar _orderTabBar(BuildContext context) {
+  return TabBar(
+    isScrollable: true,
+    tabAlignment: TabAlignment.start,
+
+    overlayColor: WidgetStateProperty.all(Colors.transparent),
+    splashFactory: NoSplash.splashFactory,
+
+    indicator: BoxDecoration(
+      color: Theme.of(context).primaryColor,
+      borderRadius: BorderRadius.circular(30),
+    ),
+    indicatorSize: TabBarIndicatorSize.tab,
+    labelColor: Theme.of(context).cardColor,
+    unselectedLabelColor: Theme.of(context).hintColor,
+    labelStyle: robotoMedium.copyWith(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    ),
+    unselectedLabelStyle: robotoMedium.copyWith(fontSize: 14),
+    dividerColor: Colors.transparent,
+    padding: const EdgeInsets.only(
+      left: Dimensions.paddingSizeDefault,
+      top: Dimensions.paddingSizeSmall,
+      bottom: Dimensions.paddingSizeDefault,
+      right: 40,
+    ),
+    tabs: [
+      Tab(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text('running_orders'.tr),
+        ),
+      ),
+      Tab(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text('my_orders'.tr),
+        ),
+      ),
+    ],
+  );
+}
+

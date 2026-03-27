@@ -9,7 +9,8 @@ class CustomAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
   final bool isBackButtonExist;
   final Function? onBackPressed;
   final Widget? actionWidget;
-  const CustomAppBarWidget({super.key, required this.title, this.isBackButtonExist = true, this.onBackPressed, this.actionWidget});
+  final TabBar? bottom;
+  const CustomAppBarWidget({super.key, required this.title, this.isBackButtonExist = true, this.onBackPressed, this.actionWidget, this.bottom});
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +40,10 @@ class CustomAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
           child: actionWidget ?? const SizedBox(),
         ),
       ],
+      bottom: bottom,
     );
   }
 
   @override
-  Size get preferredSize => Size(1170, GetPlatform.isDesktop ? 70 : 50);
+  Size get preferredSize => Size(1170, GetPlatform.isDesktop ? (bottom != null ? 120 : 70) : (bottom != null ? 100 : 60));
 }

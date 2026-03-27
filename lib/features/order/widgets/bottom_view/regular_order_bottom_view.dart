@@ -20,15 +20,18 @@ import 'package:sixam_mart_delivery/features/order/widgets/slider_button_widget.
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../helper/price_converter_helper.dart';
+
 enum RegularOrderState {waitingToProcess, readyToConfirm, readyToPickup, readyToDeliver, completeDelivery, completed}
 
 class RegularOrderBottomView extends StatelessWidget {
   final OrderController orderController;
+  final double total;
   final OrderModel controllerOrderModel;
   final bool fromLocationScreen;
   final int orderId;
   final bool showDeliveryConfirmImage;
-  const RegularOrderBottomView({super.key, required this.orderController, required this.controllerOrderModel, required this.fromLocationScreen, required this.orderId, required this.showDeliveryConfirmImage});
+  const RegularOrderBottomView({super.key, required this.orderController, required this.controllerOrderModel, required this.fromLocationScreen, required this.orderId, required this.showDeliveryConfirmImage, required this.total});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +45,7 @@ class RegularOrderBottomView extends StatelessWidget {
         return _buildOrderConfirmationActions(orderController, controllerOrderModel);
 
       case RegularOrderState.readyToPickup:
-        return _buildOrderPickupSlider(orderController, controllerOrderModel);
+        return _buildOrderPickupSlider(orderController, controllerOrderModel, total);
 
       case RegularOrderState.readyToDeliver:
         return _buildOrderDeliverySlider(orderController, controllerOrderModel);
@@ -95,7 +98,7 @@ class RegularOrderBottomView extends StatelessWidget {
         color: Theme.of(Get.context!).cardColor,
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
       ),
-      child: Text('order_waiting_for_process'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge), textAlign: TextAlign.center),
+      child: Text('order_waiting_for_process'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge), textAlign: TextAlign.center),
     );
   }
 
@@ -153,7 +156,12 @@ class RegularOrderBottomView extends StatelessWidget {
   }
 
   // Regular order pickup slider
-  Widget _buildOrderPickupSlider(OrderController orderController, OrderModel controllerOrderModel) {
+  Widget _buildOrderPickupSlider(OrderController orderController, OrderModel controllerOrderModel, double total) {
+
+    bool partialPay = controllerOrderModel.paymentMethod == 'partial_payment' && (controllerOrderModel.payments?.isNotEmpty ?? false) && controllerOrderModel.payments![1].paymentMethod == 'cash_on_delivery';
+    double partialAmount = partialPay ? (controllerOrderModel.payments?[1].amount ?? 0) : 0;
+    bool showCollectCashAmount = controllerOrderModel.paymentMethod == "cash_on_delivery" || partialPay ;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
@@ -161,28 +169,44 @@ class RegularOrderBottomView extends StatelessWidget {
         color: Theme.of(Get.context!).cardColor,
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
       ),
-      child: SliderButton(
-        action: () => _handleOrderPickup(orderController, controllerOrderModel),
-        label: Text(
-          'swipe_to_pick_up_order'.tr,
-          style: robotoMedium.copyWith(
-            fontSize: Dimensions.fontSizeLarge,
-            color: Theme.of(Get.context!).primaryColor,
+      child: Column(
+        children: [
+          showCollectCashAmount ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
+            child: Row(children: [
+              Image.asset(Images.referCoin, width: 18,),
+              SizedBox(width: Dimensions.paddingSizeExtraSmall),
+              Text('amount_collect_from_customer'.tr),
+              const Spacer(),
+              Text(PriceConverterHelper.convertPrice(partialPay ? partialAmount : total), style: robotoBold),
+            ]),
+          ) : SizedBox(),
+
+          SizedBox(height: Dimensions.paddingSizeSmall),
+          SliderButton(
+            action: () => _handleOrderPickup(orderController, controllerOrderModel),
+            label: Text(
+              'swipe_to_pick_up_order'.tr,
+              style: robotoMedium.copyWith(
+                fontSize: Dimensions.fontSizeLarge,
+                color: Theme.of(Get.context!).primaryColor,
+              ),
+            ),
+            dismissThresholds: 0.5,
+            dismissible: false,
+            shimmer: true,
+            width: 1170,
+            height: 60,
+            buttonSize: 50,
+            radius: 10,
+            icon: _buildSliderIcon(),
+            isLtr: Get.find<LocalizationController>().isLtr,
+            boxShadow: const BoxShadow(blurRadius: 0),
+            buttonColor: Theme.of(Get.context!).primaryColor,
+            backgroundColor: const Color(0xffF4F7FC),
+            baseColor: Theme.of(Get.context!).primaryColor,
           ),
-        ),
-        dismissThresholds: 0.5,
-        dismissible: false,
-        shimmer: true,
-        width: 1170,
-        height: 60,
-        buttonSize: 50,
-        radius: 10,
-        icon: _buildSliderIcon(),
-        isLtr: Get.find<LocalizationController>().isLtr,
-        boxShadow: const BoxShadow(blurRadius: 0),
-        buttonColor: Theme.of(Get.context!).primaryColor,
-        backgroundColor: const Color(0xffF4F7FC),
-        baseColor: Theme.of(Get.context!).primaryColor,
+        ],
       ),
     );
   }

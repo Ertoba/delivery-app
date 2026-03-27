@@ -16,7 +16,7 @@ class TransactionSectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
-        myAccountController.selectedIndex == 0 ? 'withdraw_request'.tr : 'transaction_history'.tr,
+        myAccountController.selectedIndex == 0 ? 'withdraw_request'.tr : myAccountController.selectedIndex == 1 ? 'transaction_history'.tr : 'wallet_history'.tr,
         style: robotoSemiBold,
       ),
       const SizedBox(height: Dimensions.paddingSizeDefault),
@@ -68,8 +68,8 @@ class EarningListWidget extends StatelessWidget {
     if (transactions!.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.only(top: 250),
-          child: Text('no_transaction_found'.tr),
+          padding: EdgeInsets.only(top: selectedIndex == 0 ? 115 : 250),
+          child: Text(selectedIndex == 0 ? 'no_withdraw_found'.tr : selectedIndex == 1 ? 'no_transaction_found'.tr : 'no_wallet_history'.tr)
         ),
       );
     }

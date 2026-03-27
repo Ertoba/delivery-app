@@ -47,7 +47,7 @@ class DashboardScreenState extends State<DashboardScreen> {
     _pageController = PageController(initialPage: widget.pageIndex);
 
     _screens = [
-      const HomeScreen(),
+      HomeScreen(onNavigateToOrders: () => _setPage(2)),
       OrderRequestScreen(onTap: () => _setPage(0)),
       const OrderScreen(),
       const ProfileScreen(),
@@ -65,11 +65,13 @@ class DashboardScreenState extends State<DashboardScreen> {
         NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
       }
       if(type == 'new_order' || type == 'order_request') {
-        Get.find<OrderController>().getCurrentOrders();
+        Get.find<OrderController>().getRunningOrders(Get.find<OrderController>().offset, status: 'all');
+        Get.find<OrderController>().getOrderCount(Get.find<OrderController>().orderType);
         Get.find<OrderController>().getLatestOrders();
         Get.dialog(NewRequestDialogWidget(isRequest: true, onTap: () => _navigateRequestPage(), orderId: int.parse(message.data['order_id'].toString()), isParcel: isParcel));
       }else if(type == 'assign' && orderID != null && orderID.isNotEmpty) {
-        Get.find<OrderController>().getCurrentOrders();
+        Get.find<OrderController>().getRunningOrders(Get.find<OrderController>().offset, status: 'all');
+        Get.find<OrderController>().getOrderCount(Get.find<OrderController>().orderType);
         Get.find<OrderController>().getLatestOrders();
         Get.dialog(NewRequestDialogWidget(isRequest: false, orderId: int.parse(message.data['order_id'].toString()), isParcel: isParcel, onTap: () {
           Get.offAllNamed(RouteHelper.getOrderDetailsRoute(int.parse(orderID), fromNotification: true));

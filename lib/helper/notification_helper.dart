@@ -145,7 +145,8 @@ class NotificationHelper {
             message,
             flutterLocalNotificationsPlugin,
           );
-          Get.find<OrderController>().getCurrentOrders();
+          Get.find<OrderController>().getRunningOrders(1, status: 'all');
+          Get.find<OrderController>().getOrderCount(Get.find<OrderController>().orderType);
           Get.find<OrderController>().getLatestOrders();
           Get.find<NotificationController>().getNotificationList();
         }

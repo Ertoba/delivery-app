@@ -21,12 +21,14 @@ import 'package:sixam_mart_delivery/common/widgets/order_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/title_widget.dart';
 import 'package:sixam_mart_delivery/features/home/widgets/count_card_widget.dart';
 import 'package:sixam_mart_delivery/features/home/widgets/earning_widget.dart';
-import 'package:sixam_mart_delivery/features/order/screens/running_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../dashboard/screens/dashboard_screen.dart';
+
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.onNavigateToOrders});
+  final Function()? onNavigateToOrders;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -59,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Get.find<OrderController>().getIgnoreList();
     Get.find<OrderController>().removeFromIgnoreList();
     await Get.find<ProfileController>().getProfile();
-    await Get.find<OrderController>().getCurrentOrders();
+    await Get.find<OrderController>().getRunningOrders(1);
     await Get.find<NotificationController>().getNotificationList();
   }
 
@@ -157,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 2,
         leading: Padding(
           padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-          child: Image.asset(Images.logoIcon, height: 30, width: 30),
+          child: Image.asset(Images.logo, height: 30, width: 30),
         ),
         titleSpacing: 0,
         title: Text(AppConstants.appName, maxLines: 1, overflow: TextOverflow.ellipsis, style: robotoMedium.copyWith(
@@ -210,6 +212,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: SingleChildScrollView(
               child: GetBuilder<ProfileController>(builder: (profileController) {
 
+                bool isPayable = profileController.profileModel != null && profileController.profileModel!.showPayNowButton == true;
+
                 bool showReferAndEarn = Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.earnings == 1
                     && (Get.find<SplashController>().configModel?.dmReferralData?.dmReferalStatus == true
                         || (Get.find<ProfileController>().profileModel?.referalEarning != null && Get.find<ProfileController>().profileModel!.referalEarning! > 0));
@@ -232,8 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         hasActiveOrder ? TitleWidget(
                           title: 'active_order'.tr, showOrderCount: true, orderCount: orderController.currentOrderList?.length ?? 0,
                             onTap: hasMoreOrder ? () {
-                            Get.toNamed(RouteHelper.getRunningOrderRoute(), arguments: const RunningOrderScreen());
-                          } : null,
+                              widget.onNavigateToOrders?.call();
+                            } : null,
                         ) : const SizedBox(),
                         SizedBox(height: hasActiveOrder ? Dimensions.paddingSizeExtraSmall : 0),
 
@@ -408,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: Dimensions.paddingSizeLarge),
 
-                          CustomButtonWidget(
+                          if(isPayable) CustomButtonWidget(
                             width: 90, height: 40,
                             isBold: false,
                             fontSize: Dimensions.fontSizeDefault,

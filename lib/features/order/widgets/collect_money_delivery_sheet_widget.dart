@@ -91,7 +91,7 @@ class CollectMoneyDeliverySheetWidget extends StatelessWidget {
                   Get.find<OrderController>().updateOrderStatus(currentOrderModel, isSenderPay ? 'picked_up' : 'delivered', parcel: isParcel).then((success) {
                     if(success) {
                       Get.find<ProfileController>().getProfile();
-                      Get.find<OrderController>().getCurrentOrders();
+                      Get.find<OrderController>().getRunningOrders(orderController.offset);
                       if(!isSenderPay) {
                         Get.offAllNamed(RouteHelper.getInitialRoute());
                       }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/withdraw_method_model.dart';
 import 'package:sixam_mart_delivery/features/disbursement/domain/models/disbursement_method_model.dart' as disburse;
 import 'package:sixam_mart_delivery/features/disbursement/domain/models/disbursement_report_model.dart' as report;
@@ -208,6 +209,7 @@ class DisbursementController extends GetxController implements GetxService {
       Get.back();
       Get.find<ProfileController>().getProfile();
       getDisbursementMethodList();
+      Get.find<MyAccountController>().getWithdrawRequestList();
       showCustomSnackBar('add_successfully'.tr, isError: false);
     }
     _isLoading = false;

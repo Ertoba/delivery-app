@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_delivery/api/api_client.dart';
@@ -6,6 +9,10 @@ import 'package:sixam_mart_delivery/features/chat/domain/models/conversation_mod
 import 'package:sixam_mart_delivery/features/chat/domain/models/message_model.dart';
 import 'package:sixam_mart_delivery/features/chat/domain/services/chat_service_interface.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
+
+import '../../../common/widgets/custom_snackbar_widget.dart';
+import '../../../helper/date_converter_helper.dart';
+import '../../../helper/responsive_helper.dart';
 
 class ChatController extends GetxController implements GetxService {
   final ChatServiceInterface chatServiceInterface;
@@ -41,6 +48,9 @@ class ChatController extends GetxController implements GetxService {
   int? _offset;
   int? get offset => _offset;
 
+  bool _isEmojiPickerVisible = false;
+  bool get isEmojiPickerVisible => _isEmojiPickerVisible;
+
   ConversationsModel? _conversationModel ;
   ConversationsModel? get conversationModel => _conversationModel;
 
@@ -50,10 +60,37 @@ class ChatController extends GetxController implements GetxService {
   MessageModel? _messageModel;
   MessageModel? get messageModel => _messageModel;
 
-  Future<void> getConversationList(int offset) async{
+  XFile? _pickedVideoFile;
+  XFile? get pickedVideoFile => _pickedVideoFile;
+
+  PlatformFile? _pickedWebVideoFile ;
+  PlatformFile? get pickedWebVideoFile => _pickedWebVideoFile;
+
+  String _type = 'customer';
+  String get type => _type;
+
+  bool _clickTab = false;
+  bool get clickTab => _clickTab;
+
+  List<XFile>? _objFile = [];
+  List<XFile>? get objFile => _objFile;
+
+  List<PlatformFile>? _objWebFile = [];
+  List<PlatformFile>? get objWebFile => _objWebFile;
+
+  double _videoSize = 0.0;
+  double get videoSize => _videoSize;
+
+  List<double> _fileSizeList = [];
+  List<double> get fileSizeList => _fileSizeList;
+
+  bool _singleFIleCrossMaxLimit = false;
+  bool get singleFIleCrossMaxLimit => _singleFIleCrossMaxLimit;
+
+  Future<void> getConversationList(int offset, {String type = ''}) async{
     _searchConversationModel = null;
     _conversationModel = null;
-    ConversationsModel? conversationModel = await chatServiceInterface.getConversationList(offset);
+    ConversationsModel? conversationModel = await chatServiceInterface.getConversationList(offset, type);
     if(conversationModel != null) {
       if(offset == 1) {
         _conversationModel = conversationModel;
@@ -66,10 +103,10 @@ class ChatController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> searchConversation(String name) async {
+  Future<void> searchConversation(String name, {String type = ''}) async {
     _searchConversationModel = ConversationsModel();
     update();
-    ConversationsModel? searchConversationModel = await chatServiceInterface.searchConversationList(name);
+    ConversationsModel? searchConversationModel = await chatServiceInterface.searchConversationList(name, type);
     if(searchConversationModel != null) {
       _searchConversationModel = searchConversationModel;
     }
@@ -120,15 +157,34 @@ class ChatController extends GetxController implements GetxService {
     _isLoading = true;
     update();
 
-    List<MultipartBody> chatImage = chatServiceInterface.processMultipartBody(_chatImage!);
-    MessageModel? messageModel = await chatServiceInterface.processSendMessage(notificationBody, chatImage, message, conversationId);
+    List<MultipartBody> allFiles = [];
+
+    if(_chatImage != null && _chatImage!.isNotEmpty) {
+      allFiles.addAll(chatServiceInterface.processMultipartBody(_chatImage!));
+    }
+
+    if(_objFile != null && _objFile!.isNotEmpty) {
+      allFiles.addAll(chatServiceInterface.processMultipartFiles(_objFile!));
+    }
+
+    if(_pickedVideoFile != null) {
+      allFiles.addAll(chatServiceInterface.processMultipartVideo(_pickedVideoFile));
+    }
+    MessageModel? messageModel = await chatServiceInterface.processSendMessage(notificationBody, allFiles, message, conversationId);
 
     if (messageModel != null) {
       _imageFiles = [];
       _chatImage = [];
+      _objFile = [];
+      _objWebFile = [];
+      _pickedVideoFile = null;
+      _pickedWebVideoFile = null;
+      _videoSize = 0;
+      _fileSizeList = [];
       _isSendButtonActive = false;
       _isLoading = false;
       _messageModel = messageModel;
+
       if(_messageModel!.conversation != null && _messageModel!.conversation!.receiverType == 'delivery_man') {
         User? receiver = _messageModel!.conversation!.receiver;
         _messageModel!.conversation!.receiver = _messageModel!.conversation!.sender;
@@ -164,4 +220,181 @@ class ChatController extends GetxController implements GetxService {
     update();
   }
 
+  String getChatTime(String todayChatTimeInUtc, String? nextChatTimeInUtc) {
+    String chatTime = '';
+    DateTime todayConversationDateTime = DateConverterHelper.isoUtcStringToLocalTimeOnly(todayChatTimeInUtc);
+    try{
+      todayConversationDateTime = DateConverterHelper.isoUtcStringToLocalTimeOnly(todayChatTimeInUtc);
+    }catch(e) {
+      todayConversationDateTime = DateConverterHelper.dateTimeStringToDate(todayChatTimeInUtc);
+    }
+
+    DateTime nextConversationDateTime;
+    DateTime currentDate = DateTime.now();
+
+    if(nextChatTimeInUtc == null){
+      return chatTime = DateConverterHelper.isoStringToLocalDateAndTime(todayChatTimeInUtc);
+    }else{
+      nextConversationDateTime = DateConverterHelper.isoUtcStringToLocalTimeOnly(nextChatTimeInUtc);
+
+      if(todayConversationDateTime.difference(nextConversationDateTime) < const Duration(minutes: 30) &&
+          todayConversationDateTime.weekday == nextConversationDateTime.weekday){
+        chatTime = '';
+      }else if(currentDate.weekday != todayConversationDateTime.weekday
+          && DateConverterHelper.countDays(todayConversationDateTime) < 6){
+        if( (currentDate.weekday -1 == 0 ? 7 : currentDate.weekday -1) == todayConversationDateTime.weekday){
+          chatTime = DateConverterHelper.convert24HourTimeTo12HourTimeWithDay(todayConversationDateTime, false);
+        }else{
+          chatTime = DateConverterHelper.convertStringTimeToDateTime(todayConversationDateTime);
+        }
+
+      }else if(currentDate.weekday == todayConversationDateTime.weekday
+          && DateConverterHelper.countDays(todayConversationDateTime) < 6){
+        chatTime = DateConverterHelper.convert24HourTimeTo12HourTimeWithDay(todayConversationDateTime, true);
+      }else{
+        chatTime = DateConverterHelper.isoStringToLocalDateAndTime(todayChatTimeInUtc);
+      }
+    }
+    return chatTime;
+  }
+
+  String getChatTimeWithPrevious (Message currentChat, Message? previousChat) {
+    DateTime todayConversationDateTime = DateConverterHelper.isoUtcStringToLocalTimeOnly(currentChat.createdAt ?? "");
+
+    DateTime previousConversationDateTime;
+
+    if(previousChat?.createdAt == null) {
+      return 'Not-Same';
+    } else {
+      previousConversationDateTime = DateConverterHelper.isoUtcStringToLocalTimeOnly(previousChat!.createdAt!);
+
+      if(previousConversationDateTime.difference(todayConversationDateTime) < const Duration(minutes: 30) &&
+          todayConversationDateTime.weekday == previousConversationDateTime.weekday && _isSameUserWithPreviousMessage(currentChat, previousChat)) {
+        return '';
+      } else {
+        return 'Not-Same';
+      }
+    }
+  }
+
+  bool _isSameUserWithPreviousMessage(Message? previousConversation, Message? currentConversation){
+    if(previousConversation?.senderId == currentConversation?.senderId && previousConversation?.message != null && currentConversation?.message !=null){
+      return true;
+    }
+    return false;
+  }
+
+  void toggleEmojiPicker() {
+    _isEmojiPickerVisible = !_isEmojiPickerVisible;
+    update();
+  }
+
+  void setType(String type, {bool willUpdate = true}) {
+    _type = type;
+    if(willUpdate) {
+      update();
+    }
+  }
+
+  void setTabSelect() {
+    _clickTab = !_clickTab;
+  }
+
+  void pickFile(bool isRemove, {int? index}) async {
+    if(isRemove) {
+      if(index != null) {
+        if(ResponsiveHelper.isWeb()) {
+          _objWebFile!.removeAt(index);
+          _fileSizeList.removeAt(index);
+        } else {
+          _objFile!.removeAt(index);
+          _fileSizeList.removeAt(index);
+        }
+      } else {
+        _objFile = [];
+        _objWebFile = [];
+        _fileSizeList = [];
+      }
+    } else {
+      if(ResponsiveHelper.isWeb()) {
+        FilePickerResult? result = await FilePicker.platform.pickFiles(
+          allowMultiple: true,
+          type: FileType.custom,
+          allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
+        );
+        if (result != null && result.files.isNotEmpty) {
+          for (var file in result.files) {
+            double fileSize = (file.size / (1024 * 1024));
+            if(fileSize <= 2) {
+              _objWebFile!.add(file);
+              _fileSizeList.add(fileSize);
+            } else {
+              showCustomSnackBar('file_size_too_large'.tr);
+            }
+          }
+          _isSendButtonActive = true;
+        }
+      } else {
+        FilePickerResult? result = await FilePicker.platform.pickFiles(
+          allowMultiple: true,
+          type: FileType.custom,
+          allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
+        );
+        if (result != null && result.files.isNotEmpty) {
+          for (var file in result.files) {
+            File selectedFile = File(file.path!);
+            double fileSize = (await selectedFile.length()) / (1024 * 1024);
+            if(fileSize <= 2) {
+              _objFile!.add(XFile(file.path!));
+              _fileSizeList.add(fileSize);
+            } else {
+              showCustomSnackBar('file_size_too_large'.tr);
+            }
+          }
+          _isSendButtonActive = true;
+        }
+      }
+    }
+    update();
+  }
+
+  void pickVideoFile(bool isRemove) async {
+    if(isRemove) {
+      _pickedVideoFile = null;
+      _pickedWebVideoFile = null;
+      _videoSize = 0;
+    } else {
+      if(ResponsiveHelper.isWeb()) {
+        FilePickerResult? result = await FilePicker.platform.pickFiles(
+          type: FileType.video,
+        );
+        if (result != null && result.files.isNotEmpty) {
+          PlatformFile file = result.files.first;
+          double fileSize = (file.size / (1024 * 1024));
+          if(fileSize <= 2) {
+            _pickedWebVideoFile = file;
+            _videoSize = fileSize;
+            _isSendButtonActive = true;
+          } else {
+            showCustomSnackBar('video_size_too_large'.tr);
+          }
+        }
+      } else {
+        final ImagePicker picker = ImagePicker();
+        XFile? video = await picker.pickVideo(source: ImageSource.gallery);
+        if (video != null) {
+          File videoFile = File(video.path);
+          double fileSize = (await videoFile.length()) / (1024 * 1024);
+          if(fileSize <= 2) {
+            _pickedVideoFile = video;
+            _videoSize = fileSize;
+            _isSendButtonActive = true;
+          } else {
+            showCustomSnackBar('video_size_too_large'.tr);
+          }
+        }
+      }
+    }
+    update();
+  }
 }

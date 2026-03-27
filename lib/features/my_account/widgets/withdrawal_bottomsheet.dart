@@ -237,7 +237,8 @@ class _WithdrawBottomSheetState extends State<WithdrawBottomSheet> {
                     } else{
                       Map<String, dynamic> data = {};
                       data['id'] = disburseController.widthDrawMethods?[disburseController.selectedMethodIndex!].id.toString();
-                      data['amount'] = amountController.text.trim();
+                      double amountValue = double.tryParse(amountController.text.trim()) ?? 0.0;
+                      data['amount'] = amountValue.toStringAsFixed(2);
                       data['sender_note'] = noteController.text.trim();
 
                       for (int i = 0; i < disburseController.methodFields.length; i++) {
@@ -254,7 +255,9 @@ class _WithdrawBottomSheetState extends State<WithdrawBottomSheet> {
                       await disburseController.createWithdrawRequest(data).then((success){
                         if(success){
                           Get.back();
-                          Get.dialog(const SuccessDialogWidget());
+                          Future.delayed(Duration(milliseconds: 1000),(){
+                            Get.dialog(const SuccessDialogWidget());
+                          });
                         }
                       });
                     }

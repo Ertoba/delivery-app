@@ -1,12 +1,9 @@
 class Images {
   static const String logo = 'assets/image/logo.png';
-  static const String logoIcon = 'assets/image/logo_icon.png';
   static const String call = 'assets/image/call.png';
   static const String lock = 'assets/image/lock.png';
   static const String english = 'assets/image/english.png';
   static const String arabic = 'assets/image/arabic.png';
-  static const String georgian = 'assets/image/georgian.png';
-  static const String russian = 'assets/image/russian.png';
   static const String spanish = 'assets/image/spanish.png';
   static const String bangla = 'assets/image/bangla.png';
   static const String mail = 'assets/image/mail.png';
@@ -93,6 +90,11 @@ class Images {
   static const String refferalIcon = 'assets/image/refferalIcon.png';
   static const String loyaltyPoint2 = 'assets/image/loyaltyPoint.png';
   static const String payMoneyImage = 'assets/image/pay_money_image.png';
+  static const String giftIcon = 'assets/image/gift.png';
+  static const String chatIcon = 'assets/image/chat_icon.png';
+  static const String callIcon = 'assets/image/call_icon.png';
+  static const String fileIcon = 'assets/image/clip.png';
+  static const String coinIcon = 'assets/image/coin_icon.png';
 
   ///Svg Images
   static const String changePasswordBgImage = 'assets/image/change_password_bg_image.svg';

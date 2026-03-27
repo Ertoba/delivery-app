@@ -4,6 +4,7 @@ import 'package:sixam_mart_delivery/api/api_client.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/order/domain/models/ignore_model.dart';
 import 'package:sixam_mart_delivery/features/order/domain/models/order_cancellation_body.dart';
+import 'package:sixam_mart_delivery/features/order/domain/models/order_count_model.dart';
 import 'package:sixam_mart_delivery/features/order/domain/models/order_details_model.dart';
 import 'package:sixam_mart_delivery/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart_delivery/features/order/domain/models/parcel_cancellation_reasons_model.dart';
@@ -26,13 +27,13 @@ class OrderService implements OrderServiceInterface {
   }
 
   @override
-  Future<PaginatedOrderModel?> getCompletedOrderList(int offset) async {
-    return await orderRepositoryInterface.getCompletedOrderList(offset);
+  Future<PaginatedOrderModel?> getCompletedOrderList(int offset, {String orderStatus = 'all'}) async {
+    return await orderRepositoryInterface.getCompletedOrderList(offset, orderStatus: orderStatus);
   }
 
   @override
-  Future<List<OrderModel>?> getCurrentOrders() async {
-    return await orderRepositoryInterface.getList();
+  Future<PaginatedOrderModel?> getCurrentOrders(int offset, {String orderStatus = 'all'}) async {
+    return await orderRepositoryInterface.getCurrentOrders(offset, orderStatus: orderStatus);
   }
 
   @override
@@ -119,6 +120,11 @@ class OrderService implements OrderServiceInterface {
       multiParts.add(MultipartBody('order_proof[]', file));
     }
     return multiParts;
+  }
+
+  @override
+  Future<List<OrderCountModel>?> getOrderCount(String type) async {
+    return await orderRepositoryInterface.getOrderCount(type);
   }
 
 }

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../../util/images.dart';
+
 class InfoCardWidget extends StatelessWidget {
   final String title;
   final String image;
@@ -35,11 +37,31 @@ class InfoCardWidget extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(height: Dimensions.paddingSizeSmall),
 
-        Text(title, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+        Row( crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+          Spacer(),
+
+          isStore && isChatAllow ? order.isGuest! ? const SizedBox() : GestureDetector(
+            onTap:  messageOnTap as void Function()?,
+            child: Image.asset(Images.chatIcon, width: 24),
+          ) : const SizedBox(),
+          SizedBox(width: Dimensions.paddingSizeSmall),
+          GestureDetector(
+            onTap: () async {
+              if(await canLaunchUrlString('tel:$phone')) {
+                launchUrlString('tel:$phone', mode: LaunchMode.externalApplication);
+              }else {
+                showCustomSnackBar('invalid_phone_number_found');
+              }
+            },
+            child: Image.asset(Images.callIcon, width: 24),
+          ),
+        ]),
         const SizedBox(height: Dimensions.paddingSizeSmall),
 
         (name != null && name!.isNotEmpty) ? Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
+          // Image
           ClipOval(child: CustomImageWidget(
             image: image,
             height: 40, width: 40, fit: BoxFit.cover,
@@ -47,75 +69,58 @@ class InfoCardWidget extends StatelessWidget {
           const SizedBox(width: Dimensions.paddingSizeSmall),
 
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
+            // Name
             Text(name!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
             const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+            // Address
+            Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Expanded(
+                child: Column( crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(address!.address ?? '',
+                    style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor), maxLines: 2, overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: address!.address != null ? Dimensions.paddingSizeExtraSmall : 0),
+                  Wrap(children: [
+                    (address!.streetNumber != null && address!.streetNumber!.isNotEmpty) ? Text('${'street_number'.tr}: ${address!.streetNumber!}, ',
+                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor), maxLines: 1, overflow: TextOverflow.ellipsis,
+                    ) : const SizedBox(),
 
-            Text(
-              address!.address ?? '',
-              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor), maxLines: 2, overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: address!.address != null ? Dimensions.paddingSizeExtraSmall : 0),
+                    (address!.house != null && address!.house!.isNotEmpty) ? Text('${'house'.tr}: ${address!.house!}, ',
+                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor), maxLines: 1, overflow: TextOverflow.ellipsis,
+                    ) : const SizedBox(),
 
-            Wrap(children: [
-              (address!.streetNumber != null && address!.streetNumber!.isNotEmpty) ? Text('${'street_number'.tr}: ${address!.streetNumber!}, ',
-                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor), maxLines: 1, overflow: TextOverflow.ellipsis,
-              ) : const SizedBox(),
-
-              (address!.house != null && address!.house!.isNotEmpty) ? Text('${'house'.tr}: ${address!.house!}, ',
-                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor), maxLines: 1, overflow: TextOverflow.ellipsis,
-              ) : const SizedBox(),
-
-              (address!.floor != null && address!.floor!.isNotEmpty) ? Text('${'floor'.tr}: ${address!.floor!}' ,
-                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor), maxLines: 1, overflow: TextOverflow.ellipsis,
-              ) : const SizedBox(),
-
+                    (address!.floor != null && address!.floor!.isNotEmpty) ? Text('${'floor'.tr}: ${address!.floor!}' ,
+                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor), maxLines: 1, overflow: TextOverflow.ellipsis,
+                    ) : const SizedBox(),
+                  ]),
+                ]),
+              ),
+              showButton ? Container(
+                padding: EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).disabledColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4)
+                ),
+                child: Row(children: [
+                  GestureDetector(
+                    onTap: () async {
+                      String url ='https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&mode=d';
+                      if (await canLaunchUrlString(url)) {
+                        await launchUrlString(url, mode: LaunchMode.externalApplication);
+                      } else {
+                        throw '${'could_not_launch'.tr} $url';
+                      }
+                    },
+                    child: Row(children: [
+                      Icon(Icons.directions, color: Theme.of(context).disabledColor, size: 20),
+                      SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                      Text('direction'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor)),
+                    ]),
+                  ),
+                ]),
+              ) : const SizedBox(height: Dimensions.paddingSizeDefault),
             ]),
-
-            showButton ? Row(children: [
-
-              TextButton.icon(
-                onPressed: () async {
-                  if(await canLaunchUrlString('tel:$phone')) {
-                    launchUrlString('tel:$phone', mode: LaunchMode.externalApplication);
-                  }else {
-                    showCustomSnackBar('invalid_phone_number_found');
-                  }
-                },
-                icon: Icon(Icons.call, color: Theme.of(context).primaryColor, size: 20),
-                label: Text(
-                  'call'.tr,
-                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
-                ),
-              ),
-
-              isStore && isChatAllow ? order.isGuest! ? const SizedBox() : TextButton.icon(
-                onPressed: messageOnTap as void Function()?,
-                icon: Icon(Icons.message, color: Theme.of(context).primaryColor, size: 20),
-                label: Text(
-                  'chat'.tr,
-                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
-                ),
-              ) : const SizedBox(),
-
-              TextButton.icon(
-                onPressed: () async {
-                  String url ='https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&mode=d';
-                  if (await canLaunchUrlString(url)) {
-                    await launchUrlString(url, mode: LaunchMode.externalApplication);
-                  } else {
-                    throw '${'could_not_launch'.tr} $url';
-                  }
-                },
-                icon: Icon(Icons.directions, color: Theme.of(context).disabledColor, size: 20),
-                label: Text(
-                  'direction'.tr,
-                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-                ),
-              ),
-
-            ]) : const SizedBox(height: Dimensions.paddingSizeDefault),
-
+            SizedBox(height: Dimensions.paddingSizeExtraSmall)
           ])),
 
         ]) : Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),

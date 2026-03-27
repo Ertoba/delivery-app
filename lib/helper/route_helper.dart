@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:sixam_mart_delivery/features/auth/screens/dm_registration_success_screen.dart';
 import 'package:sixam_mart_delivery/features/disbursement/domain/models/disbursement_method_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/screens/edit_withdraw_method_screen.dart';
@@ -26,12 +27,12 @@ import 'package:sixam_mart_delivery/features/html/screens/html_viewer_screen.dar
 import 'package:sixam_mart_delivery/features/language/screens/language_screen.dart';
 import 'package:sixam_mart_delivery/features/notification/screens/notification_screen.dart';
 import 'package:sixam_mart_delivery/features/order/screens/order_details_screen.dart';
-import 'package:sixam_mart_delivery/features/order/screens/running_order_screen.dart';
 import 'package:sixam_mart_delivery/features/profile/screens/update_profile_screen.dart';
 import 'package:sixam_mart_delivery/features/splash/screens/splash_screen.dart';
 import 'package:sixam_mart_delivery/features/update/screens/update_screen.dart';
 import 'package:get/get.dart';
-
+// Create a file: lib/util/app_constants.dart or add to existing constants
+final GlobalKey<DashboardScreenState> dashboardKey = GlobalKey<DashboardScreenState>();
 class RouteHelper {
   static const String initial = '/';
   static const String splash = '/splash';
@@ -126,7 +127,7 @@ class RouteHelper {
   }
 
   static List<GetPage> routes = [
-    GetPage(name: initial, page: () => DashboardScreen(pageIndex: 0, fromOrderDetails: Get.parameters['from_order_details'] == 'true')),
+    GetPage(name: initial, page: () => DashboardScreen(key: dashboardKey, pageIndex: 0, fromOrderDetails: Get.parameters['from_order_details'] == 'true')),
     GetPage(name: splash, page: () {
       NotificationBodyModel? data;
       if(Get.parameters['data'] != 'null') {
@@ -160,7 +161,6 @@ class RouteHelper {
     }),
     GetPage(name: updateProfile, page: () => const UpdateProfileScreen()),
     GetPage(name: notification, page: () => NotificationScreen(fromNotification: Get.parameters['from'] == 'true')),
-    GetPage(name: runningOrder, page: () => const RunningOrderScreen()),
     GetPage(name: terms, page: () => const HtmlViewerScreen(isPrivacyPolicy: false)),
     GetPage(name: privacy, page: () => const HtmlViewerScreen(isPrivacyPolicy: true)),
     GetPage(name: language, page: () => const ChooseLanguageScreen()),

@@ -2,11 +2,11 @@ import 'package:sixam_mart_delivery/features/language/domain/models/language_mod
 import 'package:sixam_mart_delivery/util/images.dart';
 
 class AppConstants {
-  static const String appName = 'პორტალი კურიერი';
-  static const double appVersion = 3.6; ///Flutter sdk 3.38.5
+  static const String appName = '6amMart Delivery';
+  static const double appVersion = 3.7; ///Flutter sdk 3.41.1
   static const String fontFamily = 'Roboto';
 
-  static const String baseUrl = 'https://portal.crypt.ge';
+  static const String baseUrl = 'https://6ammart-admin.6amtech.com';
 
   static const String configUri = '/api/v1/config';
   static const String forgetPasswordUri = '/api/v1/auth/delivery-man/forgot-password';
@@ -61,6 +61,7 @@ class AppConstants {
   static const String loyaltyReportUri = '/api/v1/delivery-man/loyalty-report';
   static const String loyaltyPointListUri = '/api/v1/delivery-man/loyalty-point-list';
   static const String pointConvertUri = '/api/v1/delivery-man/convert-loyalty-points';
+  static const String orderCount = '/api/v1/delivery-man/orders-count';
 
   ///chat url
   static const String getConversationListUri = '/api/v1/delivery-man/message/list';
@@ -111,8 +112,9 @@ class AppConstants {
   static const String vendor = 'vendor';
 
   static List<LanguageModel> languages = [
-    LanguageModel(imageUrl: Images.georgian, languageName: 'ქართული', countryCode: 'GE', languageCode: 'ka'),
-    LanguageModel(imageUrl: Images.russian, languageName: 'Русский', countryCode: 'RU', languageCode: 'ru'),
     LanguageModel(imageUrl: Images.english, languageName: 'English', countryCode: 'US', languageCode: 'en'),
+    LanguageModel(imageUrl: Images.arabic, languageName: 'Arabic', countryCode: 'SA', languageCode: 'ar'),
+    LanguageModel(imageUrl: Images.spanish, languageName: 'Spanish', countryCode: 'ES', languageCode: 'es'),
+    LanguageModel(imageUrl: Images.bangla, languageName: 'Bengali', countryCode: 'BN', languageCode: 'bn'),
   ];
 }

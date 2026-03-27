@@ -163,7 +163,7 @@ class _VerifyDeliverySheetWidgetState extends State<VerifyDeliverySheetWidget> {
                   Get.find<OrderController>().updateOrderStatus(widget.currentOrderModel, widget.currentOrderModel.orderStatus == 'handover' ? 'picked_up' : 'delivered', parcel: widget.isParcel).then((success) {
                     if(success) {
                       Get.find<ProfileController>().getProfile();
-                      Get.find<OrderController>().getCurrentOrders();
+                      Get.find<OrderController>().getRunningOrders(orderController.offset);
                       if(!widget.isSenderPay) {
                         Get.offAllNamed(RouteHelper.getInitialRoute());
                       }

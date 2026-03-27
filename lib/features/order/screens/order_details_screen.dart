@@ -24,6 +24,8 @@ import 'package:sixam_mart_delivery/features/order/widgets/info_card_widget.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../widgets/custom_order_details_card.dart';
+
 class OrderDetailsScreen extends StatefulWidget {
   final int? orderId;
   final bool? isRunningOrder;
@@ -110,7 +112,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
 
             bool restConfModel = Get.find<SplashController>().configModel!.orderConfirmationModel != 'deliveryman';
 
-            bool? parcel, pickedUp, cod, wallet, partialPay, offlinePay;
+            bool? parcel, pickedUp, cod, wallet, partialPay, offlinePay, digitalyPaid;
 
             bool showDeliveryConfirmImage = false;
 
@@ -167,6 +169,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
               pickedUp = controllerOrderModel.orderStatus == AppConstants.pickedUp;
               cod = controllerOrderModel.paymentMethod == 'cash_on_delivery';
               wallet = controllerOrderModel.paymentMethod == 'wallet';
+              digitalyPaid = controllerOrderModel.paymentMethod == 'ssl_commerz';
               partialPay = controllerOrderModel.paymentMethod == 'partial_payment';
               offlinePay = controllerOrderModel.paymentMethod == 'offline_payment';
 
@@ -177,25 +180,28 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
 
               Expanded(child: SingleChildScrollView(
                 padding: EdgeInsets.all(Dimensions.paddingSizeDefault),
-                physics: const BouncingScrollPhysics(),
+                physics: const ClampingScrollPhysics(),
                 child: Column(children: [
 
                   Row(children: [
                     Text('${parcel! ? 'delivery_id'.tr : 'order_id'.tr}:', style: robotoRegular),
                     const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
-                    Text(controllerOrderModel.id.toString(), style: robotoMedium),
+                    Text(controllerOrderModel.id.toString(), style: robotoBold),
                     const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                     const Expanded(child: SizedBox()),
-                    Container(height: 7, width: 7, decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.green)),
+                    Container(height: 7, width: 7,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: controllerOrderModel.orderStatus?.toLowerCase() == "canceled" ? Colors.red : Colors.green,
+                      ),
+                    ),
                     const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
-                    Text(
-                      controllerOrderModel.orderStatus!.tr,
-                      style: robotoRegular,
-                    ),
+                    Text(controllerOrderModel.orderStatus!.tr, style: robotoBold),
                   ]),
+
                   const SizedBox(height: Dimensions.paddingSizeLarge),
 
                   parcel && order?.orderStatus == AppConstants.canceled && !(order?.parcelCancellation?.beforePickup == 1) ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -203,13 +209,27 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
 
                     Text(order?.parcelCancellation?.returnDate != null ? DateConverterHelper.dateTimeStringToDateTime(order!.parcelCancellation!.returnDate!) : 'not_set_yet'.tr, style: robotoRegular),
                   ]) : const SizedBox(),
+
+                  controllerOrderModel.scheduleAt!.isNotEmpty && controllerOrderModel.scheduleAt != null ? Column(children: [
+                    Row(children: [
+                      Text('${'schedule'.tr} ', style: robotoRegular),
+                      const Expanded(child: SizedBox()),
+
+                      Text(
+                        DateConverterHelper.dateTimeStringToDateTime(controllerOrderModel.scheduleAt!),
+                        style: robotoRegular,
+                      ),
+                    ]),
+                    const SizedBox(height: Dimensions.paddingSizeLarge),
+                  ]) : const SizedBox(),
+
                   SizedBox(height: parcel && order?.orderStatus == AppConstants.canceled && !(order?.parcelCancellation?.beforePickup == 1) ? Dimensions.paddingSizeLarge : 0),
 
                   Row(children: [
-                    Text('${parcel ? 'charge_payer'.tr : 'item'.tr}:', style: robotoRegular),
+                    Text('${digitalyPaid == true && controllerOrderModel.chargePayer != null ? 'paid_by'.tr : parcel ? 'charge_payer'.tr : 'item'.tr}:', style: robotoRegular),
                     const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                     Text(
-                      parcel ? controllerOrderModel.chargePayer!.tr : orderController.orderDetailsModel!.length.toString(),
+                      digitalyPaid == true && controllerOrderModel.chargePayer != null ? controllerOrderModel.chargePayer! : parcel ? controllerOrderModel.chargePayer!.tr : orderController.orderDetailsModel!.length.toString(),
                       style: robotoMedium.copyWith(color: Theme.of(context).primaryColor),
                     ),
                     const Expanded(child: SizedBox()),
@@ -219,16 +239,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                       child: Text(
                         cod! ? 'cod'.tr : wallet! ? 'wallet'.tr : partialPay! ? 'partially_pay'.tr : offlinePay! ? 'offline_payment'.tr : 'digitally_paid'.tr,
                         style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor),
-                      ),
-                    ),
+                      )
+                    )
                   ]),
-                  const SizedBox(height: Dimensions.paddingSizeSmall),
 
                   orderController.orderDetailsModel!.isNotEmpty && orderController.orderDetailsModel![0].itemDetails != null && orderController.orderDetailsModel![0].itemDetails!.moduleType == 'food' ? Column(children: [
-                    const Divider(height: Dimensions.paddingSizeLarge),
-
+                    const SizedBox(height: Dimensions.paddingSizeLarge),
                     Row(children: [
-                      Text('${'cutlery'.tr}: ', style: robotoRegular),
+                      Text('${'cutlery'.tr} ', style: robotoRegular),
                       const Expanded(child: SizedBox()),
 
                       Text(
@@ -237,43 +255,30 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                       ),
                     ]),
                   ]) : const SizedBox(),
-                  SizedBox(height: orderController.orderDetailsModel!.isNotEmpty && orderController.orderDetailsModel![0].itemDetails != null && orderController.orderDetailsModel![0].itemDetails!.moduleType == 'food' ? Dimensions.paddingSizeSmall : 0),
 
-                  controllerOrderModel.unavailableItemNote != null ? Column(
-                    children: [
-                      const Divider(height: Dimensions.paddingSizeLarge),
+                  SizedBox(height: Dimensions.paddingSizeSmall),
+                  Divider(thickness: 1, color: Theme.of(context).disabledColor.withValues(alpha: 0.05)),
+                  SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                      Row(children: [
-                        Text('${'unavailable_item_note'.tr}: ', style: robotoMedium),
-
-                        Text(
-                          controllerOrderModel.unavailableItemNote!,
-                          style: robotoRegular,
-                        ),
-                      ]),
-                    ],
-                  ) : const SizedBox(),
+                  controllerOrderModel.unavailableItemNote != null ?
+                    CustomOrderDetailsCard(
+                      title: '${'unavailable_item_note'.tr}: ' ,
+                      metaValue: controllerOrderModel.unavailableItemNote!,
+                    ) : const SizedBox(),
                   SizedBox(height: controllerOrderModel.unavailableItemNote != null ? Dimensions.paddingSizeSmall : 0),
 
-                  controllerOrderModel.deliveryInstruction != null ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Divider(height: Dimensions.paddingSizeLarge),
-                    RichText(
-                      textAlign: TextAlign.start,
-                      text: TextSpan(
-                          text: '${'delivery_instruction'.tr}: ',
-                          style: robotoMedium.copyWith(color: Theme.of(context).textTheme.bodyMedium!.color),
-                          children: <TextSpan>[
-                            TextSpan(text: controllerOrderModel.deliveryInstruction!.tr,
-                                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)
-                            )
-                          ]
-                      ),
-                    ),
-                  ]) : const SizedBox(),
+                  controllerOrderModel.deliveryInstruction != null ?
+                  CustomOrderDetailsCard(
+                    title: '${'delivery_instruction'.tr}: ' ,
+                    metaValue: controllerOrderModel.deliveryInstruction!.tr,
+                  ) : const SizedBox(),
+
                   SizedBox(height: controllerOrderModel.deliveryInstruction != null ? Dimensions.paddingSizeSmall : 0),
 
-                  controllerOrderModel.bringChangeAmount != null && controllerOrderModel.bringChangeAmount! > 0 ? Container(
+                  controllerOrderModel.bringChangeAmount != null && controllerOrderModel.bringChangeAmount! > 0 ?
+                  Container(
                     width: double.infinity,
+                    margin: EdgeInsets.only(top: Dimensions.paddingSizeSmall),
                     padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                     decoration: BoxDecoration(
                       color: const Color(0XFF009AF1).withValues(alpha: 0.1),
@@ -306,7 +311,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                       ),
                       user: User(
                         id: controllerOrderModel.storeId, fName: controllerOrderModel.storeName,
-                        imageFullUrl: controllerOrderModel.storeLogoFullUrl,
+                        imageFullUrl: controllerOrderModel.storeLogoFullUrl, phone: controllerOrderModel.storePhone
                       ),
                     )),
                     order: order!,
@@ -331,6 +336,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                       user: User(
                         id: controllerOrderModel.customer!.id, fName: controllerOrderModel.customer!.fName,
                         lName: controllerOrderModel.customer!.lName, imageFullUrl: controllerOrderModel.customer!.imageFullUrl,
+                          phone: controllerOrderModel.customer?.phone,
                       ),
                     )),
                     order: order,
@@ -345,10 +351,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                       boxShadow: Get.isDarkMode ? null : [BoxShadow(color: Colors.grey[200]!, spreadRadius: 1, blurRadius: 5)],
                     ),
                     child: controllerOrderModel.parcelCategory != null ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('parcel_category'.tr, style: robotoRegular),
+                      Text('parcel_category'.tr, style: robotoBold),
                       const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                       Row(children: [
-                        ClipOval(child: CustomImageWidget(
+                        ClipRRect(borderRadius: BorderRadius.circular(Dimensions.radiusSmall), child: CustomImageWidget(
                           image: '${controllerOrderModel.parcelCategory!.imageFullUrl}',
                           height: 35, width: 35, fit: BoxFit.cover,
                         )),
@@ -373,13 +379,30 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                         Text('no_parcel_category_data_found'.tr, style: robotoMedium),
                       ]),
                     ),
-                  ) : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: orderController.orderDetailsModel!.length,
-                    itemBuilder: (context, index) {
-                      return OrderItemWidget(order: controllerOrderModel, orderDetails: orderController.orderDetailsModel![index]);
-                    },
+                  ) : Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      boxShadow: Get.isDarkMode ? null : [BoxShadow(color: Colors.grey[200]!, spreadRadius: 1, blurRadius: 5)],
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    child: Column(
+                      spacing: 10, crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('item_info'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: orderController.orderDetailsModel!.length,
+                          itemBuilder: (context, index) {
+                            return OrderItemWidget(order: controllerOrderModel, orderDetails: orderController.orderDetailsModel![index]);
+                          },
+                          separatorBuilder: (context, index){
+                            return Divider(height: 25,);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: parcel && order.parcelCancellation != null ? Dimensions.paddingSizeLarge : 0),
 
@@ -465,58 +488,76 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                     ]),
                   ) : const SizedBox(),
 
-                  (controllerOrderModel.orderNote != null && controllerOrderModel.orderNote!.isNotEmpty) ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('additional_note'.tr, style: robotoRegular),
-                    const SizedBox(height: Dimensions.paddingSizeSmall),
-                    Container(
-                      width: 1170,
-                      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(width: 1, color: Theme.of(context).disabledColor),
-                      ),
-                      child: Text(
-                        controllerOrderModel.orderNote!,
-                        style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-                      ),
+                  (controllerOrderModel.orderNote != null && controllerOrderModel.orderNote!.isNotEmpty) ? Container(
+                    margin: !parcel ? EdgeInsets.only(top: Dimensions.paddingSizeLarge) : null,
+                    padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      boxShadow: Get.isDarkMode ? null : [BoxShadow(color: Colors.grey[200]!, spreadRadius: 1, blurRadius: 5)],
                     ),
-                  ]) : const SizedBox(),
-                  SizedBox(height: (controllerOrderModel.orderNote != null && controllerOrderModel.orderNote!.isNotEmpty) ? Dimensions.paddingSizeLarge : 0),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('additional_note'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+                      const SizedBox(height: Dimensions.paddingSizeSmall),
+                      Container(
+                        width: 1170,
+                        padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(width: 1, color: Theme.of(context).disabledColor),
+                        ),
+                        child: Text(
+                          controllerOrderModel.orderNote!,
+                          style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
+                        ),
+                      ),
+                    ]),
+                  ) : const SizedBox(),
+                  // SizedBox(height: (controllerOrderModel.orderNote != null && controllerOrderModel.orderNote!.isNotEmpty) ? Dimensions.paddingSizeLarge : 0),
 
                   (Get.find<SplashController>().getModule(controllerOrderModel.moduleType).orderAttachment!
                       && controllerOrderModel.orderAttachmentFullUrl != null && controllerOrderModel.orderAttachmentFullUrl!.isNotEmpty)
-                      ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('prescription'.tr, style: robotoRegular),
-                    const SizedBox(height: Dimensions.paddingSizeSmall),
+                      ? Container(
+                        margin: EdgeInsets.only(top: Dimensions.paddingSizeLarge),
+                        padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                          boxShadow: Get.isDarkMode ? null : [BoxShadow(color: Colors.grey[200]!, spreadRadius: 1, blurRadius: 5)],
+                        ),
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text('prescription'.tr, style: robotoRegular),
+                          const SizedBox(height: Dimensions.paddingSizeSmall),
 
-                    GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        childAspectRatio: 1.5,
-                        crossAxisCount: ResponsiveHelper.isTab(context) ? 5 : 3,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 5,
-                      ),
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: controllerOrderModel.orderAttachmentFullUrl!.length,
-                      itemBuilder: (BuildContext context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: InkWell(
-                            onTap: () => openDialog(context, controllerOrderModel.orderAttachmentFullUrl![index]),
-                            child: Center(child: ClipRRect(
-                              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                              child: CustomImageWidget(
-                                image: controllerOrderModel.orderAttachmentFullUrl![index],
-                                width: 100, height: 100,
-                              ),
-                            )),
+                          GridView.builder(
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              childAspectRatio: 1.5,
+                              crossAxisCount: ResponsiveHelper.isTab(context) ? 5 : 3,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 5,
+                            ),
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: controllerOrderModel.orderAttachmentFullUrl!.length,
+                            itemBuilder: (BuildContext context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: InkWell(
+                                  onTap: () => openDialog(context, controllerOrderModel.orderAttachmentFullUrl![index]),
+                                  child: Center(child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                                    child: CustomImageWidget(
+                                      image: controllerOrderModel.orderAttachmentFullUrl![index],
+                                      width: 100, height: 100,
+                                    ),
+                                  )),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: Dimensions.paddingSizeLarge),
-                  ]) : const SizedBox(),
+                          const SizedBox(height: Dimensions.paddingSizeLarge),
+                        ]),
+                      ) : const SizedBox(),
 
                   (controllerOrderModel.orderStatus == 'delivered' && controllerOrderModel.orderProofFullUrl != null
                   && controllerOrderModel.orderProofFullUrl!.isNotEmpty) ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -550,182 +591,194 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                         );
                       },
                     ),
-
-                    const SizedBox(height: Dimensions.paddingSizeLarge),
                   ]) : const SizedBox(),
-                  const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
-                  !parcel ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Text('item_price'.tr, style: robotoRegular),
-                    Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(PriceConverterHelper.convertPrice(itemsPrice), style: robotoRegular),
-                    ]),
-                  ]) : const SizedBox(),
-                  SizedBox(height: !parcel ? 10 : 0),
 
-                  Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('addons'.tr, style: robotoRegular),
-                      Text('(+) ${PriceConverterHelper.convertPrice(addOns)}', style: robotoRegular),
-                    ],
-                  ) : const SizedBox(),
-
-                  Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? Divider(
-                    thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.5),
-                  ) : const SizedBox(),
-
-                  Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('subtotal'.tr, style: robotoMedium),
-                      Text(PriceConverterHelper.convertPrice(subTotal), style: robotoMedium),
-                    ],
-                  ) : const SizedBox(),
-                  SizedBox(height: Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? 10 : 0),
-
-                  !parcel ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Text('discount'.tr, style: robotoRegular),
-                    Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text('(-) ${PriceConverterHelper.convertPrice(discount)}', style: robotoRegular),
-                    ]),
-                  ]) : const SizedBox(),
-                  SizedBox(height: !parcel ? 10 : 0),
-
-                  couponDiscount > 0 ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Text('coupon_discount'.tr, style: robotoRegular),
-                    Text(
-                      '(-) ${PriceConverterHelper.convertPrice(couponDiscount)}',
-                      style: robotoRegular,
+                  Container(
+                    margin: EdgeInsets.only(top: Dimensions.paddingSizeLarge),
+                    padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      boxShadow: Get.isDarkMode ? null : [BoxShadow(color: Colors.grey[200]!, spreadRadius: 1, blurRadius: 5)],
                     ),
-                  ]) : const SizedBox(),
-                  SizedBox(height: couponDiscount > 0 ? 10 : 0),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('billing_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+                      SizedBox(height: Dimensions.paddingSizeSmall),
 
-                  (referrerBonusAmount > 0) ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('referral_discount'.tr, style: robotoRegular),
-                      Text('(-) ${PriceConverterHelper.convertPrice(referrerBonusAmount)}', style: robotoRegular),
-                    ],
-                  ) : const SizedBox(),
-                  SizedBox(height: referrerBonusAmount > 0 ? 10 : 0),
-
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Text('delivery_fee'.tr, style: robotoRegular),
-                    Text('(+) ${PriceConverterHelper.convertPrice(deliveryCharge)}', style: robotoRegular),
-                  ]),
-                  const SizedBox(height: 10),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('delivery_man_tips'.tr, style: robotoRegular),
-                      Text('(+) ${PriceConverterHelper.convertPrice(dmTips)}', style: robotoRegular),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-
-                  (extraPackagingAmount > 0) ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('extra_packaging'.tr, style: robotoRegular),
-                      Text('(+) ${PriceConverterHelper.convertPrice(extraPackagingAmount)}', style: robotoRegular),
-                    ],
-                  ) : const SizedBox(),
-                  SizedBox(height: extraPackagingAmount > 0 ? 10 : 0),
-
-                  (order.additionalCharge != null && order.additionalCharge! > 0) ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Expanded(
-                      child: Text(Get.find<SplashController>().configModel!.additionalChargeName!, style: robotoRegular, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    ),
-                    SizedBox(width: Dimensions.paddingSizeSmall),
-
-                    Text('(+) ${PriceConverterHelper.convertPrice(order.additionalCharge)}', style: robotoRegular, textDirection: TextDirection.ltr),
-                  ]) : const SizedBox(),
-                  (order.additionalCharge != null && order.additionalCharge! > 0) ? const SizedBox(height: 10) : const SizedBox(),
-
-                  (tax! == 0) || taxIncluded ? const SizedBox() : Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Text('vat_tax'.tr, style: robotoRegular),
-                    Text('(+) ${PriceConverterHelper.convertPrice(tax)}', style: robotoRegular),
-                  ]),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                    child: Divider(thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.5)),
-                  ),
-
-                  partialPay! ? DottedBorder(
-                    options: RoundedRectDottedBorderOptions(
-                      color: Theme.of(context).primaryColor,
-                      strokeWidth: 1,
-                      strokeCap: StrokeCap.butt,
-                      dashPattern: const [8, 5],
-                      padding: const EdgeInsets.all(0),
-                      radius: const Radius.circular(Dimensions.radiusDefault),
-                    ),
-                    child: Ink(
-                      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                      color: !restConfModel ? Theme.of(context).primaryColor.withValues(alpha: 0.05) : Colors.transparent,
-                      child: Column(children: [
-
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          Text('total_amount'.tr, style: robotoMedium.copyWith(
-                            fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor,
-                          )),
-                          Text(
-                            PriceConverterHelper.convertPrice(total),
-                            style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
-                          ),
+                      !parcel ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        Text('item_price'.tr, style: robotoRegular),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Text(PriceConverterHelper.convertPrice(itemsPrice), style: robotoRegular),
                         ]),
-                        const SizedBox(height: 10),
+                      ]) : const SizedBox(),
+                      SizedBox(height: !parcel ? 10 : 0),
 
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          Text('paid_by_wallet'.tr, style: !restConfModel ? robotoMedium : robotoRegular),
-                          Text(
-                            PriceConverterHelper.convertPrice(order.payments![0].amount),
-                            style: !restConfModel ? robotoMedium : robotoRegular,
-                          ),
-                        ]),
-                        const SizedBox(height: 10),
+                      Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('addons'.tr, style: robotoRegular),
+                          Text('(+) ${PriceConverterHelper.convertPrice(addOns)}', style: robotoRegular),
+                        ],
+                      ) : const SizedBox(),
 
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          Text('${order.payments?[1].paymentStatus == 'paid' ? 'paid_by'.tr : 'due_amount'.tr} (${order.payments![1].paymentMethod?.tr})', style: !restConfModel ? robotoMedium : robotoRegular),
-                          Text(
-                            PriceConverterHelper.convertPrice(order.payments![1].amount),
-                            style: !restConfModel ? robotoMedium : robotoRegular,
-                          ),
+                      Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? Divider(
+                        thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.5),
+                      ) : const SizedBox(),
+
+                      Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('subtotal'.tr, style: robotoMedium),
+                          Text(PriceConverterHelper.convertPrice(subTotal), style: robotoMedium),
+                        ],
+                      ) : const SizedBox(),
+                      SizedBox(height: Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? 10 : 0),
+
+                      !parcel ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        Text('discount'.tr, style: robotoRegular),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Text('(-) ${PriceConverterHelper.convertPrice(discount)}', style: robotoRegular),
                         ]),
+                      ]) : const SizedBox(),
+                      SizedBox(height: !parcel ? 10 : 0),
+
+                      couponDiscount > 0 ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        Text('coupon_discount'.tr, style: robotoRegular),
+                        Text(
+                          '(-) ${PriceConverterHelper.convertPrice(couponDiscount)}',
+                          style: robotoRegular,
+                        ),
+                      ]) : const SizedBox(),
+                      SizedBox(height: couponDiscount > 0 ? 10 : 0),
+
+                      (referrerBonusAmount > 0) ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('referral_discount'.tr, style: robotoRegular),
+                          Text('(-) ${PriceConverterHelper.convertPrice(referrerBonusAmount)}', style: robotoRegular),
+                        ],
+                      ) : const SizedBox(),
+                      SizedBox(height: referrerBonusAmount > 0 ? 10 : 0),
+
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        Text('delivery_fee'.tr, style: robotoRegular),
+                        Text('(+) ${PriceConverterHelper.convertPrice(deliveryCharge)}', style: robotoRegular),
                       ]),
-                    ),
-                  ) : const SizedBox(),
-                  SizedBox(height: partialPay ? 20 : 0),
+                      const SizedBox(height: 10),
 
-                  !partialPay ? Row(children: [
-                    Text('total_amount'.tr, style: robotoMedium.copyWith(
-                      fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor,
-                    )),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('delivery_man_tips'.tr, style: robotoRegular),
+                          Text('(+) ${PriceConverterHelper.convertPrice(dmTips)}', style: robotoRegular),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
 
-                    taxIncluded ? Text(' ${'vat_tax_inc'.tr}', style: robotoMedium.copyWith(
-                      fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor,
-                    )) : const SizedBox(),
+                      (extraPackagingAmount > 0) ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('extra_packaging'.tr, style: robotoRegular),
+                          Text('(+) ${PriceConverterHelper.convertPrice(extraPackagingAmount)}', style: robotoRegular),
+                        ],
+                      ) : const SizedBox(),
+                      SizedBox(height: extraPackagingAmount > 0 ? 10 : 0),
 
-                    const Expanded(child: SizedBox()),
+                      (order.additionalCharge != null && order.additionalCharge! > 0) ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        Expanded(
+                          child: Text(Get.find<SplashController>().configModel!.additionalChargeName!, style: robotoRegular, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ),
+                        SizedBox(width: Dimensions.paddingSizeSmall),
 
-                    Text(
-                      PriceConverterHelper.convertPrice(total),
-                      style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
-                    ),
-                  ]) : const SizedBox(),
+                        Text('(+) ${PriceConverterHelper.convertPrice(order.additionalCharge)}', style: robotoRegular, textDirection: TextDirection.ltr),
+                      ]) : const SizedBox(),
+                      (order.additionalCharge != null && order.additionalCharge! > 0) ? const SizedBox(height: 10) : const SizedBox(),
+
+                      (tax! == 0) || taxIncluded ? const SizedBox() : Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        Text('vat_tax'.tr, style: robotoRegular),
+                        Text('(+) ${PriceConverterHelper.convertPrice(tax)}', style: robotoRegular),
+                      ]),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+                        child: Divider(thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.5)),
+                      ),
+
+                      partialPay! ? DottedBorder(
+                        options: RoundedRectDottedBorderOptions(
+                          color: Theme.of(context).primaryColor,
+                          strokeWidth: 1,
+                          strokeCap: StrokeCap.butt,
+                          dashPattern: const [8, 5],
+                          padding: const EdgeInsets.all(0),
+                          radius: const Radius.circular(Dimensions.radiusDefault),
+                        ),
+                        child: Ink(
+                          padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                          color: !restConfModel ? Theme.of(context).primaryColor.withValues(alpha: 0.05) : Colors.transparent,
+                          child: Column(children: [
+
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                              Text('total_amount'.tr, style: robotoMedium.copyWith(
+                                fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor,
+                              )),
+                              Text(
+                                PriceConverterHelper.convertPrice(total),
+                                style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
+                              ),
+                            ]),
+                            const SizedBox(height: 10),
+
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                              Text('paid_by_wallet'.tr, style: !restConfModel ? robotoMedium : robotoRegular),
+                              Text(
+                                PriceConverterHelper.convertPrice(order.payments![0].amount),
+                                style: !restConfModel ? robotoMedium : robotoRegular,
+                              ),
+                            ]),
+                            const SizedBox(height: 10),
+
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                              Text('${order.payments?[1].paymentStatus == 'paid' ? 'paid_by'.tr : 'due_amount'.tr} (${order.payments![1].paymentMethod?.tr})', style: !restConfModel ? robotoMedium : robotoRegular),
+                              Text(
+                                PriceConverterHelper.convertPrice(order.payments![1].amount),
+                                style: !restConfModel ? robotoMedium : robotoRegular,
+                              ),
+                            ]),
+                          ]),
+                        ),
+                      ) : const SizedBox(),
+                      SizedBox(height: partialPay ? 20 : 0),
+
+                      !partialPay ? Row(children: [
+                        Text('total_amount'.tr, style: robotoMedium.copyWith(
+                          fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor,
+                        )),
+
+                        taxIncluded ? Text(' ${'vat_tax_inc'.tr}', style: robotoMedium.copyWith(
+                          fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor,
+                        )) : const SizedBox(),
+
+                        const Expanded(child: SizedBox()),
+
+                        Text(
+                          PriceConverterHelper.convertPrice(total),
+                          style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
+                        ),
+                      ]) : const SizedBox(),
+                    ]),
+                  ),
 
                 ]),
               )),
 
               parcel ? ParcelBottomView(
                 orderController: orderController, controllerOrderModel: controllerOrderModel, orderId: widget.orderId!,
-                fromLocationScreen: widget.fromLocationScreen, showDeliveryConfirmImage: showDeliveryConfirmImage,
+                fromLocationScreen: widget.fromLocationScreen, showDeliveryConfirmImage: showDeliveryConfirmImage, total: total,
               ) : RegularOrderBottomView(
                 orderController: orderController, controllerOrderModel: controllerOrderModel, fromLocationScreen: widget.fromLocationScreen,
-                orderId: widget.orderId!, showDeliveryConfirmImage: showDeliveryConfirmImage,
+                orderId: widget.orderId!, showDeliveryConfirmImage: showDeliveryConfirmImage, total: total,
               ),
 
             ]) : const Center(child: CircularProgressIndicator());

@@ -12,9 +12,9 @@ class ChatRepository implements ChatRepositoryInterface {
   ChatRepository({required this.apiClient, required this.sharedPreferences});
 
   @override
-  Future<ConversationsModel?> getConversationList(int offset) async {
+  Future<ConversationsModel?> getConversationList(int offset, String type) async {
     ConversationsModel? conversationModel;
-    Response response = await apiClient.getData('${AppConstants.getConversationListUri}?token=${_getUserToken()}&offset=$offset&limit=10');
+    Response response = await apiClient.getData('${AppConstants.getConversationListUri}?token=${_getUserToken()}&offset=$offset&limit=10&type=$type');
     if(response.statusCode == 200) {
       conversationModel = ConversationsModel.fromJson(response.body);
     }
@@ -22,9 +22,9 @@ class ChatRepository implements ChatRepositoryInterface {
   }
 
   @override
-  Future<ConversationsModel?> searchConversationList(String name) async {
+  Future<ConversationsModel?> searchConversationList(String name, String type) async {
     ConversationsModel? searchConversationModel;
-    Response response = await apiClient.getData('${AppConstants.searchConversationListUri}?name=$name&token=${_getUserToken()}&limit=20&offset=1');
+    Response response = await apiClient.getData('${AppConstants.searchConversationListUri}?name=$name&token=${_getUserToken()}&limit=20&offset=1&type=$type');
     if(response.statusCode == 200) {
       searchConversationModel = ConversationsModel.fromJson(response.body);
     }
@@ -45,8 +45,16 @@ class ChatRepository implements ChatRepositoryInterface {
   @override
   Future<MessageModel?> sendMessage(String message, List<MultipartBody> file, int? conversationId, int? userId, String userType) async {
     MessageModel? messageModel;
-    Response response = await apiClient.postMultipartData(AppConstants.sendMessageUri,
-      {'message': message, 'receiver_type': userType,  conversationId != null ? 'conversation_id' : 'receiver_id': '${conversationId ?? userId}', 'token': _getUserToken(), 'offset': '1', 'limit': '10'}, file);
+    Map<String, String> fields = {};
+    fields.addAll({
+      'message': message,
+      'receiver_type': userType,
+      conversationId != null ? 'conversation_id' : 'receiver_id': '${conversationId ?? userId}',
+      'token': _getUserToken(),
+      'offset': '1',
+      'limit': '10'
+    });
+    Response response = await apiClient.postMultipartData(AppConstants.sendMessageUri, fields, file);
     if(response.statusCode == 200) {
       messageModel = MessageModel.fromJson(response.body);
     }
