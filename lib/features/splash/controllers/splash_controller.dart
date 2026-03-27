@@ -32,9 +32,13 @@ class SplashController extends GetxController implements GetxService {
     Response response = await splashServiceInterface.getConfigData();
     bool isSuccess = false;
     if(response.statusCode == 200) {
-      _data = response.body;
-      _configModel = ConfigModel.fromJson(response.body);
-      isSuccess = true;
+      try {
+        _data = response.body;
+        _configModel = ConfigModel.fromJson(response.body);
+        isSuccess = true;
+      } catch(e) {
+        isSuccess = false;
+      }
     }else {
       isSuccess = false;
     }
