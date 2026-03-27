@@ -13,7 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>6amMart Delivery</string>
+	<string>პორტალი კურიერი</string>
+	<key>CFBundleDisplayName</key>
+	<string>პორტალი კურიერი</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

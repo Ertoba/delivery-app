@@ -2,7 +2,7 @@ import 'package:sixam_mart_delivery/features/language/domain/models/language_mod
 import 'package:sixam_mart_delivery/util/images.dart';
 
 class AppConstants {
-  static const String appName = '6amMart Delivery';
+  static const String appName = 'პორტალი კურიერი';
   static const double appVersion = 3.7; ///Flutter sdk 3.41.1
   static const String fontFamily = 'Roboto';
 
