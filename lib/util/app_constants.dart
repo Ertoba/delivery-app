@@ -6,7 +6,7 @@ class AppConstants {
   static const double appVersion = 3.7; ///Flutter sdk 3.41.1
   static const String fontFamily = 'Roboto';
 
-  static const String baseUrl = 'https://6ammart-admin.6amtech.com';
+  static const String baseUrl = 'https://portal.crypt.ge';
 
   static const String configUri = '/api/v1/config';
   static const String forgetPasswordUri = '/api/v1/auth/delivery-man/forgot-password';
