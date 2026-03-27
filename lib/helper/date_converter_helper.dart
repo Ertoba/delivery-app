@@ -279,6 +279,35 @@ class DateConverterHelper {
 
     return _translatedLabel('${key}s', '${singular}s');
   }
+
+  static DateTime isoUtcStringToLocalTimeOnly(String dateTime) {
+    return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(dateTime, true).toLocal();
+  }
+
+  static String isoStringToLocalDateAndTime(String dateTime) {
+    return DateFormat(
+      'dd MMM yyyy \'at\' ${_timeFormatter()}',
+      _dateLocale(),
+    ).format(isoUtcStringToLocalTimeOnly(dateTime));
+  }
+
+  static int countDays(DateTime? dateTime) {
+    final startDate = dateTime!;
+    final endDate = DateTime.now();
+    return endDate.difference(startDate).inDays;
+  }
+
+  static String convert24HourTimeTo12HourTimeWithDay(DateTime time, bool isToday) {
+    if (isToday) {
+      return DateFormat('\'Today at\' ${_timeFormatter()}').format(time);
+    } else {
+      return DateFormat('\'Yesterday at\' ${_timeFormatter()}').format(time);
+    }
+  }
+
+  static String convertStringTimeToDateTime(DateTime time) {
+    return DateFormat('EEE \'at\' ${_timeFormatter()}').format(time.toLocal());
+  }
 }
 
 class _TimeUnit {
