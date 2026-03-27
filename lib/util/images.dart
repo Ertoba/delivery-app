@@ -6,6 +6,7 @@ class Images {
   static const String arabic = 'assets/image/arabic.png';
   static const String spanish = 'assets/image/spanish.png';
   static const String bangla = 'assets/image/bangla.png';
+  static const String georgian = 'assets/image/georgian.png';
   static const String mail = 'assets/image/mail.png';
   static const String checked = 'assets/image/checked.png';
   static const String deliveryManMarker = 'assets/image/delivery_man_marker.png';
