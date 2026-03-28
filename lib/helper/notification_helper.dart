@@ -26,7 +26,11 @@ class NotificationHelper {
     var androidInitialize = const AndroidInitializationSettings(
       'notification_icon',
     );
-    var iOSInitialize = const DarwinInitializationSettings();
+    var iOSInitialize = const DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
+    );
     var initializationsSettings = InitializationSettings(
       android: androidInitialize,
       iOS: iOSInitialize,
@@ -213,38 +217,36 @@ class NotificationHelper {
     RemoteMessage message,
     FlutterLocalNotificationsPlugin fln,
   ) async {
-    if (!GetPlatform.isIOS) {
-      String? title;
-      String? body;
-      String? image;
-      NotificationBodyModel? notificationBody = convertNotification(
-        message.data,
-      );
+    String? title;
+    String? body;
+    String? image;
+    NotificationBodyModel? notificationBody = convertNotification(
+      message.data,
+    );
 
-      title = localizedTitle(message.data['title']);
-      body = localizedBody(message.data['body']);
-      image =
-          (message.data['image'] != null && message.data['image'].isNotEmpty)
-          ? message.data['image'].startsWith('http')
-                ? message.data['image']
-                : '${AppConstants.baseUrl}/storage/app/public/notification/${message.data['image']}'
-          : null;
+    title = localizedTitle(message.data['title']);
+    body = localizedBody(message.data['body']);
+    image =
+        (message.data['image'] != null && message.data['image'].isNotEmpty)
+        ? message.data['image'].startsWith('http')
+              ? message.data['image']
+              : '${AppConstants.baseUrl}/storage/app/public/notification/${message.data['image']}'
+        : null;
 
-      if (image != null && image.isNotEmpty) {
-        try {
-          await showBigPictureNotificationHiddenLargeIcon(
-            title,
-            body,
-            notificationBody,
-            image,
-            fln,
-          );
-        } catch (e) {
-          await showBigTextNotification(title, body, notificationBody, fln);
-        }
-      } else {
+    if (image != null && image.isNotEmpty) {
+      try {
+        await showBigPictureNotificationHiddenLargeIcon(
+          title,
+          body,
+          notificationBody,
+          image,
+          fln,
+        );
+      } catch (e) {
         await showBigTextNotification(title, body, notificationBody, fln);
       }
+    } else {
+      await showBigTextNotification(title, body, notificationBody, fln);
     }
   }
 
