@@ -18,6 +18,7 @@ import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationHelper {
   static Future<void> initialize(
@@ -258,6 +259,25 @@ class NotificationHelper {
     return _localizedNotificationText(body);
   }
 
+  static Future<bool> shouldUseGeorgianNotificationText() async {
+    if (Get.locale?.languageCode == 'ka') {
+      return true;
+    }
+
+    try {
+      final SharedPreferences preferences =
+          await SharedPreferences.getInstance();
+      final List<String?> languageCodes = [
+        preferences.getString(AppConstants.languageCode),
+        preferences.getString(AppConstants.cacheLanguageCode),
+      ];
+
+      return languageCodes.any((code) => code?.toLowerCase() == 'ka');
+    } catch (_) {
+      return false;
+    }
+  }
+
   static String _localizedNotificationText(
     String? text, {
     bool isTitle = false,
@@ -272,6 +292,10 @@ class NotificationHelper {
         'notification_order_title',
         'შეკვეთის შეტყობინება',
       ),
+      'Order is processing': _translatedLabel(
+        'notification_is_processing',
+        'შეკვეთა მუშავდება',
+      ),
     };
 
     if (exactMatches.containsKey(rawText)) {
@@ -284,6 +308,16 @@ class NotificationHelper {
         (_) => _translatedLabel(
           'notification_new_order_alert_confirm_to_proceed',
           'ახალი შეკვეთის შეტყობინება, გასაგრძელებლად დაადასტურეთ',
+        ),
+      ),
+      _NotificationTextPattern(
+        RegExp(
+          r'^New order request arrived, you can confirm this\.?$',
+          caseSensitive: false,
+        ),
+        (_) => _translatedLabel(
+          'notification_new_order_request_body',
+          'ახალი შეკვეთის მოთხოვნა მოვიდა, შეგიძლიათ დაადასტუროთ.',
         ),
       ),
       _NotificationTextPattern(
@@ -573,7 +607,7 @@ Future<ServiceRequestResult> _startService(
   if (await FlutterForegroundTask.isRunningService) {
     return FlutterForegroundTask.restartService();
   } else {
-    final bool isKa = Get.locale?.languageCode == 'ka';
+    final bool isKa = await NotificationHelper.shouldUseGeorgianNotificationText();
     final String requestTitle = isKa
         ? NotificationHelper._translatedLabel(
             'notification_new_order_request_title',
@@ -673,15 +707,16 @@ class MyTaskHandler extends TaskHandler {
   }
 
   @override
-  void onNotificationDismissed() {
+  void onNotificationDismissed() async {
+    final bool isKa = await NotificationHelper.shouldUseGeorgianNotificationText();
     FlutterForegroundTask.updateService(
-      notificationTitle: Get.locale?.languageCode == 'ka'
+      notificationTitle: isKa
           ? NotificationHelper._translatedLabel(
               'notification_assigned_new_order',
               'ახალი შეკვეთა დაგენიშნათ',
             )
           : 'You got a new order!',
-      notificationText: Get.locale?.languageCode == 'ka'
+      notificationText: isKa
           ? NotificationHelper._translatedLabel(
               'notification_open_app_check_order_details',
               'გახსენით აპი და გადაამოწმეთ შეკვეთის დეტალები.',
