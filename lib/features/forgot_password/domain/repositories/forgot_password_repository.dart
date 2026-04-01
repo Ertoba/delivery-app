@@ -106,9 +106,13 @@ class ForgotPasswordRepository implements ForgotPasswordRepositoryInterface {
       "password": password,
       "confirm_password": confirmPassword,
     };
-    requestBody.removeWhere(
-      (key, value) => value == null || value.toString().isEmpty,
-    );
+    requestBody.removeWhere((key, value) {
+      if (value == null) {
+        return true;
+      }
+      final String normalizedValue = value.toString().trim().toLowerCase();
+      return normalizedValue.isEmpty || normalizedValue == 'null';
+    });
     Response response = await apiClient.putData(
       AppConstants.resetPasswordUri,
       requestBody,
