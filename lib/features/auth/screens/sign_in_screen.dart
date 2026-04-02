@@ -75,7 +75,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
                     Text(
-                      'welcome_back'.tr,
+                      'პორტალი გელოდება',
                       style: robotoRegular.copyWith(
                         fontSize: Dimensions.fontSizeDefault,
                         color: Theme.of(
@@ -139,7 +139,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   authController.toggleRememberMe(),
                             ),
                             title: Text(
-                              'შენახვა',
+                              'save'.tr,
                               style: robotoRegular.copyWith(
                                 fontSize: Dimensions.fontSizeDefault * 0.9,
                               ),
