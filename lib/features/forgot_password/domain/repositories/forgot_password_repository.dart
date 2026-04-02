@@ -42,19 +42,30 @@ class ForgotPasswordRepository implements ForgotPasswordRepositoryInterface {
 
   @override
   Future<ResponseModel> forgetPassword(String? phone) async {
-    ResponseModel responseModel;
-    String? deviceToken = await _saveDeviceToken();
-    Response response = await apiClient.postData(
-      AppConstants.forgetPasswordUri,
-      {"phone": phone, "fcm_token": deviceToken},
-      handleError: false,
-    );
-    if (response.statusCode == 200) {
-      responseModel = ResponseModel(true, response.body["message"]);
-    } else {
-      responseModel = ResponseModel(false, response.statusText);
+    try {
+      ResponseModel responseModel;
+      final String? deviceToken = await _saveDeviceToken();
+      final Map<String, dynamic> requestBody = {"phone": phone};
+
+      if (deviceToken != null && deviceToken.isNotEmpty) {
+        requestBody["fcm_token"] = deviceToken;
+      }
+
+      Response response = await apiClient.postData(
+        AppConstants.forgetPasswordUri,
+        requestBody,
+        handleError: false,
+      );
+      if (response.statusCode == 200) {
+        responseModel = ResponseModel(true, response.body["message"]);
+      } else {
+        responseModel = ResponseModel(false, response.statusText);
+      }
+      return responseModel;
+    } catch (e) {
+      debugPrint('----Forgot Password Error----- $e');
+      return ResponseModel(false, 'connection_to_api_server_failed'.tr);
     }
-    return responseModel;
   }
 
   @override
@@ -131,12 +142,20 @@ class ForgotPasswordRepository implements ForgotPasswordRepositoryInterface {
   }
 
   Future<String?> _saveDeviceToken() async {
-    String? deviceToken = '';
-    if (!GetPlatform.isWeb) {
-      deviceToken = (await FirebaseMessaging.instance.getToken())!;
+    if (GetPlatform.isWeb) {
+      return null;
     }
-    debugPrint('----Device Token----- $deviceToken');
-    return deviceToken;
+
+    try {
+      final String? deviceToken = await FirebaseMessaging.instance
+          .getToken()
+          .timeout(const Duration(seconds: 8), onTimeout: () => null);
+      debugPrint('----Device Token----- $deviceToken');
+      return deviceToken;
+    } catch (e) {
+      debugPrint('----Device Token Error----- $e');
+      return null;
+    }
   }
 
   @override

@@ -20,10 +20,14 @@ class ForgotPasswordController extends GetxController implements GetxService {
   String _verificationCode = '';
   String get verificationCode => _verificationCode;
 
-  Future<bool> changePassword(ProfileModel updatedUserModel, String password) async {
+  Future<bool> changePassword(
+    ProfileModel updatedUserModel,
+    String password,
+  ) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await forgotPasswordServiceInterface.changePassword(updatedUserModel, password);
+    ResponseModel responseModel = await forgotPasswordServiceInterface
+        .changePassword(updatedUserModel, password);
     _isLoading = false;
     if (responseModel.isSuccess) {
       Get.back();
@@ -35,37 +39,57 @@ class ForgotPasswordController extends GetxController implements GetxService {
     return responseModel.isSuccess;
   }
 
-  Future<ResponseModel> forgetPassword(String? email) async {
+  Future<ResponseModel> forgetPassword(String? phone) async {
     _resendOtpLoading = true;
     update();
-    ResponseModel responseModel = await forgotPasswordServiceInterface.forgetPassword(email);
-    _resendOtpLoading = false;
-    update();
-    return responseModel;
+    try {
+      return await forgotPasswordServiceInterface.forgetPassword(phone);
+    } catch (e) {
+      return ResponseModel(false, 'connection_to_api_server_failed'.tr);
+    } finally {
+      _resendOtpLoading = false;
+      update();
+    }
   }
 
   Future<ResponseModel> verifyToken(String? number) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await forgotPasswordServiceInterface.verifyToken(number, _verificationCode);
+    ResponseModel responseModel = await forgotPasswordServiceInterface
+        .verifyToken(number, _verificationCode);
     _isLoading = false;
     update();
     return responseModel;
   }
 
-  Future<ResponseModel> verifyFirebaseOtp({required String phoneNumber, required String session, required String otp}) async {
+  Future<ResponseModel> verifyFirebaseOtp({
+    required String phoneNumber,
+    required String session,
+    required String otp,
+  }) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await forgotPasswordServiceInterface.verifyFirebaseOtp(phoneNumber: phoneNumber, session: session, otp: otp);
+    ResponseModel responseModel = await forgotPasswordServiceInterface
+        .verifyFirebaseOtp(
+          phoneNumber: phoneNumber,
+          session: session,
+          otp: otp,
+        );
     _isLoading = false;
     update();
     return responseModel;
   }
 
-  Future<ResponseModel> resetPassword(String? resetToken, String phone, String password, String confirmPassword) async {
+  Future<ResponseModel> resetPassword(
+    String? resetToken,
+    String phone,
+    String password,
+    String confirmPassword,
+  ) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await forgotPasswordServiceInterface.resetPassword(resetToken, phone, password, confirmPassword);
+    ResponseModel responseModel = await forgotPasswordServiceInterface
+        .resetPassword(resetToken, phone, password, confirmPassword);
     _isLoading = false;
     update();
     return responseModel;
@@ -76,7 +100,10 @@ class ForgotPasswordController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> firebaseVerifyPhoneNumber(String phoneNumber, {bool canRoute = true}) async {
+  Future<void> firebaseVerifyPhoneNumber(
+    String phoneNumber, {
+    bool canRoute = true,
+  }) async {
     _resendOtpLoading = true;
     update();
 
@@ -87,23 +114,23 @@ class ForgotPasswordController extends GetxController implements GetxService {
         _resendOtpLoading = false;
         update();
 
-        if(e.code == 'invalid-phone-number') {
+        if (e.code == 'invalid-phone-number') {
           showCustomSnackBar('please_submit_a_valid_phone_number'.tr);
-        }else{
+        } else {
           showCustomSnackBar(e.message?.replaceAll('_', ' '));
         }
-
       },
       codeSent: (String vId, int? resendToken) {
         _resendOtpLoading = false;
         update();
 
-        if(canRoute) {
-          Get.toNamed(RouteHelper.getVerificationRoute(phoneNumber, session: vId));
+        if (canRoute) {
+          Get.toNamed(
+            RouteHelper.getVerificationRoute(phoneNumber, session: vId),
+          );
         }
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
     );
   }
-
 }
