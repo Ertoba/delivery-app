@@ -654,4 +654,16 @@
   "notification_new_order_request_body": "ახალი შეკვეთის მოთხოვნა მოვიდა, შეგიძლიათ დაადასტუროთ.",
   "notification_assigned_new_order": "ახალი შეკვეთა დაგენიშნათ",
   "notification_open_app_check_order_details": "გახსენით აპი და გადაამოწმეთ შეკვეთის დეტალები."
+  ,
+  "phone_number_not_found": "ტელეფონის ნომერი ვერ მოიძებნა!",
+  "email_not_found": "ელფოსტა ვერ მოიძებნა!",
+  "failed_to_send_email": "ელფოსტის გაგზავნა ვერ მოხერხდა.",
+  "failed_to_send_sms_popup": "SMS-ის გაგზავნა ვერ მოხერხდა.",
+  "otp_successfully_sent_to_your_phone": "ერთჯერადი კოდი წარმატებით გაიგზავნა თქვენს ნომერზე.",
+  "otp_successfully_sent_to_your_mail": "ერთჯერადი კოდი წარმატებით გაიგზავნა თქვენს ელფოსტაზე.",
+  "otp_successfully_sent_to_your_phone_and_mail": "ერთჯერადი კოდი წარმატებით გაიგზავნა თქვენს ნომერზეც და ელფოსტაზეც.",
+  "otp_found_you_can_proceed": "კოდი დადასტურდა, შეგიძლიათ გაგრძელება.",
+  "invalid_token_popup": "კოდი არასწორია.",
+  "request_failed": "მოთხოვნა ვერ შესრულდა.",
+  "connection_to_api_server_failed": "სერვერთან დაკავშირება ვერ მოხერხდა. შეამოწმეთ ინტერნეტი."
 }
