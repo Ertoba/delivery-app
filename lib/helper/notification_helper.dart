@@ -161,7 +161,9 @@ class NotificationHelper {
             flutterLocalNotificationsPlugin,
           );
           Get.find<OrderController>().getRunningOrders(1, status: 'all');
-          Get.find<OrderController>().getOrderCount(Get.find<OrderController>().orderType);
+          Get.find<OrderController>().getOrderCount(
+            Get.find<OrderController>().orderType,
+          );
           Get.find<OrderController>().getLatestOrders();
           Get.find<NotificationController>().getNotificationList();
         }
@@ -221,14 +223,11 @@ class NotificationHelper {
     String? title;
     String? body;
     String? image;
-    NotificationBodyModel? notificationBody = convertNotification(
-      message.data,
-    );
+    NotificationBodyModel? notificationBody = convertNotification(message.data);
 
     title = localizedTitle(message.data['title']);
     body = localizedBody(message.data['body']);
-    image =
-        (message.data['image'] != null && message.data['image'].isNotEmpty)
+    image = (message.data['image'] != null && message.data['image'].isNotEmpty)
         ? message.data['image'].startsWith('http')
               ? message.data['image']
               : '${AppConstants.baseUrl}/storage/app/public/notification/${message.data['image']}'
@@ -286,6 +285,9 @@ class NotificationHelper {
     if (rawText.isEmpty || Get.locale?.languageCode != 'ka') {
       return rawText;
     }
+    final String normalizedText = rawText
+        .replaceFirst(RegExp(r'^messages\.'), '')
+        .trim();
 
     final Map<String, String> exactMatches = {
       'Order Notification': _translatedLabel(
@@ -296,10 +298,14 @@ class NotificationHelper {
         'notification_is_processing',
         'შეკვეთა მუშავდება',
       ),
+      'Loyalty Point Transaction': _translatedLabel(
+        'notification_loyalty_point_transaction',
+        'ქულების ტრანზაქცია',
+      ),
     };
 
-    if (exactMatches.containsKey(rawText)) {
-      return exactMatches[rawText]!;
+    if (exactMatches.containsKey(normalizedText)) {
+      return exactMatches[normalizedText]!;
     }
 
     final List<_NotificationTextPattern> patterns = [
@@ -346,16 +352,32 @@ class NotificationHelper {
         (match) =>
             '${_translatedLabel('notification_order_prefix', 'შეკვეთა')} #${match.group(1)} ${_translatedLabel('notification_delivered_successfully', 'წარმატებით ჩაბარდა')}',
       ),
+      _NotificationTextPattern(
+        RegExp(
+          r'^You have earned\s+([\d.,]+)\s+Loyalty points?$',
+          caseSensitive: false,
+        ),
+        (match) =>
+            '${_translatedLabel('notification_loyalty_points_earned_prefix', 'თქვენ დაგერიცხათ')} ${match.group(1)} ${_translatedLabel('notification_loyalty_points_unit', 'ქულა')}',
+      ),
+      _NotificationTextPattern(
+        RegExp(
+          r'^You have converted\s+([\d.,]+)\s+Loyalty points?$',
+          caseSensitive: false,
+        ),
+        (match) =>
+            '${_translatedLabel('notification_loyalty_points_converted_prefix', 'თქვენ გადაცვალეთ')} ${match.group(1)} ${_translatedLabel('notification_loyalty_points_unit', 'ქულა')}',
+      ),
     ];
 
     for (final pattern in patterns) {
-      final RegExpMatch? match = pattern.regex.firstMatch(rawText);
+      final RegExpMatch? match = pattern.regex.firstMatch(normalizedText);
       if (match != null) {
         return pattern.builder(match);
       }
     }
 
-    return rawText;
+    return normalizedText;
   }
 
   static String _translatedLabel(String key, String fallback) {
@@ -607,7 +629,8 @@ Future<ServiceRequestResult> _startService(
   if (await FlutterForegroundTask.isRunningService) {
     return FlutterForegroundTask.restartService();
   } else {
-    final bool isKa = await NotificationHelper.shouldUseGeorgianNotificationText();
+    final bool isKa =
+        await NotificationHelper.shouldUseGeorgianNotificationText();
     final String requestTitle = isKa
         ? NotificationHelper._translatedLabel(
             'notification_new_order_request_title',
@@ -708,7 +731,8 @@ class MyTaskHandler extends TaskHandler {
 
   @override
   void onNotificationDismissed() async {
-    final bool isKa = await NotificationHelper.shouldUseGeorgianNotificationText();
+    final bool isKa =
+        await NotificationHelper.shouldUseGeorgianNotificationText();
     FlutterForegroundTask.updateService(
       notificationTitle: isKa
           ? NotificationHelper._translatedLabel(
