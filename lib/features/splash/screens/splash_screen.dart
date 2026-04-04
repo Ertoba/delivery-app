@@ -7,9 +7,7 @@ import 'package:sixam_mart_delivery/features/splash/controllers/splash_controlle
 import 'package:sixam_mart_delivery/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
-import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
-import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -29,22 +27,33 @@ class SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    if(Get.find<AuthController>().isLoggedIn()) {
+    if (Get.find<AuthController>().isLoggedIn()) {
       Get.find<ProfileController>().getProfile();
     }
 
     bool firstTime = true;
-    _onConnectivityChanged = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
-      bool isConnected = result.contains(ConnectivityResult.wifi) || result.contains(ConnectivityResult.mobile);
+    _onConnectivityChanged = Connectivity().onConnectivityChanged.listen((
+      List<ConnectivityResult> result,
+    ) {
+      bool isConnected =
+          result.contains(ConnectivityResult.wifi) ||
+          result.contains(ConnectivityResult.mobile);
 
-      if(!firstTime) {
-        isConnected ? ScaffoldMessenger.of(Get.context!).hideCurrentSnackBar() : const SizedBox();
-        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
-          backgroundColor: isConnected ? Colors.green : Colors.red,
-          duration: Duration(seconds: isConnected ? 3 : 6000),
-          content: Text(isConnected ? 'connected'.tr : 'no_connection'.tr, textAlign: TextAlign.center),
-        ));
-        if(isConnected) {
+      if (!firstTime) {
+        isConnected
+            ? ScaffoldMessenger.of(Get.context!).hideCurrentSnackBar()
+            : const SizedBox();
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            backgroundColor: isConnected ? Colors.green : Colors.red,
+            duration: Duration(seconds: isConnected ? 3 : 6000),
+            content: Text(
+              isConnected ? 'connected'.tr : 'no_connection'.tr,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        if (isConnected) {
           _route();
         }
       }
@@ -54,7 +63,6 @@ class SplashScreenState extends State<SplashScreen> {
 
     Get.find<SplashController>().initSharedData();
     _route();
-
   }
 
   @override
@@ -67,21 +75,20 @@ class SplashScreenState extends State<SplashScreen> {
   void _route() {
     Get.find<SplashController>().getConfigData().then((isSuccess) async {
       if (isSuccess) {
-        Timer(const Duration(seconds: 1), () async {
-          double? minimumVersion = _getMinimumVersion();
-          bool isMaintenanceMode = Get.find<SplashController>().configModel!.maintenanceMode!;
-          bool needsUpdate = AppConstants.appVersion < minimumVersion!;
+        double? minimumVersion = _getMinimumVersion();
+        bool isMaintenanceMode =
+            Get.find<SplashController>().configModel!.maintenanceMode!;
+        bool needsUpdate = AppConstants.appVersion < minimumVersion!;
 
-          if (needsUpdate || isMaintenanceMode) {
-            Get.offNamed(RouteHelper.getUpdateRoute(needsUpdate));
-          }else{
-            if(widget.body != null) {
-              await _handleNotificationRouting(widget.body);
-            }else{
-              await _handleDefaultRouting();
-            }
+        if (needsUpdate || isMaintenanceMode) {
+          Get.offNamed(RouteHelper.getUpdateRoute(needsUpdate));
+        } else {
+          if (widget.body != null) {
+            await _handleNotificationRouting(widget.body);
+          } else {
+            await _handleDefaultRouting();
           }
-        });
+        }
       }
     });
   }
@@ -95,18 +102,36 @@ class SplashScreenState extends State<SplashScreen> {
     return 0;
   }
 
-  Future<void> _handleNotificationRouting(NotificationBodyModel? notificationBody) async {
+  Future<void> _handleNotificationRouting(
+    NotificationBodyModel? notificationBody,
+  ) async {
     final notificationType = notificationBody?.notificationType;
 
     final Map<NotificationType, Function> notificationActions = {
-      NotificationType.order: () => Get.toNamed(RouteHelper.getOrderDetailsRoute(notificationBody?.orderId, fromNotification: true)),
-      NotificationType.order_request: () => Get.toNamed(RouteHelper.getMainRoute('order-request')),
-      NotificationType.block: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
-      NotificationType.unblock: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
+      NotificationType.order: () => Get.toNamed(
+        RouteHelper.getOrderDetailsRoute(
+          notificationBody?.orderId,
+          fromNotification: true,
+        ),
+      ),
+      NotificationType.order_request: () =>
+          Get.toNamed(RouteHelper.getMainRoute('order-request')),
+      NotificationType.block: () =>
+          Get.offAllNamed(RouteHelper.getSignInRoute()),
+      NotificationType.unblock: () =>
+          Get.offAllNamed(RouteHelper.getSignInRoute()),
       NotificationType.otp: () => null,
-      NotificationType.unassign: () => Get.to(const DashboardScreen(pageIndex: 1)),
-      NotificationType.message: () => Get.toNamed(RouteHelper.getChatRoute(notificationBody: notificationBody, conversationId: notificationBody?.conversationId, fromNotification: true)),
-      NotificationType.general: () => Get.toNamed(RouteHelper.getNotificationRoute(fromNotification: true)),
+      NotificationType.unassign: () =>
+          Get.to(const DashboardScreen(pageIndex: 1)),
+      NotificationType.message: () => Get.toNamed(
+        RouteHelper.getChatRoute(
+          notificationBody: notificationBody,
+          conversationId: notificationBody?.conversationId,
+          fromNotification: true,
+        ),
+      ),
+      NotificationType.general: () =>
+          Get.toNamed(RouteHelper.getNotificationRoute(fromNotification: true)),
     };
 
     notificationActions[notificationType]?.call();
@@ -127,7 +152,9 @@ class SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       key: _globalKey,
       backgroundColor: const Color(0xFFF75D04),
-      body: const SizedBox.expand(),
+      body: Center(
+        child: Image.asset(Images.headerLogo, width: 104, height: 104),
+      ),
     );
   }
 }

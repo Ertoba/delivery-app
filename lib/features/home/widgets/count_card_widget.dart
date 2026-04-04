@@ -8,37 +8,72 @@ class CountCardWidget extends StatelessWidget {
   final String title;
   final String? value;
   final double height;
-  const CountCardWidget({super.key, required this.backgroundColor, required this.title, required this.value, required this.height});
+  const CountCardWidget({
+    super.key,
+    required this.backgroundColor,
+    required this.title,
+    required this.value,
+    required this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height, width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+      height: height,
+      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimensions.paddingSizeLarge,
+      ),
       decoration: BoxDecoration(
         color: value != null ? backgroundColor : Theme.of(context).shadowColor,
         borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
       ),
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          value != null
+              ? Text(
+                  value!,
+                  style: robotoBold.copyWith(
+                    fontSize: 40,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )
+              : Shimmer(
+                  duration: const Duration(seconds: 2),
+                  enabled: value == null,
+                  color: Colors.grey[500]!,
+                  child: Container(
+                    height: 60,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                ),
+          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-        value != null ? Text(
-          value!, style: robotoBold.copyWith(fontSize: 40, color: Theme.of(context).textTheme.bodyLarge?.color), textAlign: TextAlign.center,
-          maxLines: 1, overflow: TextOverflow.ellipsis,
-        ) : Shimmer(
-          duration: const Duration(seconds: 2),
-          enabled: value == null,
-          color: Colors.grey[500]!,
-          child: Container(height: 60, width: 50, decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(5))),
-        ),
-        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-        Text(
-          title,
-          style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color),
-          textAlign: TextAlign.center,
-        ),
-
-      ]),
+          SizedBox(
+            height: 32,
+            child: Center(
+              child: Text(
+                title,
+                style: robotoRegular.copyWith(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                  fontSize: Dimensions.fontSizeExtraSmall,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
