@@ -7,7 +7,6 @@ import 'package:sixam_mart_delivery/features/splash/controllers/splash_controlle
 import 'package:sixam_mart_delivery/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
-import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -152,9 +151,7 @@ class SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       key: _globalKey,
       backgroundColor: const Color(0xFFF75D04),
-      body: Center(
-        child: Image.asset(Images.headerLogo, width: 104, height: 104),
-      ),
+      body: const SizedBox.expand(),
     );
   }
 }
