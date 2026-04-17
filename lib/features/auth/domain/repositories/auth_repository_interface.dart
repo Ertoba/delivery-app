@@ -3,7 +3,7 @@ import 'package:sixam_mart_delivery/features/auth/domain/models/delivery_man_bod
 import 'package:sixam_mart_delivery/interface/repository_interface.dart';
 
 abstract class AuthRepositoryInterface implements RepositoryInterface {
-  Future<dynamic> login(String phone, String password);
+  Future<dynamic> login(String phone, String password, String type);
   Future<dynamic> updateToken();
   Future<bool> saveUserToken(String token, String zoneTopic, String vehicleWiseTopic);
   String getUserToken();
@@ -18,4 +18,6 @@ abstract class AuthRepositoryInterface implements RepositoryInterface {
   void setNotificationActive(bool isActive);
   Future<bool> clearUserNumberAndPassword();
   Future<dynamic> registerDeliveryMan(DeliveryManBodyModel deliveryManBody, List<MultipartBody> multiParts);
+  Future<void> saveRideCreatedTime(DateTime dateTime);
+  Future<String> remainingTime();
 }

@@ -15,7 +15,9 @@ import 'package:sixam_mart_delivery/features/splash/controllers/splash_controlle
 import 'package:sixam_mart_delivery/features/auth/domain/models/delivery_man_body_model.dart';
 import 'package:sixam_mart_delivery/helper/custom_validator_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
@@ -50,6 +52,7 @@ class _DmRegistrationScreenState extends State<DmRegistrationScreen> {
   final FocusNode _identityNumberNode = FocusNode();
 
   String? _countryDialCode;
+  bool isRideActive = AppConstants.appMode == AppMode.ride;
 
   @override
   void initState() {
@@ -76,8 +79,7 @@ class _DmRegistrationScreenState extends State<DmRegistrationScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            'delivery_man_registration'.tr,
+          title: Text(isRideActive ? "rider_registration".tr : 'delivery_man_registration'.tr,
             style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.bodyLarge!.color),
           ),
           centerTitle: true,
@@ -124,6 +126,10 @@ class _DmRegistrationScreenState extends State<DmRegistrationScreen> {
 
         body: GetBuilder<AuthController>(builder: (authController) {
           return GetBuilder<AddressController>(builder: (addressController) {
+
+            var config = Get.find<SplashController>().configModel;
+            bool isRiderReferralActive = config?.riderReferralData?.referalStatus ?? false;
+            bool isDmReferralActive = config?.dmReferralData?.referalStatus ?? false;
 
             return Column(children: [
               Expanded(child: SingleChildScrollView(
@@ -325,40 +331,6 @@ class _DmRegistrationScreenState extends State<DmRegistrationScreen> {
                         padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                         child: Column(children: [
 
-                          Stack(clipBehavior: Clip.none, children: [
-                            CustomDropdownButton(
-                              hintText: 'select_delivery_type'.tr,
-                              items: authController.dmTypeList,
-                              selectedValue: authController.selectedDmType,
-                              onChanged: (value) {
-                                authController.setSelectedDmType(value);
-                              },
-                            ),
-
-                            Positioned(
-                              left: 10, top: -10,
-                              child: Container(
-                                color: Theme.of(context).cardColor,
-                                padding: const EdgeInsets.all(2),
-                                child: Row(children: [
-                                  Text('select_delivery_type'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).hintColor)),
-                                  Text(' *', style: robotoRegular.copyWith(color: Theme.of(context).colorScheme.error)),
-                                ]),
-                              ),
-                            ),
-                          ]),
-                          const SizedBox(height: Dimensions.paddingSizeExtraLarge),
-
-                          (authController.selectedDmType == 'freelancer') ? Padding(
-                            padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeExtraLarge),
-                            child: CustomTextFieldWidget(
-                              hintText: 'Ex: SPECIAL2025',
-                              labelText: 'referral_code'.tr,
-                              controller: _referTextController,
-                              inputAction: TextInputAction.done,
-                            ),
-                          ) : const SizedBox(),
-
                           addressController.zoneList != null ? Stack(clipBehavior: Clip.none, children: [
                             CustomDropdownButton(
                               hintText: 'select_delivery_zone'.tr,
@@ -389,9 +361,10 @@ class _DmRegistrationScreenState extends State<DmRegistrationScreen> {
                               child: Container(height: 50, color: Theme.of(context).shadowColor),
                             ),
                           ),
-                          const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
-                          authController.vehicleIds != null ? Stack(clipBehavior: Clip.none, children: [
+                          SizedBox(height: isRideActive ? 0: Dimensions.paddingSizeExtraLarge),
+
+                          isRideActive ? SizedBox() : authController.vehicleIds != null ? Stack(clipBehavior: Clip.none, children: [
                             CustomDropdownButton(
                               hintText: 'select_vehicle_type'.tr,
                               dropdownMenuItems: authController.vehicles!.map((vehicle) => DropdownMenuItem<String>(
@@ -421,6 +394,44 @@ class _DmRegistrationScreenState extends State<DmRegistrationScreen> {
                               child: Container(height: 50, color: Theme.of(context).shadowColor),
                             ),
                           ),
+
+                          if(!isRideActive) Padding(
+                            padding: const EdgeInsets.only(top: Dimensions.paddingSizeExtraLarge),
+                            child: Stack(clipBehavior: Clip.none, children: [
+                              CustomDropdownButton(
+                                hintText: 'select_delivery_type'.tr,
+                                items: authController.dmTypeList,
+                                selectedValue: authController.selectedDmType,
+                                onChanged: (value) {
+                                  authController.setSelectedDmType(value);
+                                },
+                              ),
+
+                              Positioned(
+                                left: 10, top: -10,
+                                child: Container(
+                                  color: Theme.of(context).cardColor,
+                                  padding: const EdgeInsets.all(2),
+                                  child: Row(children: [
+                                    Text('select_delivery_type'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).hintColor)),
+                                    Text(' *', style: robotoRegular.copyWith(color: Theme.of(context).colorScheme.error)),
+                                  ]),
+                                ),
+                              ),
+                            ]),
+                          ),
+
+
+                          ((isRideActive && isRiderReferralActive) || ( !isRideActive && isDmReferralActive && authController.selectedDmType == 'freelancer')) ? Padding(
+                            padding: const EdgeInsets.only(top: Dimensions.paddingSizeExtraLarge),
+                            child: CustomTextFieldWidget(
+                              hintText: 'Ex: SPECIAL2025',
+                              labelText: 'referral_code'.tr,
+                              controller: _referTextController,
+                              inputAction: TextInputAction.done,
+                            ),
+                          ) : const SizedBox(),
+
                         ]),
                       ),
                       const SizedBox(height: Dimensions.paddingSizeLarge),
@@ -616,6 +627,8 @@ class _DmRegistrationScreenState extends State<DmRegistrationScreen> {
                   PhoneValid phoneValid = await CustomValidator.isPhoneValid(numberWithCountryCode);
                   numberWithCountryCode = phoneValid.phone;
 
+                  String type = AppConstants.appMode == AppMode.delivery ? AppConstants.isDelivery : AppConstants.isRide;
+
                   if(authController.dmStatus == 0.4){
                     if(fName.isEmpty) {
                       showCustomSnackBar('enter_delivery_man_first_name'.tr);
@@ -641,11 +654,11 @@ class _DmRegistrationScreenState extends State<DmRegistrationScreen> {
                       authController.dmStatusChange(0.8);
                     }
                   }else{
-                    if(authController.selectedDmTypeId == null) {
+                    if(authController.selectedDmTypeId == null && !isRideActive) {
                       showCustomSnackBar('select_delivery_type'.tr);
                     }else if(addressController.selectedDeliveryZoneId == null){
                       showCustomSnackBar('select_delivery_zone'.tr);
-                    }else if(authController.selectedVehicleId == null){
+                    }else if(authController.selectedVehicleId == null && !isRideActive){
                       showCustomSnackBar('select_vehicle_type'.tr);
                     }else if(authController.selectedIdentityType == null){
                       showCustomSnackBar('select_identity_type'.tr);
@@ -654,11 +667,14 @@ class _DmRegistrationScreenState extends State<DmRegistrationScreen> {
                     }else if(authController.pickedIdentities.isEmpty) {
                       showCustomSnackBar('please_upload_identity_image'.tr);
                     }else {
+                      String earningType = isRideActive ? '1' : authController.selectedDmTypeId!;
+
                       authController.registerDeliveryMan(DeliveryManBodyModel(
                         fName: fName, lName: lName, password: password, phone: numberWithCountryCode, email: email,
                         identityNumber: identityNumber, identityType: authController.selectedIdentityType,
-                        earning: authController.selectedDmTypeId, zoneId: addressController.selectedDeliveryZoneId,
+                        earning: earningType, zoneId: addressController.selectedDeliveryZoneId,
                         vehicleId: authController.selectedVehicleId, referCode: _referTextController.text,
+                        type: type
                       ));
                     }
                   }

@@ -79,10 +79,10 @@ class CodePickerWidget extends StatefulWidget {
 }
 
 class _CodePickerWidgetState extends State<CodePickerWidget> {
+
   CountryCode? selectedItem;
   List<CountryCode>? elements = [];
   List<CountryCode>? favoriteElements = [];
-
 
   List<CountryCode> getCountryList(){
     List<Map<String, String>> jsonList = widget.countryList != null? widget.countryList! : [];
@@ -205,35 +205,28 @@ class _CodePickerWidgetState extends State<CodePickerWidget> {
         }
       });
     } else {
-      showModalBottomSheet(
-        barrierColor: widget.barrierColor ?? Colors.grey.withValues(alpha: 0.5),
-        backgroundColor: widget.backgroundColor ?? Colors.transparent,
-        context: context,
-        builder: (context) => Center(
-          child: SelectionDialog(
-            elements!,
-            favoriteElements!,
-            showCountryOnly: widget.showCountryOnly,
-            emptySearchBuilder: widget.emptySearchBuilder,
-            searchDecoration: widget.searchDecoration!,
-            searchStyle: widget.searchStyle,
-            textStyle: widget.dialogTextStyle,
-            boxDecoration: widget.boxDecoration,
-            showFlag: widget.showFlagDialog ?? widget.showFlag,
-            flagWidth: widget.flagWidth!,
-            flagDecoration: widget.flagDecoration,
-            size: widget.dialogSize,
-            backgroundColor: widget.dialogBackgroundColor,
-            barrierColor: widget.barrierColor,
-            hideSearch: widget.hideSearch!,
-            closeIcon: widget.closeIcon,
-            hideHeaderText: false,
-            headerAlignment: MainAxisAlignment.start,
-            headerTextStyle: robotoMedium,
-            topBarPadding: EdgeInsets.zero,
-          ),
-        ),
-      ).then((e) {
+      Get.bottomSheet(SelectionDialog(
+        elements!,
+        favoriteElements!,
+        showCountryOnly: widget.showCountryOnly,
+        emptySearchBuilder: widget.emptySearchBuilder,
+        searchDecoration: widget.searchDecoration!,
+        searchStyle: widget.searchStyle,
+        textStyle: widget.dialogTextStyle,
+        boxDecoration: widget.boxDecoration,
+        showFlag: widget.showFlagDialog ?? widget.showFlag,
+        flagWidth: widget.flagWidth!,
+        flagDecoration: widget.flagDecoration,
+        size: Size(context.width, context.height * 0.5),
+        backgroundColor: widget.dialogBackgroundColor,
+        barrierColor: widget.barrierColor,
+        hideSearch: widget.hideSearch!,
+        closeIcon: widget.closeIcon,
+        hideHeaderText: false,
+        headerAlignment: MainAxisAlignment.start,
+        headerTextStyle: robotoMedium,
+        topBarPadding: EdgeInsets.zero,
+      ), isScrollControlled: true).then((e) {
         if (e != null) {
           setState(() {
             selectedItem = e;

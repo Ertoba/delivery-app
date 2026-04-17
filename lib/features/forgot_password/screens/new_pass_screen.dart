@@ -5,7 +5,9 @@ import 'package:sixam_mart_delivery/features/forgot_password/controllers/forgot_
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/profile/domain/models/profile_model.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_app_bar_widget.dart';
@@ -151,6 +153,8 @@ class _NewPassScreenState extends State<NewPassScreen> {
   void _resetPassword(AuthController authController) {
     String password = _newPasswordController.text.trim();
     String confirmPassword = _confirmPasswordController.text.trim();
+    String type = AppConstants.appMode == AppMode.delivery ? AppConstants.isDelivery : AppConstants.isRide;
+
     if (password.isEmpty) {
       showCustomSnackBar('enter_password'.tr);
     }else if (password.length < 8) {
@@ -166,7 +170,7 @@ class _NewPassScreenState extends State<NewPassScreen> {
       }else {
         Get.find<ForgotPasswordController>().resetPassword(widget.resetToken, '+${widget.number!.trim()}', password, confirmPassword).then((value) {
           if (value.isSuccess) {
-            Get.find<AuthController>().login('+${widget.number!.trim()}', password).then((value) async {
+            Get.find<AuthController>().login('+${widget.number!.trim()}', password, type).then((value) async {
               Get.offAllNamed(RouteHelper.getInitialRoute());
             });
           } else {

@@ -29,13 +29,19 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
-  Future<void> recordWebSocketLocation(RecordLocationBodyModel recordLocationBody) async {
-    await profileRepositoryInterface.recordWebSocketLocation(recordLocationBody);
+  Future<void> recordWebSocketLocation(RecordLocationBodyModel recordLocationBody, String zoneId) async {
+    await profileRepositoryInterface.recordWebSocketLocation(recordLocationBody, zoneId );
   }
 
   @override
-  Future<Response> recordLocation(RecordLocationBodyModel recordLocationBody) async {
-    return await profileRepositoryInterface.recordLocation(recordLocationBody);
+  Future<Response> recordLocation(RecordLocationBodyModel recordLocationBody, String zoneId) async {
+    return await profileRepositoryInterface.recordLocation(recordLocationBody, zoneId);
+  }
+
+
+  @override
+  Future<String> getZoneId(Position locationResult) async {
+    return await profileRepositoryInterface.getZoneId(locationResult);
   }
 
   @override
@@ -85,6 +91,11 @@ class ProfileService implements ProfileServiceInterface {
     }else {
       callback();
     }
+  }
+
+  @override
+  Future getProfileLevelInfo() {
+    return profileRepositoryInterface.getProfileLevelInfo();
   }
 
 }

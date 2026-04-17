@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
@@ -12,6 +14,11 @@ class ReferralEarnBottomSheetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    var config = Get.find<SplashController>().configModel;
+    bool isRideActive = AppConstants.appMode == AppMode.ride;
+    double referralAmount = isRideActive ? (config?.riderReferralData?.referalAmount ?? 0) :  (config?.dmReferralData?.referalAmount ?? 0);
+
     return SafeArea(
       top: false,
       child: Container(
@@ -117,7 +124,7 @@ class ReferralEarnBottomSheetWidget extends StatelessWidget {
                       ),
                       children: [
                         TextSpan(
-                          text: '${PriceConverterHelper.convertPrice(Get.find<SplashController>().configModel?.dmReferralData?.dmReferalAmount ?? 0)} ',
+                          text: '${PriceConverterHelper.convertPrice(referralAmount)} ',
                           style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
                         ),
                         TextSpan(

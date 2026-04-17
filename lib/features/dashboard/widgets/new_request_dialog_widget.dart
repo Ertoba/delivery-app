@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:sixam_mart_delivery/features/order/controllers/order_controller.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/controllers/order_controller.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
@@ -12,8 +12,8 @@ class NewRequestDialogWidget extends StatefulWidget {
   final bool isRequest;
   final Function onTap;
   final int orderId;
-  final bool isParcel;
-  const NewRequestDialogWidget({super.key, required this.isRequest, required this.onTap, required this.orderId, required this.isParcel});
+  final bool hideItemCount;
+  const NewRequestDialogWidget({super.key, required this.isRequest, required this.onTap, required this.orderId, required this.hideItemCount});
 
   @override
   State<NewRequestDialogWidget> createState() => _NewRequestDialogWidgetState();
@@ -27,7 +27,7 @@ class _NewRequestDialogWidgetState extends State<NewRequestDialogWidget> {
     super.initState();
 
     _startAlarm();
-    Get.find<OrderController>().getOrderDetails(widget.orderId, widget.isParcel);
+    Get.find<OrderController>().getOrderDetails(widget.orderId, widget.hideItemCount);
   }
 
   @override
@@ -64,7 +64,7 @@ class _NewRequestDialogWidgetState extends State<NewRequestDialogWidget> {
               ),
             ),
 
-            !widget.isParcel && orderController.orderDetailsModel != null ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            widget.hideItemCount && orderController.orderDetailsModel != null && orderController.orderDetailsModel!.length != 0 ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text('with'.tr , textAlign: TextAlign.center, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault)),
               Text(
                 ' ${orderController.orderDetailsModel != null ? orderController.orderDetailsModel!.length.toString() : 0} ',

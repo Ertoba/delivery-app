@@ -1,17 +1,16 @@
 class Images {
   static const String logo = 'assets/image/logo.png';
-  static const String headerLogo = 'assets/image/header_logo.png';
+  static const String georgian = 'assets/image/georgian.png';
+  static const String russian = 'assets/image/russian.png';
   static const String call = 'assets/image/call.png';
   static const String lock = 'assets/image/lock.png';
   static const String english = 'assets/image/english.png';
   static const String arabic = 'assets/image/arabic.png';
   static const String spanish = 'assets/image/spanish.png';
   static const String bangla = 'assets/image/bangla.png';
-  static const String georgian = 'assets/image/georgian.png';
   static const String mail = 'assets/image/mail.png';
   static const String checked = 'assets/image/checked.png';
-  static const String deliveryManMarker =
-      'assets/image/delivery_man_marker.png';
+  static const String deliveryManMarker = 'assets/image/delivery_man_marker.png';
   static const String locationMarker = 'assets/image/location_marker.png';
   static const String restaurantMarker = 'assets/image/restaurant_marker.png';
   static const String location = 'assets/image/location.png';
@@ -28,21 +27,16 @@ class Images {
   static const String user = 'assets/image/user.png';
   static const String forgot = 'assets/image/forgot.png';
   static const String wallet = 'assets/image/wallet.png';
-  static const String locationPermission =
-      'assets/image/location_permission.png';
+  static const String locationPermission = 'assets/image/location_permission.png';
   static const String update = 'assets/image/update.png';
   static const String maintenance = 'assets/image/maintenance.png';
   static const String image = 'assets/image/image.png';
   static const String send = 'assets/image/send.png';
-  static const String notificationPlaceholder =
-      'assets/image/notification_placeholder.jpg';
+  static const String notificationPlaceholder = 'assets/image/notification_placeholder.jpg';
   static const String deliveredSuccess = 'assets/image/delivered_success.gif';
-  static const String transactionReportIcon =
-      'assets/image/transaction_report_icon.png';
-  static const String onHoldTransactionIcon =
-      'assets/image/on_hold_transaction_icon.png';
-  static const String attentionWarningIcon =
-      'assets/image/attention_warning_icon.png';
+  static const String transactionReportIcon = 'assets/image/transaction_report_icon.png';
+  static const String onHoldTransactionIcon = 'assets/image/on_hold_transaction_icon.png';
+  static const String attentionWarningIcon = 'assets/image/attention_warning_icon.png';
   static const String walletIcon = 'assets/image/wallet_icon.png';
   static const String cashInHandBg = 'assets/image/cash_in_hand_bg.png';
   static const String customerMarker = 'assets/image/customer_marker.png';
@@ -51,12 +45,11 @@ class Images {
   static const String userMarker = 'assets/image/user_marker.png';
   static const String markerStore = 'assets/image/marker_store.png';
   static const String languageBackground = 'assets/image/language_bg.png';
-  static const String cautionDialogIcon =
-      'assets/image/caution_dialog_icon.png';
+  static const String cautionDialogIcon = 'assets/image/caution_dialog_icon.png';
+  static const String emptyTransaction = 'assets/image/empty_transaction.png';
   static const String personIcon = 'assets/image/person.png';
   static const String dmOfflineIcon = 'assets/image/dm_offline_icon.png';
-  static const String locationAccessIcon =
-      'assets/image/location_access_icon.png';
+  static const String locationAccessIcon = 'assets/image/location_access_icon.png';
   static const String pictureIcon = 'assets/image/picture_icon.png';
   static const String successIcon = 'assets/image/success_icon.png';
   static const String emptyPaymentIcon = 'assets/image/empty_payment_icon.png';
@@ -64,10 +57,8 @@ class Images {
   static const String deleteIcon = 'assets/image/delete_icon.png';
   static const String balanceIcon = 'assets/image/balance_icon.png';
   static const String coin = 'assets/image/coin.png';
-  static const String pendingWithdrawIcon =
-      'assets/image/pending_withdraw_icon.png';
-  static const String alreadyWithdrawIcon =
-      'assets/image/already_withdraw_icon.png';
+  static const String pendingWithdrawIcon = 'assets/image/pending_withdraw_icon.png';
+  static const String alreadyWithdrawIcon = 'assets/image/already_withdraw_icon.png';
   static const String verification = 'assets/image/verification.png';
   static const String orderNotification = 'assets/image/order_notification.png';
   static const String otherNotification = 'assets/image/other_notification.png';
@@ -98,8 +89,7 @@ class Images {
   static const String referCoin = 'assets/image/refer_coin.png';
   static const String totalEarning = 'assets/image/totalEarning.png';
   static const String deliveryFeeEarned = 'assets/image/deliveryFeeEarned.png';
-  static const String deliveryTipsEarned =
-      'assets/image/deliveryTipsEarned.png';
+  static const String deliveryTipsEarned = 'assets/image/deliveryTipsEarned.png';
   static const String refferalIcon = 'assets/image/refferalIcon.png';
   static const String loyaltyPoint2 = 'assets/image/loyaltyPoint.png';
   static const String payMoneyImage = 'assets/image/pay_money_image.png';
@@ -110,7 +100,60 @@ class Images {
   static const String coinIcon = 'assets/image/coin_icon.png';
 
   ///Svg Images
-  static const String changePasswordBgImage =
-      'assets/image/change_password_bg_image.svg';
+  static const String changePasswordBgImage = 'assets/image/change_password_bg_image.svg';
   static const String orderIcon = 'assets/image/order_on_the_way_icon.svg';
+
+  /// rider
+  static const String fromIcon = 'assets/image/rider/from_icon.png';
+  static const String targetLocationIcon = 'assets/image/rider/target_location_icon.png';
+  static const String carTop = 'assets/image/rider/car_top.png';
+  static const String mapLocationIcon = 'assets/image/rider/map_location_icon.png';
+  static const String carIconTop = 'assets/image/rider/car_icon_top.png';
+  static const String distanceCalculated = 'assets/image/rider/distance_calculated_icon.png';
+  static const String completationDialogIcon = 'assets/image/rider/completation_dialog_icon.png';
+  static const String completationDialogIcon2 = 'assets/image/rider/completation_dialog_icon2.png';
+  static const String reqListIcon = 'assets/image/rider/req_list_icon.png';
+  static const String trafficOfflineIcon = 'assets/image/rider/traffic_offline_icon.png';
+  static const String trafficOnlineIcon = 'assets/image/rider/traffic_online_icon.png';
+  static const String safetyAlarmIcon = 'assets/image/rider/safety_alarm_icon.png';
+  static const String shieldCheckIcon = 'assets/image/rider/shield_check_icon.png';
+  static const String safelyShieldIcon1 = 'assets/image/rider/safety_shield_icon1.png';
+  static const String safelyShieldIcon2 = 'assets/image/rider/safety_shield_icon2.png';
+  static const String safelyShieldIcon3 = 'assets/image/rider/safety_shield_icon3.png';
+  static const String currentLocation = 'assets/image/rider/current_location_icon.png';
+  static const String rideCar = 'assets/image/rider/ride_car.png';
+  static const String rideBike = 'assets/image/rider/ride_bike.png';
+  static const String rideShareIcon = 'assets/image/rider/ride_share_icon.png';
+  static const String myEarnIcon = 'assets/image/rider/my_earn_icon.png';
+  static const String arrowRight = 'assets/image/rider/arrow_right.png';
+  static const String clockIcon = 'assets/image/rider/clock_icon.png';
+  static const String calenderIcon = 'assets/image/rider/calender_icon.png';
+  static const String noDataFound = 'assets/image/rider/no_data_found.png';
+  static const String noReview = 'assets/image/rider/no_review.png';
+  static const String levelUpAwardIcon = 'assets/image/rider/lvele_up_award_icon.png';
+  static const String navigation = 'assets/image/rider/navigation.png';
+  static const String bikeTop = 'assets/image/rider/bike_top.png';
+  static const String leaderBoardIcon = 'assets/image/rider/leaderboard_icon.png';
+  static const String curvedArrow = 'assets/image/rider/curved_arrow.png';
+  static const String supportImage = 'assets/image/support_image.png';
+  static const String deleteImage = 'assets/image/delete_image.png';
+  static const String edit = 'assets/image/edit.png';
+  static const String delete = 'assets/image/delete.png';
+  static const String destinationIcon = 'assets/image/destination.png';
+  static const String offline = 'assets/image/ofline.png';
+  static const String phoneOrderDetails = 'assets/image/phone_order_details.png';
+  static const String riderCall = 'assets/image/rider_call.png';
+  static const String riderChat = 'assets/image/chat.png';
+  static const String frame = 'assets/image/frame2.png';
+  static const String module = 'assets/image/module.png';
+  static const String taxiPickup = 'assets/image/taxi_pickup.png';
+  static const String taxiDestination = 'assets/image/taxi_destination.png';
+  static const String flag = 'assets/image/flag.png';
+  static const String mapIcon = 'assets/image/map_icon.png';
+  static const String mapFrame = 'assets/image/map_frame.png';
+  static const String shieldTick = 'assets/image/shield-tick.png';
+  static const String rideImage = 'assets/image/ride_image.png';
+  static const String noRideRequest = 'assets/image/no_ride_request.png';
+  static const String noDeliveryRequest = 'assets/image/no_delivery_request.png';
+  static const String car = 'assets/image/car.png';
 }

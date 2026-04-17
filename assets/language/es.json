@@ -638,5 +638,8 @@
   "amount_collect_from_customer": "Monto a cobrar al cliente",
   "already_paid_digitally": "Ya pagado digitalmente",
   "schedule": "Horario",
-  "you_can_pay_the_amount_to_the_admin": "Puedes pagar el monto al administrador"
+  "you_can_pay_the_amount_to_the_admin": "Puedes pagar el monto al administrador",
+  "from_customer_to_store_distance": "Distancia del cliente a la tienda",
+  "your_distance_from_store": "Tu distancia de la tienda",
+  "order_date": "Fecha del pedido"
 }

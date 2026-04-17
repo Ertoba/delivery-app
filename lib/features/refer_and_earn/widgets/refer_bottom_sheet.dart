@@ -7,7 +7,9 @@ import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
@@ -21,6 +23,11 @@ class ReferBottomSheet extends StatefulWidget {
 class _ReferBottomSheetState extends State<ReferBottomSheet> {
   @override
   Widget build(BuildContext context) {
+
+    var config = Get.find<SplashController>().configModel;
+    bool isRideActive = AppConstants.appMode == AppMode.ride;
+    double referralAmount = isRideActive ? (config?.riderReferralData?.referalAmount ?? 0) :  (config?.dmReferralData?.referalAmount ?? 0);
+    
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -57,7 +64,7 @@ class _ReferBottomSheetState extends State<ReferBottomSheet> {
                   fontSize: Dimensions.fontSizeDefault - 1, height: 1.5,
                 ),
                 children: [TextSpan(
-                  text: '  ${PriceConverterHelper.convertPrice(Get.find<SplashController>().configModel?.dmReferralData?.dmReferalAmount ?? 0)}  ',
+                  text: '  ${PriceConverterHelper.convertPrice(referralAmount)}  ',
                   style: robotoBold,
                 ),
                   TextSpan(

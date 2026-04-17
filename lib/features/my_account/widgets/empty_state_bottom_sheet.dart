@@ -4,7 +4,9 @@ import 'package:sixam_mart_delivery/common/widgets/custom_asset_image_widget.dar
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
@@ -14,6 +16,11 @@ class EmptyStateBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    bool isRideActive = AppConstants.appMode == AppMode.ride;
+    final config = Get.find<SplashController>().configModel;
+    double minimumPayableAmount = isRideActive ? (config?.minAmountToPayRider ?? 0) : (config?.minAmountToPayDm ?? 0);
+
     return Container(
       width: context.width,
       padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
@@ -55,7 +62,7 @@ class EmptyStateBottomSheet extends StatelessWidget {
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
               Text(
-                noPaymentMethod ? 'no_payment_method_is_available'.tr : '${'you_do_not_have_sufficient_balance_to_pay_the_minimum_payable_balance_is'.tr} ${PriceConverterHelper.convertPrice(Get.find<SplashController>().configModel!.minAmountToPayDm)}',
+                noPaymentMethod ? 'no_payment_method_is_available'.tr : '${'you_do_not_have_sufficient_balance_to_pay_the_minimum_payable_balance_is'.tr} ${PriceConverterHelper.convertPrice(minimumPayableAmount)}',
                 style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge!.color?.withValues(alpha: 0.5)),
                 textAlign: TextAlign.center,
               ),

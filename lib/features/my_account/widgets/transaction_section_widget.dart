@@ -5,6 +5,7 @@ import 'package:sixam_mart_delivery/helper/date_converter_helper.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
 import 'package:sixam_mart_delivery/helper/string_extension.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
 class TransactionSectionWidget extends StatelessWidget {
@@ -69,7 +70,14 @@ class EarningListWidget extends StatelessWidget {
       return Center(
         child: Padding(
           padding: EdgeInsets.only(top: selectedIndex == 0 ? 115 : 250),
-          child: Text(selectedIndex == 0 ? 'no_withdraw_found'.tr : selectedIndex == 1 ? 'no_transaction_found'.tr : 'no_wallet_history'.tr)
+          child: Column(
+            children: [
+              Image.asset(Images.emptyTransaction, width: 50, height: 50,),
+              SizedBox(height: Dimensions.paddingSizeSmall,),
+
+              Text(selectedIndex == 0 ? 'no_withdraw_found'.tr : selectedIndex == 1 ? 'no_transaction_found'.tr : 'no_wallet_history'.tr),
+            ],
+          )
         ),
       );
     }

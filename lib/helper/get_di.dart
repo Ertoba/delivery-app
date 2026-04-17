@@ -46,11 +46,11 @@ import 'package:sixam_mart_delivery/features/notification/domain/repositories/no
 import 'package:sixam_mart_delivery/features/notification/domain/repositories/notification_repository_interface.dart';
 import 'package:sixam_mart_delivery/features/notification/domain/services/notification_service.dart';
 import 'package:sixam_mart_delivery/features/notification/domain/services/notification_service_interface.dart';
-import 'package:sixam_mart_delivery/features/order/controllers/order_controller.dart';
-import 'package:sixam_mart_delivery/features/order/domain/repositories/order_repository.dart';
-import 'package:sixam_mart_delivery/features/order/domain/repositories/order_repository_interface.dart';
-import 'package:sixam_mart_delivery/features/order/domain/services/order_service.dart';
-import 'package:sixam_mart_delivery/features/order/domain/services/order_service_interface.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/controllers/order_controller.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/domain/repositories/order_repository.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/domain/repositories/order_repository_interface.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/domain/services/order_service.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/domain/services/order_service_interface.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/profile/domain/repositories/profile_repository.dart';
 import 'package:sixam_mart_delivery/features/profile/domain/repositories/profile_repository_interface.dart';
@@ -61,6 +61,38 @@ import 'package:sixam_mart_delivery/features/refer_and_earn/domain/repositories/
 import 'package:sixam_mart_delivery/features/refer_and_earn/domain/repositories/refer_and_earn_repository_interface.dart';
 import 'package:sixam_mart_delivery/features/refer_and_earn/domain/services/refer_and_earn_service.dart';
 import 'package:sixam_mart_delivery/features/refer_and_earn/domain/services/refer_and_earn_service_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/controllers/add_vehicle_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/domain/repositories/add_vehicle_repository.dart';
+import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/domain/repositories/add_vehicle_repository_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/domain/services/add_vehicle_service.dart';
+import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/domain/services/add_vehicle_service_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/leaderboard/controllers/leader_board_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/leaderboard/domain/repositories/leader_board_repository.dart';
+import 'package:sixam_mart_delivery/features/ride_module/leaderboard/domain/repositories/leader_board_repository_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/leaderboard/domain/services/leader_board_service.dart';
+import 'package:sixam_mart_delivery/features/ride_module/leaderboard/domain/services/leader_board_service_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/map/controllers/otp_time_count_Controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/map/controllers/ride_map_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/review/controllers/review_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/review/domain/repositories/review_repository.dart';
+import 'package:sixam_mart_delivery/features/ride_module/review/domain/repositories/review_repository_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/review/domain/services/review_service.dart';
+import 'package:sixam_mart_delivery/features/ride_module/review/domain/services/review_service_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/controllers/ride_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/domain/repositories/ride_order_repository.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/domain/repositories/ride_order_repository_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/domain/services/ride_order_service.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/domain/services/ride_order_service_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/safety/controllers/safety_alert_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/safety/domain/repositories/safety_alert_repository.dart';
+import 'package:sixam_mart_delivery/features/ride_module/safety/domain/repositories/safety_alert_repository_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/safety/domain/services/safety_alert_service.dart';
+import 'package:sixam_mart_delivery/features/ride_module/safety/domain/services/safety_alert_service_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/trip/controllers/trip_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/trip/domain/repositories/trip_repository.dart';
+import 'package:sixam_mart_delivery/features/ride_module/trip/domain/repositories/trip_repository_interface.dart';
+import 'package:sixam_mart_delivery/features/ride_module/trip/domain/services/trip_service.dart';
+import 'package:sixam_mart_delivery/features/ride_module/trip/domain/services/trip_service_interface.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/features/splash/domain/repositories/splash_repository.dart';
 import 'package:sixam_mart_delivery/features/splash/domain/repositories/splash_repository_interface.dart';
@@ -119,6 +151,25 @@ Future<Map<String, Map<String, String>>> init() async {
   ReferEarnRepositoryInterface referEarnRepositoryInterface = ReferEarnRepository(apiClient: Get.find(), sharedPreferences: Get.find());
   Get.lazyPut(() => referEarnRepositoryInterface);
 
+  AddVehicleRepositoryInterface addVehicleRepositoryInterface = AddVehicleRepository(apiClient: Get.find(), sharedPreferences: Get.find());
+  Get.lazyPut(() => addVehicleRepositoryInterface);
+
+  RideOrderRepositoryInterface rideOrderRepositoryInterface = RideOrderRepository(apiClient: Get.find(), sharedPreferences: Get.find());
+  Get.lazyPut(() => rideOrderRepositoryInterface);
+
+  TripRepositoryInterface tripRepositoryInterface = TripRepository(apiClient: Get.find(), sharedPreferences : Get.find());
+  Get.lazyPut(() => tripRepositoryInterface);
+
+  SafetyAlertRepositoryInterface safetyAlertRepositoryInterface = SafetyAlertRepository(apiClient: Get.find(), sharedPreferences: Get.find());
+  Get.lazyPut(() => safetyAlertRepositoryInterface);
+
+
+  ReviewRepositoryInterface reviewRepositoryInterface = ReviewRepository(apiClient: Get.find(), sharedPreferences: Get.find());
+  Get.lazyPut(() => reviewRepositoryInterface);
+
+  LeaderBoardRepositoryInterface leaderBoardRepositoryInterface = LeaderBoardRepository(apiClient: Get.find(), sharedPreferences: Get.find());
+  Get.lazyPut(() => leaderBoardRepositoryInterface);
+
   /// Service Interface
   HtmlServiceInterface htmlServiceInterface = HtmlService(htmlRepositoryInterface: Get.find());
   Get.lazyPut(() => htmlServiceInterface);
@@ -159,6 +210,25 @@ Future<Map<String, Map<String, String>>> init() async {
   ReferEarnServiceInterface referEarnServiceInterface = ReferEarnService(referEarnRepositoryInterface: Get.find());
   Get.lazyPut(() => referEarnServiceInterface);
 
+  AddVehicleServiceInterface addVehicleServiceInterface = AddVehicleService(addVehicleRepositoryInterface: Get.find());
+  Get.lazyPut(() => addVehicleServiceInterface);
+
+  RideOrderServiceInterface rideOrderServiceInterface = RideOrderService(rideOrderRepositoryInterface: Get.find());
+  Get.lazyPut(() => rideOrderServiceInterface);
+
+  TripServiceInterface tripServiceInterface = TripService(tripRepositoryInterface: Get.find());
+  Get.lazyPut(() => tripServiceInterface);
+
+  SafetyAlertServiceInterface safetyAlertServiceInterface = SafetyAlertService(safetyAlertRepositoryInterface: Get.find());
+  Get.lazyPut(() => safetyAlertServiceInterface);
+
+
+  ReviewServiceInterface reviewServiceInterface = ReviewService(reviewRepositoryInterface: Get.find());
+  Get.lazyPut(() => reviewServiceInterface);
+
+  LeaderBoardServiceInterface leaderBoardServiceInterface = LeaderBoardService(leaderBoardRepositoryInterface: Get.find());
+  Get.lazyPut(() => leaderBoardServiceInterface);
+
   /// Service
   Get.lazyPut(() => HtmlService(htmlRepositoryInterface: Get.find()));
   Get.lazyPut(() => DisbursementService(disbursementRepositoryInterface: Get.find()));
@@ -172,6 +242,10 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => AddressService(addressRepositoryInterface: Get.find()));
   Get.lazyPut(() => AuthService(authRepositoryInterface: Get.find()));
   Get.lazyPut(() => OrderService(orderRepositoryInterface: Get.find()));
+
+  Get.lazyPut(() => TripService(tripRepositoryInterface: Get.find()));
+  Get.lazyPut(() => SafetyAlertService(safetyAlertRepositoryInterface: Get.find()));
+  Get.lazyPut(() => ReviewRepository(apiClient: Get.find(), sharedPreferences: Get.find()));
 
   /// Controller
   Get.lazyPut(() => HtmlController(htmlServiceInterface: Get.find()));
@@ -188,6 +262,15 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => AuthController(authServiceInterface: Get.find()));
   Get.lazyPut(() => OrderController(orderServiceInterface: Get.find()));
   Get.lazyPut(() => ReferAndEarnController(referEarnServiceInterface: Get.find()));
+
+  Get.lazyPut(() => RiderMapController());
+  Get.lazyPut(() => AddVehicleController(addVehicleServiceInterface: Get.find()));
+  Get.lazyPut(() => RideController(rideOrderServiceInterface: Get.find()));
+  Get.lazyPut(() => TripController(tripServiceInterface: Get.find()));
+  Get.lazyPut(() => SafetyAlertController(safetyAlertServiceInterface: Get.find()));
+  Get.lazyPut(() => OtpTimeCountController());
+  Get.lazyPut(() => ReviewController(reviewServiceInterface: Get.find()));
+  Get.lazyPut(() => LeaderBoardController(leaderBoardServiceInterface: Get.find()));
 
   /// Retrieving localized data
   Map<String, Map<String, String>> languages = {};

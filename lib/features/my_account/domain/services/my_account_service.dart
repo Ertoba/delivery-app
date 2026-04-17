@@ -63,8 +63,8 @@ class MyAccountService implements MyAccountServiceInterface {
   }
 
   @override
-  Future<Response> convertPoint(String point) async {
-    return await myAccountRepositoryInterface.convertPoint(point);
+  Future<Response> convertPoint(String point, {required bool isRideActive}) async {
+    return await myAccountRepositoryInterface.convertPoint(point, isRideActive: isRideActive);
   }
 
 }

@@ -7,12 +7,15 @@ import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_c
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
 class PointToWalletMoneyWidget extends StatefulWidget {
-  const PointToWalletMoneyWidget({super.key});
+  final bool isRideActive;
+  const PointToWalletMoneyWidget({super.key, required this.isRideActive});
 
   @override
   State<PointToWalletMoneyWidget> createState() =>
@@ -41,10 +44,12 @@ class _PointToWalletMoneyWidgetState extends State<PointToWalletMoneyWidget> {
         borderRadius: BorderRadius.circular(Dimensions.paddingSizeDefault),
       ),
       child: GetBuilder<MyAccountController>(builder: (myAccountController) {
+        bool isRideActive = AppConstants.appMode == AppMode.ride;
+        final config = Get.find<SplashController>().configModel;
         final int enteredPoint = int.tryParse(amountController.text) ?? 0;
-        final int minPoint = Get.find<SplashController>().configModel?.dmLoyalityPointData?.dmMinLoyalityPointToConvert ?? 0;
+        final int minPoint = isRideActive ? (config?.riderLoyalityPointData?.minLoyalityPointToConvert ?? 0) : (config?.dmLoyalityPointData?.minLoyalityPointToConvert ?? 0);
         final int availablePoint = Get.find<ProfileController>().profileModel?.loyaltyPoint ?? 0;
-        final int conversionRate = Get.find<SplashController>().configModel?.dmLoyalityPointData?.dmLoyalityPointConversionRate ?? 1;
+        final int conversionRate = isRideActive ? (config?.riderLoyalityPointData?.loyalityPointConversionRate ?? 1) : (config?.dmLoyalityPointData?.loyalityPointConversionRate ?? 1);
         final bool isValid = enteredPoint >= minPoint && enteredPoint <= availablePoint && enteredPoint > 0;
 
         return Padding(
@@ -177,7 +182,7 @@ class _PointToWalletMoneyWidgetState extends State<PointToWalletMoneyWidget> {
                 disabledFontColor: Colors.white,
                 radius: 10,
                 onPressed: isValid ? () {
-                  myAccountController.convertPoint(enteredPoint.toString()).then((value) {
+                  myAccountController.convertPoint(enteredPoint.toString(), isRideActive: isRideActive).then((value) {
                     if (value.statusCode == 200) {
                       Get.back();
                       showCustomSnackBar('successfully_converted_to_wallet_money'.tr, isError: false);

@@ -14,4 +14,5 @@ abstract class ChatServiceInterface {
   Future<MessageModel?> processSendMessage(NotificationBodyModel? notificationBody, List<MultipartBody> chatImage, String message, int? conversationId);
   List<MultipartBody> processMultipartFiles(List<XFile> files);
   List<MultipartBody> processMultipartVideo(XFile? video);
+  Future<MessageModel?> sendFaqMessage({String? questionId});
 }

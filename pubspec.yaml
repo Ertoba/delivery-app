@@ -1,7 +1,7 @@
 name: sixam_mart_delivery
 description: A new Flutter application.
 publish_to: 'none' #
-version: 1.0.0+1
+version: 3.8.0+3
 
 environment:
   sdk: ^3.10.0
@@ -39,7 +39,6 @@ dependencies:
   intl: ^0.20.2
   dotted_border: ^3.1.0
   photo_view: ^0.15.0
-  web_socket_channel: ^3.0.3
   flutter_inappwebview: ^6.1.5
   just_the_tooltip: ^0.0.12
   flutter_svg: ^2.2.3
@@ -53,6 +52,18 @@ dependencies:
   emoji_picker_flutter: ^4.4.0
   file_picker: ^10.3.10
 
+  # rider
+  expandable_bottom_sheet: ^1.1.1+1
+  google_map_custom_windows: ^1.1.0
+  dart_pusher_channels: ^1.2.3
+  #web_socket_channel: ^3.0.3
+  fl_chart: ^0.69.2
+  square_progress_indicator: ^0.0.8
+  percent_indicator: ^4.2.5
+  flutter_polyline_points: ^3.0.1
+  video_thumbnail: ^0.5.6
+  readmore: ^3.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -63,7 +74,9 @@ flutter:
 
   assets:
     - assets/image/
+    - assets/image/rider/
     - assets/language/
+    - assets/map/
     - assets/notification.mp3
 
   fonts:

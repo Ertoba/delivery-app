@@ -3,6 +3,8 @@ import 'package:sixam_mart_delivery/api/api_client.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/models/delivery_man_body_model.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/models/vehicle_model.dart';
+import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart_delivery/helper/pusher_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -80,12 +82,17 @@ class AuthController extends GetxController implements GetxService {
   bool _notificationLoading = false;
   bool get notificationLoading => _notificationLoading;
 
-  Future<ResponseModel> login(String phone, String password) async {
+  Future<ResponseModel> login(String phone, String password, String type) async {
     _isLoading = true;
     update();
-    Response response = await authServiceInterface.login(phone, password);
+    Response response = await authServiceInterface.login(phone, password, type);
     ResponseModel responseModel;
     if (response.statusCode == 200) {
+
+      if(Get.find<SplashController>().configModel?.webSocketStatus ?? false){
+        PusherHelper.initializePusher();
+      }
+
       authServiceInterface.saveUserToken(response.body['token'], response.body['zone_topic'], response.body['topic']);
       await authServiceInterface.updateToken();
       responseModel = ResponseModel(true, 'successful');
@@ -273,6 +280,10 @@ class AuthController extends GetxController implements GetxService {
     _uppercaseCheck = false;
     _lowercaseCheck = false;
     _spatialCheck = false;
+  }
+
+  void saveRideCreatedTime(){
+    authServiceInterface.saveRideCreatedTime(DateTime.now());
   }
   
 }

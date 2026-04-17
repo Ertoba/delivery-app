@@ -8,6 +8,7 @@ import 'package:sixam_mart_delivery/helper/date_converter_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_app_bar_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_image_widget.dart';
@@ -17,7 +18,7 @@ import 'package:sixam_mart_delivery/common/widgets/paginated_list_view_widget.da
 import 'package:sixam_mart_delivery/features/chat/widgets/search_field_widget.dart';
 
 import '../../auth/controllers/auth_controller.dart';
-import '../../order/widgets/sliver_delegate.dart';
+import '../../../common/widgets/sliver_delegate.dart';
 import '../../profile/controllers/profile_controller.dart';
 
 class ConversationScreen extends StatefulWidget {
@@ -31,6 +32,7 @@ class _ConversationScreenState extends State<ConversationScreen> with TickerProv
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   late TabController _tabController;
+  bool isRideActive = AppConstants.appMode == AppMode.ride;
 
   @override
   void initState() {
@@ -122,7 +124,7 @@ class _ConversationScreenState extends State<ConversationScreen> with TickerProv
             },
             child: CustomScrollView(controller: _scrollController, slivers: [
               // Sticky Tab bar
-              SliverPersistentHeader(
+              if(!isRideActive) SliverPersistentHeader(
                 pinned: true,
                 delegate: SliverDelegate(height: 60, child: Container(
                   alignment: Alignment.center,
@@ -212,7 +214,7 @@ class _ConversationScreenState extends State<ConversationScreen> with TickerProv
               type = conversation.senderType;
             }
 
-            bool unSeen = conversation.lastMessage?.isSeen == false && conversation.unreadMessageCount! > 0 && conversation.lastMessage!.senderId != user?.id;
+            bool unSeen = conversation.lastMessage?.isSeen == 0 && conversation.unreadMessageCount! > 0 && conversation.lastMessage!.senderId != user?.id;
 
             return Container(
               margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),

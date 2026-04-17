@@ -1,26 +1,28 @@
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:sixam_mart_delivery/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart_delivery/features/home/widgets/order_count_card_widget.dart';
+import 'package:sixam_mart_delivery/features/dashboard/screens/dashboard_screen.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/active_order_widget.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/active_ride_widget.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/cash_in_hand_card_widget.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/home_earning_widget.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/order_count_widget.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/referal_card_widget.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/ride_activity_view.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/ride_floating_button_widget.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/ride_order_count_widget.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/vehicle_add_widget.dart';
 import 'package:sixam_mart_delivery/features/notification/controllers/notification_controller.dart';
-import 'package:sixam_mart_delivery/features/order/controllers/order_controller.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/controllers/order_controller.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart_delivery/features/refer_and_earn/screens/refer_and_earn_screen.dart';
-import 'package:sixam_mart_delivery/features/refer_and_earn/widgets/refer_bottom_sheet.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/controllers/ride_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/trip/controllers/trip_controller.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
-import 'package:sixam_mart_delivery/util/color_resources.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
-import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
-import 'package:sixam_mart_delivery/common/widgets/order_shimmer_widget.dart';
-import 'package:sixam_mart_delivery/common/widgets/order_widget.dart';
-import 'package:sixam_mart_delivery/common/widgets/title_widget.dart';
-import 'package:sixam_mart_delivery/features/home/widgets/count_card_widget.dart';
-import 'package:sixam_mart_delivery/features/home/widgets/earning_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,9 +35,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   late final AppLifecycleListener _listener;
   bool _isNotificationPermissionGranted = true;
   bool _isBatteryOptimizationGranted = true;
+  bool isRideActive = AppConstants.appMode == AppMode.ride;
 
   @override
   void initState() {
@@ -43,7 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _checkSystemNotification();
 
-    _listener = AppLifecycleListener(onStateChange: _onStateChanged);
+    _listener = AppLifecycleListener(
+      onStateChange: _onStateChanged,
+    );
 
     _loadData();
 
@@ -53,16 +59,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadData() async {
+
     Get.find<OrderController>().getIgnoreList();
     Get.find<OrderController>().removeFromIgnoreList();
+
+    if(isRideActive){
+      Get.find<RideController>().getLastRideDetail();
+      Get.find<TripController>().getDailyLog();
+      Get.find<TripController>().rideCancellationReasonList();
+      Get.find<RideController>().ongoingTripList();
+      Get.find<ProfileController>().getProfileLevelInfo();
+      await Get.find<TripController>().getTripList(1);
+    }else{
+      await Get.find<OrderController>().getRunningOrders(1, willUpdate: false);
+    }
     await Get.find<ProfileController>().getProfile();
-    await Get.find<OrderController>().getRunningOrders(1);
     await Get.find<NotificationController>().getNotificationList();
   }
 
   Future<void> _checkSystemNotification() async {
-    if (await Permission.notification.status.isDenied ||
-        await Permission.notification.status.isPermanentlyDenied) {
+    if(await Permission.notification.status.isDenied || await Permission.notification.status.isPermanentlyDenied) {
       await Get.find<AuthController>().setNotificationActive(false);
     }
   }
@@ -88,16 +104,15 @@ class _HomeScreenState extends State<HomeScreen> {
     var notificationStatus = await Permission.notification.status;
     var batteryStatus = await Permission.ignoreBatteryOptimizations.status;
 
-    if (notificationStatus.isDenied || notificationStatus.isPermanentlyDenied) {
+    if(notificationStatus.isDenied || notificationStatus.isPermanentlyDenied) {
       setState(() {
         _isNotificationPermissionGranted = false;
         _isBatteryOptimizationGranted = true;
       });
 
-      await Get.find<AuthController>().setNotificationActive(
-        !notificationStatus.isDenied,
-      );
-    } else if (batteryStatus.isDenied) {
+      await Get.find<AuthController>().setNotificationActive(!notificationStatus.isDenied);
+
+    } else if(batteryStatus.isDenied) {
       setState(() {
         _isBatteryOptimizationGranted = false;
         _isNotificationPermissionGranted = true;
@@ -110,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Get.find<ProfileController>().setBackgroundNotificationActive(true);
     }
 
-    if (batteryStatus.isDenied) {
+    if(batteryStatus.isDenied) {
       Get.find<ProfileController>().setBackgroundNotificationActive(false);
     }
   }
@@ -131,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (status.isGranted) {
       return;
-    } else if (status.isDenied) {
+    } else if(status.isDenied) {
       await Permission.ignoreBatteryOptimizations.request();
     } else {
       openAppSettings();
@@ -148,833 +163,158 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).cardColor,
-        surfaceTintColor: Theme.of(context).cardColor,
-        shadowColor: Theme.of(context).disabledColor.withValues(alpha: 0.5),
-        elevation: 2,
-        leading: Padding(
-          padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-          child: Image.asset(Images.headerLogo, height: 34, width: 34),
-        ),
-        titleSpacing: 0,
-        title: Text(
-          AppConstants.appName,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: robotoMedium.copyWith(
-            color: Theme.of(context).textTheme.bodyLarge!.color,
-            fontSize: Dimensions.fontSizeDefault,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: GetBuilder<NotificationController>(
-              builder: (notificationController) {
-                return Stack(
-                  children: [
-                    Icon(
-                      Icons.notifications,
-                      size: 25,
-                      color: Theme.of(context).textTheme.bodyLarge!.color,
-                    ),
+    return GetBuilder<ProfileController>(builder: (profileController){
 
-                    notificationController.hasNotification
-                        ? Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(
-                              height: 10,
-                              width: 10,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.error,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  width: 1,
-                                  color: Theme.of(context).cardColor,
-                                ),
-                              ),
-                            ),
-                          )
-                        : const SizedBox(),
-                  ],
-                );
-              },
+      bool isRideActive = AppConstants.appMode == AppMode.ride;
+
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).cardColor,
+          surfaceTintColor: Theme.of(context).cardColor,
+          shadowColor: Theme.of(context).disabledColor.withValues(alpha: 0.5),
+          elevation: 2,
+          leading: Padding(
+            padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+            child: Image.asset(Images.logo, height: 30, width: 30),
+          ),
+          titleSpacing: 0,
+          title: Text(AppConstants.appName, maxLines: 1, overflow: TextOverflow.ellipsis, style: robotoMedium.copyWith(
+            color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: Dimensions.fontSizeDefault,
+          )),
+          actions: [
+            IconButton(
+              icon: GetBuilder<NotificationController>(builder: (notificationController) {
+                return Stack(children: [
+
+                  Icon(Icons.notifications, size: 25, color: Theme.of(context).textTheme.bodyLarge!.color),
+
+                  notificationController.hasNotification ? Positioned(top: 0, right: 0, child: Container(
+                    height: 10, width: 10, decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.error, shape: BoxShape.circle,
+                    border: Border.all(width: 1, color: Theme.of(context).cardColor),
+                  ),
+                  )) : const SizedBox(),
+
+                ]);
+              }),
+              onPressed: () => Get.toNamed(RouteHelper.getNotificationRoute()),
             ),
-            onPressed: () => Get.toNamed(RouteHelper.getNotificationRoute()),
-          ),
 
-          const SizedBox(width: Dimensions.paddingSizeSmall),
-        ],
+            const SizedBox(width: Dimensions.paddingSizeSmall),
+          ],
+        ),
+
+        body: RefreshIndicator(
+          onRefresh: () async {
+            return await _loadData();
+          },
+          child: Column(children: [
+
+            if(!_isNotificationPermissionGranted)
+              permissionWarning(isBatteryPermission: false, onTap: requestNotificationPermission, closeOnTap: () {
+                setState(() {
+                  _isNotificationPermissionGranted = true;
+                });
+              }),
+
+            if(!_isBatteryOptimizationGranted)
+              permissionWarning(isBatteryPermission: true, onTap: requestBatteryOptimization, closeOnTap: () {
+                setState(() {
+                  _isBatteryOptimizationGranted = true;
+                });
+              }),
+
+            Expanded(
+              child: Stack(children: [
+                SingleChildScrollView(
+                  child: GetBuilder<ProfileController>(builder: (profileController) {
+
+                    var config = Get.find<SplashController>().configModel;
+
+                    bool showReferAndEarn = profileController.profileModel != null && profileController.profileModel!.earnings == 1
+                        && (isRideActive ? (config?.riderReferralData?.referalStatus ?? false) : (config?.dmReferralData?.referalStatus ?? false));
+
+                    bool addNewVehicle = profileController.profileModel?.vehicle == null || profileController.profileModel?.vehicle?.vehicleRequestStatus == "pending";
+
+                    bool showEarningWidget = profileController.profileModel != null && profileController.profileModel!.earnings == 1;
+
+                    bool showCashInHandCard = profileController.profileModel != null && profileController.profileModel!.cashInHands! > 0;
+
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
+                      child: Column( children: [
+
+                        if(isRideActive)...[
+                         addNewVehicle
+                             ? VehicleAddWidget(vehicle: profileController.profileModel?.vehicle)
+                             : ActiveRideWidget(),
+                        ] else...[
+                          ActiveOrderWidget(onNavigateToOrders: ()=> Get.offAll(DashboardScreen(pageIndex: 2)))
+                        ],
+
+                        if(showEarningWidget) HomeEarningWidget(profileController: profileController,),
+
+                        isRideActive
+                            ? RideOrderCountWidget(profileController: profileController)
+                            : OrderCountWidget(profileController: profileController),
+
+                        isRideActive ? RideActivityView() : SizedBox(),
+
+                        if(showCashInHandCard) CashInHandCardWidget(profileController: profileController),
+
+                        if(showReferAndEarn) ReferralCardWidget()
+
+                      ]),
+                    );
+                  }),
+                ),
+
+                if(isRideActive) RideMapNavigationWidget(),
+              ]),
+            ),
+          ]),
+        ),
+      );
+    });
+  }
+
+  Widget permissionWarning({required bool isBatteryPermission, required Function() onTap, required Function() closeOnTap}) {
+    return GetPlatform.isAndroid ? Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Theme.of(context).textTheme.bodyLarge!.color?.withValues(alpha: 0.7),
       ),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+          child: Row(children: [
 
-      body: RefreshIndicator(
-        onRefresh: () async {
-          return await _loadData();
-        },
-        child: Column(
-          children: [
-            if (!_isNotificationPermissionGranted)
-              permissionWarning(
-                isBatteryPermission: false,
-                onTap: requestNotificationPermission,
-                closeOnTap: () {
-                  setState(() {
-                    _isNotificationPermissionGranted = true;
-                  });
-                },
-              ),
-
-            if (!_isBatteryOptimizationGranted)
-              permissionWarning(
-                isBatteryPermission: true,
-                onTap: requestBatteryOptimization,
-                closeOnTap: () {
-                  setState(() {
-                    _isBatteryOptimizationGranted = true;
-                  });
-                },
+            if(isBatteryPermission)
+              Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: Image.asset(Images.allertIcon, height: 20, width: 20),
               ),
 
             Expanded(
-              child: SingleChildScrollView(
-                child: GetBuilder<ProfileController>(
-                  builder: (profileController) {
-                    bool isPayable =
-                        profileController.profileModel != null &&
-                        profileController.profileModel!.showPayNowButton ==
-                            true;
-
-                    bool showReferAndEarn =
-                        Get.find<ProfileController>().profileModel != null &&
-                        Get.find<ProfileController>().profileModel!.earnings ==
-                            1 &&
-                        (Get.find<SplashController>()
-                                    .configModel
-                                    ?.dmReferralData
-                                    ?.dmReferalStatus ==
-                                true ||
-                            (Get.find<ProfileController>()
-                                        .profileModel
-                                        ?.referalEarning !=
-                                    null &&
-                                Get.find<ProfileController>()
-                                        .profileModel!
-                                        .referalEarning! >
-                                    0));
-
-                    return Column(
-                      children: [
-                        GetBuilder<OrderController>(
-                          builder: (orderController) {
-                            bool hasActiveOrder =
-                                orderController.currentOrderList == null ||
-                                orderController.currentOrderList!.isNotEmpty;
-                            bool hasMoreOrder =
-                                orderController.currentOrderList != null &&
-                                orderController.currentOrderList!.length > 1;
-
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).primaryColor.withValues(alpha: 0.1),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: Dimensions.paddingSizeDefault,
-                              ),
-                              child: Column(
-                                children: [
-                                  const SizedBox(
-                                    height: Dimensions.paddingSizeSmall,
-                                  ),
-
-                                  hasActiveOrder
-                                      ? TitleWidget(
-                                          title: 'active_order'.tr,
-                                          showOrderCount: true,
-                                          orderCount:
-                                              orderController
-                                                  .currentOrderList
-                                                  ?.length ??
-                                              0,
-                                          onTap: hasMoreOrder
-                                              ? () {
-                                                  widget.onNavigateToOrders
-                                                      ?.call();
-                                                }
-                                              : null,
-                                        )
-                                      : const SizedBox(),
-                                  SizedBox(
-                                    height: hasActiveOrder
-                                        ? Dimensions.paddingSizeExtraSmall
-                                        : 0,
-                                  ),
-
-                                  orderController.currentOrderList == null
-                                      ? OrderShimmerWidget(
-                                          isEnabled:
-                                              orderController
-                                                  .currentOrderList ==
-                                              null,
-                                        )
-                                      : orderController
-                                            .currentOrderList!
-                                            .isNotEmpty
-                                      ? OrderWidget(
-                                          orderModel: orderController
-                                              .currentOrderList![0],
-                                          isRunningOrder: true,
-                                          orderIndex: 0,
-                                          cardWidth: context.width * 0.9,
-                                        )
-                                      : const SizedBox(),
-                                  SizedBox(
-                                    height: hasActiveOrder
-                                        ? Dimensions.paddingSizeDefault
-                                        : 0,
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: Dimensions.paddingSizeDefault,
-                            vertical: Dimensions.paddingSizeSmall,
-                          ),
-                          child: Column(
-                            children: [
-                              (profileController.profileModel != null &&
-                                      profileController
-                                              .profileModel!
-                                              .earnings ==
-                                          1)
-                                  ? Column(
-                                      children: [
-                                        TitleWidget(title: 'earnings'.tr),
-                                        const SizedBox(
-                                          height: Dimensions.paddingSizeSmall,
-                                        ),
-
-                                        Container(
-                                          padding: const EdgeInsets.all(
-                                            Dimensions.paddingSizeLarge,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              Dimensions.radiusDefault,
-                                            ),
-                                            color: Theme.of(
-                                              context,
-                                            ).primaryColor,
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  const SizedBox(
-                                                    width: Dimensions
-                                                        .paddingSizeSmall,
-                                                  ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      color: Theme.of(context)
-                                                          .cardColor
-                                                          .withValues(
-                                                            alpha: 0.1,
-                                                          ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            50,
-                                                          ),
-                                                    ),
-                                                    padding: const EdgeInsets.only(
-                                                      bottom: Dimensions
-                                                          .paddingSizeDefault,
-                                                      left: Dimensions
-                                                          .paddingSizeDefault,
-                                                      top: Dimensions
-                                                          .paddingSizeSmall,
-                                                      right: Dimensions
-                                                          .paddingSizeSmall,
-                                                    ),
-                                                    child: Image.asset(
-                                                      Images.wallet,
-                                                      width: 40,
-                                                      height: 40,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: Dimensions
-                                                        .paddingSizeLarge,
-                                                  ),
-
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'balance'.tr,
-                                                        style: robotoMedium.copyWith(
-                                                          fontSize: Dimensions
-                                                              .fontSizeSmall,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .cardColor
-                                                                  .withValues(
-                                                                    alpha: 0.9,
-                                                                  ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: Dimensions
-                                                            .paddingSizeExtraSmall,
-                                                      ),
-
-                                                      profileController
-                                                                  .profileModel !=
-                                                              null
-                                                          ? Text(
-                                                              PriceConverterHelper.convertPrice(
-                                                                profileController
-                                                                    .profileModel!
-                                                                    .balance,
-                                                              ),
-                                                              style: robotoBold
-                                                                  .copyWith(
-                                                                    fontSize:
-                                                                        24,
-                                                                    color: Theme.of(
-                                                                      context,
-                                                                    ).cardColor,
-                                                                  ),
-                                                              maxLines: 1,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            )
-                                                          : Container(
-                                                              height: 30,
-                                                              width: 60,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(
-                                                height:
-                                                    Dimensions.paddingSizeLarge,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  EarningWidget(
-                                                    title: 'today'.tr,
-                                                    amount: profileController
-                                                        .profileModel
-                                                        ?.todaysEarning,
-                                                  ),
-                                                  Container(
-                                                    height: 30,
-                                                    width: 1,
-                                                    color: Theme.of(context)
-                                                        .cardColor
-                                                        .withValues(alpha: 0.8),
-                                                  ),
-
-                                                  EarningWidget(
-                                                    title: 'this_week'.tr,
-                                                    amount: profileController
-                                                        .profileModel
-                                                        ?.thisWeekEarning,
-                                                  ),
-                                                  Container(
-                                                    height: 30,
-                                                    width: 1,
-                                                    color: Theme.of(context)
-                                                        .cardColor
-                                                        .withValues(alpha: 0.8),
-                                                  ),
-
-                                                  EarningWidget(
-                                                    title: 'this_month'.tr,
-                                                    amount: profileController
-                                                        .profileModel
-                                                        ?.thisMonthEarning,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: Dimensions.paddingSizeDefault,
-                                        ),
-                                      ],
-                                    )
-                                  : const SizedBox(),
-
-                              TitleWidget(title: 'orders'.tr),
-                              const SizedBox(
-                                height: Dimensions.paddingSizeExtraSmall,
-                              ),
-
-                              (profileController.profileModel != null &&
-                                      profileController
-                                              .profileModel!
-                                              .earnings ==
-                                          1)
-                                  ? Row(
-                                      children: [
-                                        OrderCountCardWidget(
-                                          title: 'todays_orders'.tr,
-                                          value: profileController
-                                              .profileModel
-                                              ?.todaysOrderCount
-                                              .toString(),
-                                        ),
-                                        const SizedBox(
-                                          width: Dimensions.paddingSizeDefault,
-                                        ),
-
-                                        OrderCountCardWidget(
-                                          title: 'this_week_orders'.tr,
-                                          value: profileController
-                                              .profileModel
-                                              ?.thisWeekOrderCount
-                                              .toString(),
-                                        ),
-                                        const SizedBox(
-                                          width: Dimensions.paddingSizeDefault,
-                                        ),
-
-                                        OrderCountCardWidget(
-                                          title: 'total_orders'.tr,
-                                          value: profileController
-                                              .profileModel
-                                              ?.orderCount
-                                              .toString(),
-                                        ),
-                                      ],
-                                    )
-                                  : Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: CountCardWidget(
-                                                title: 'todays_orders'.tr,
-                                                backgroundColor: const Color(
-                                                  0xffE5EAFF,
-                                                ),
-                                                height: 180,
-                                                value: profileController
-                                                    .profileModel
-                                                    ?.todaysOrderCount
-                                                    .toString(),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width:
-                                                  Dimensions.paddingSizeSmall,
-                                            ),
-
-                                            Expanded(
-                                              child: CountCardWidget(
-                                                title: 'this_week_orders'.tr,
-                                                backgroundColor: const Color(
-                                                  0xffE84E50,
-                                                ).withValues(alpha: 0.2),
-                                                height: 180,
-                                                value: profileController
-                                                    .profileModel
-                                                    ?.thisWeekOrderCount
-                                                    .toString(),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: Dimensions.paddingSizeSmall,
-                                        ),
-
-                                        CountCardWidget(
-                                          title: 'total_orders'.tr,
-                                          backgroundColor: const Color(
-                                            0xffE1FFD8,
-                                          ),
-                                          height: 140,
-                                          value: profileController
-                                              .profileModel
-                                              ?.orderCount
-                                              .toString(),
-                                        ),
-                                      ],
-                                    ),
-                              const SizedBox(
-                                height: Dimensions.paddingSizeLarge,
-                              ),
-
-                              profileController.profileModel != null
-                                  ? profileController
-                                                .profileModel!
-                                                .cashInHands! >
-                                            0
-                                        ? Container(
-                                            width: MediaQuery.of(
-                                              context,
-                                            ).size.width,
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(
-                                                context,
-                                              ).cardColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                    Dimensions.radiusDefault,
-                                                  ),
-                                              border: Border.all(
-                                                color: Theme.of(
-                                                  context,
-                                                ).disabledColor,
-                                                width: 0.2,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Get.isDarkMode
-                                                      ? Colors.white.withValues(
-                                                          alpha: 0.05,
-                                                        )
-                                                      : Colors.black.withValues(
-                                                          alpha: 0.05,
-                                                        ),
-                                                  blurRadius: 20,
-                                                  spreadRadius: 0,
-                                                  offset: const Offset(0, 5),
-                                                ),
-                                              ],
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal:
-                                                  Dimensions.paddingSizeDefault,
-                                              vertical:
-                                                  Dimensions.paddingSizeLarge,
-                                            ),
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    color: Theme.of(context)
-                                                        .primaryColor
-                                                        .withValues(alpha: 0.1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          50,
-                                                        ),
-                                                  ),
-                                                  padding: const EdgeInsets.all(
-                                                    10,
-                                                  ),
-                                                  child: Image.asset(
-                                                    Images.payMoney,
-                                                    height: 40,
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  height: Dimensions
-                                                      .paddingSizeSmall,
-                                                ),
-
-                                                Text(
-                                                  PriceConverterHelper.convertPrice(
-                                                    profileController
-                                                        .profileModel!
-                                                        .cashInHands,
-                                                  ),
-                                                  style: robotoBold.copyWith(
-                                                    fontSize: Dimensions
-                                                        .fontSizeOverLarge,
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  height: Dimensions
-                                                      .paddingSizeSmall,
-                                                ),
-
-                                                RichText(
-                                                  text: TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text:
-                                                            'cash_in_your_hand'
-                                                                .tr,
-                                                        style: robotoRegular
-                                                            .copyWith(
-                                                              color:
-                                                                  Theme.of(
-                                                                        context,
-                                                                      )
-                                                                      .textTheme
-                                                                      .bodyLarge!
-                                                                      .color!
-                                                                      .withValues(
-                                                                        alpha:
-                                                                            0.8,
-                                                                      ),
-                                                            ),
-                                                      ),
-
-                                                      if ((profileController
-                                                                  .profileModel!
-                                                                  .dmMaxMyAccount !=
-                                                              null) &&
-                                                          (profileController
-                                                                  .profileModel!
-                                                                  .dmMaxMyAccount! >
-                                                              0) &&
-                                                          (profileController
-                                                                  .profileModel!
-                                                                  .cashInHands! >
-                                                              profileController
-                                                                  .profileModel!
-                                                                  .dmMaxMyAccount!))
-                                                        TextSpan(
-                                                          text:
-                                                              ' (${'limit_exceeded'.tr})',
-                                                          style: robotoRegular
-                                                              .copyWith(
-                                                                color:
-                                                                    ColorResources
-                                                                        .red,
-                                                                fontSize:
-                                                                    Dimensions
-                                                                        .fontSizeSmall -
-                                                                    2,
-                                                              ),
-                                                        ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  height: Dimensions
-                                                      .paddingSizeLarge,
-                                                ),
-
-                                                if (isPayable)
-                                                  CustomButtonWidget(
-                                                    width: 90,
-                                                    height: 40,
-                                                    isBold: false,
-                                                    fontSize: Dimensions
-                                                        .fontSizeDefault,
-                                                    buttonText: 'pay_now'.tr,
-                                                    backgroundColor: Theme.of(
-                                                      context,
-                                                    ).primaryColor,
-                                                    onPressed: () => Get.toNamed(
-                                                      RouteHelper.getMyAccountRoute(),
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
-                                          )
-                                        : const SizedBox()
-                                  : Shimmer(
-                                      duration: const Duration(seconds: 2),
-                                      enabled: true,
-                                      child: Container(
-                                        height: 85,
-                                        width: MediaQuery.of(
-                                          context,
-                                        ).size.width,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            Dimensions.radiusDefault,
-                                          ),
-                                          color: Theme.of(context).shadowColor,
-                                        ),
-                                      ),
-                                    ),
-                              const SizedBox(
-                                height: Dimensions.paddingSizeLarge,
-                              ),
-
-                              if (showReferAndEarn)
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(() => const ReferAndEarnScreen());
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                        Dimensions.radiusDefault,
-                                      ),
-                                      color: Theme.of(
-                                        context,
-                                      ).disabledColor.withValues(alpha: 0.125),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: Dimensions.paddingSizeSmall,
-                                      horizontal: Dimensions.paddingSizeLarge,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'invite_and_get_rewards'.tr,
-                                                style: robotoBold.copyWith(
-                                                  fontSize:
-                                                      Dimensions.fontSizeLarge,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height:
-                                                    Dimensions.paddingSizeSmall,
-                                              ),
-
-                                              Text(
-                                                'share_code_with_your_friends'
-                                                    .tr,
-                                                style: robotoRegular.copyWith(
-                                                  fontSize:
-                                                      Dimensions.fontSizeSmall,
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyLarge!
-                                                      .color!
-                                                      .withValues(alpha: 0.7),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: Dimensions
-                                                    .paddingSizeExtraSmall,
-                                              ),
-
-                                              Row(
-                                                children: [
-                                                  CustomButtonWidget(
-                                                    height: 30,
-                                                    width: 130,
-                                                    buttonText:
-                                                        'invite_friends'.tr,
-                                                    fontSize: Dimensions
-                                                        .fontSizeSmall,
-                                                    onPressed: () {
-                                                      Get.bottomSheet(
-                                                        const ReferBottomSheet(),
-                                                        isScrollControlled:
-                                                            true,
-                                                      );
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: Dimensions.paddingSizeSmall,
-                                        ),
-
-                                        Image.asset(
-                                          Images.shareImage,
-                                          width: 100,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+              child: Row(children: [
+                Flexible(
+                  child: Text(
+                    isBatteryPermission ? 'for_better_performance_allow_notification_to_run_in_background'.tr
+                        : 'notification_is_disabled_please_allow_notification'.tr,
+                    maxLines: 2, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Colors.white),
+                  ),
                 ),
-              ),
+                const SizedBox(width: Dimensions.paddingSizeSmall),
+                const Icon(Icons.arrow_circle_right_rounded, color: Colors.white, size: 24,),
+              ]),
             ),
-          ],
+
+            // const SizedBox(width: 20),
+          ]),
         ),
       ),
-    );
-  }
-
-  Widget permissionWarning({
-    required bool isBatteryPermission,
-    required Function() onTap,
-    required Function() closeOnTap,
-  }) {
-    return GetPlatform.isAndroid
-        ? Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).textTheme.bodyLarge!.color?.withValues(alpha: 0.7),
-            ),
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                child: Row(
-                  children: [
-                    if (isBatteryPermission)
-                      Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Image.asset(
-                          Images.allertIcon,
-                          height: 20,
-                          width: 20,
-                        ),
-                      ),
-
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              isBatteryPermission
-                                  ? 'for_better_performance_allow_notification_to_run_in_background'
-                                        .tr
-                                  : 'notification_is_disabled_please_allow_notification'
-                                        .tr,
-                              maxLines: 2,
-                              style: robotoRegular.copyWith(
-                                fontSize: Dimensions.fontSizeSmall,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: Dimensions.paddingSizeSmall),
-                          const Icon(
-                            Icons.arrow_circle_right_rounded,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // const SizedBox(width: 20),
-                  ],
-                ),
-              ),
-            ),
-          )
-        : const SizedBox();
+    ) : const SizedBox();
   }
 }

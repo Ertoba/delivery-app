@@ -5,7 +5,7 @@ import 'package:sixam_mart_delivery/features/auth/domain/models/delivery_man_bod
 import 'package:sixam_mart_delivery/features/auth/domain/models/vehicle_model.dart';
 
 abstract class AuthServiceInterface {
-  Future<Response> login(String phone, String password);
+  Future<Response> login(String phone, String password, String type);
   Future<Response> updateToken();
   Future<bool> saveUserToken(String token, String zoneTopic, String vehicleWiseTopic);
   String getUserToken();
@@ -24,4 +24,6 @@ abstract class AuthServiceInterface {
   List<MultipartBody> prepareMultiPartsBody(XFile? pickedImage, List<XFile> pickedIdentities);
   List<int?> vehicleIds (List<VehicleModel>? vehicles);
   Future<XFile?> pickImageFromGallery();
+  Future<dynamic> saveRideCreatedTime(DateTime dateTime);
+  Future<dynamic> remainingTime();
 }

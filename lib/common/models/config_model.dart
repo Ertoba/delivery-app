@@ -24,12 +24,13 @@ class ConfigModel {
   bool? maintenanceMode;
   String? orderConfirmationModel;
   bool? showDmEarning;
+  bool? showRiderEarning;
   bool? canceledByDeliveryman;
   String? timeformat;
   List<Language>? language;
   bool? toggleVegNonVeg;
   bool? toggleDmRegistration;
-  bool? toggleStoreRegistration;
+  bool? toggleRiderRegistration;
   int? scheduleOrderSlotDuration;
   int? digitAfterDecimalPoint;
   double? parcelPerKmShippingCharge;
@@ -39,17 +40,37 @@ class ConfigModel {
   String? additionalChargeName;
   bool? webSocketStatus;
   String? webSocketUri;
-  int? webSocketPort;
+  String? webSocketPort;
   String? webSocketKey;
+  String? websocketScheme;
   String? disbursementType;
   List<PaymentBody>? activePaymentMethodList;
   double? minAmountToPayDm;
+  double? minAmountToPayRider;
   bool? firebaseOtpVerification;
   int? parcelCancellationStatus;
   ParcelCancellationBasicSetup? parcelCancellationBasicSetup;
   ParcelReturnTimeFee? parcelReturnTimeFee;
-  DmLoyalityPointData? dmLoyalityPointData;
-  DmReferralData? dmReferralData;
+  LoyalityPointData? dmLoyalityPointData;
+  LoyalityPointData? riderLoyalityPointData;
+  ReferralData? dmReferralData;
+  ReferralData? riderReferralData;
+
+  /// Ride Module
+  List<String>? vehicleFuelTypes;
+  List<String>? vehicleTransmissionTypes;
+  int? safetyFeatureStatus;
+  int? safetyFeatureMinimumTripDelayTime;
+  String? safetyFeatureMinimumTripDelayTimeType;
+  int? afterTripCompleteSafetyFeatureSetTime;
+  // safety_feature_after_ride_complete_time_format need to add this key
+  String? safetyFeatureEmergencyGovtNumber;
+  int? bidOnFare;
+  int? otpConfirmationForTrip;
+  int? riderLevelStatus;
+  bool? riderCanReviewCustomer;
+  List<RiderFaqs>? riderFaqs;
+  double? completionRadius;
 
   ConfigModel({
     this.businessName,
@@ -82,7 +103,7 @@ class ConfigModel {
     this.language,
     this.toggleVegNonVeg,
     this.toggleDmRegistration,
-    this.toggleStoreRegistration,
+    this.toggleRiderRegistration,
     this.scheduleOrderSlotDuration,
     this.digitAfterDecimalPoint,
     this.moduleConfig,
@@ -93,16 +114,36 @@ class ConfigModel {
     this.webSocketUri,
     this.webSocketPort,
     this.webSocketKey,
+    this.websocketScheme,
     this.webSocketStatus,
     this.disbursementType,
     this.activePaymentMethodList,
     this.minAmountToPayDm,
+    this.minAmountToPayRider,
     this.firebaseOtpVerification,
     this.parcelCancellationStatus,
     this.parcelCancellationBasicSetup,
     this.parcelReturnTimeFee,
     this.dmLoyalityPointData,
+    this.riderLoyalityPointData,
     this.dmReferralData,
+    this.riderReferralData,
+
+    /// Ride Module
+    this.vehicleFuelTypes,
+    this.vehicleTransmissionTypes,
+    this.safetyFeatureStatus,
+    this.afterTripCompleteSafetyFeatureSetTime,
+    this.safetyFeatureEmergencyGovtNumber,
+    this.safetyFeatureMinimumTripDelayTime,
+    this.safetyFeatureMinimumTripDelayTimeType,
+    this.bidOnFare,
+    this.otpConfirmationForTrip,
+    this.riderLevelStatus,
+    this.riderCanReviewCustomer,
+    this.completionRadius,
+    this.showRiderEarning,
+    this.riderFaqs
   });
 
   ConfigModel.fromJson(Map<String, dynamic> json) {
@@ -142,7 +183,7 @@ class ConfigModel {
     }
     toggleVegNonVeg = json['toggle_veg_non_veg'];
     toggleDmRegistration = json['toggle_dm_registration'];
-    toggleStoreRegistration = json['toggle_store_registration'];
+    toggleRiderRegistration = json['toggle_rider_registration'];
     scheduleOrderSlotDuration = json['schedule_order_slot_duration'] == 0 ? 30 : json['schedule_order_slot_duration'];
     digitAfterDecimalPoint = json['digit_after_decimal_point'];
     moduleConfig = json['module_config'] != null ? ModuleConfig.fromJson(json['module_config']) : null;
@@ -151,8 +192,9 @@ class ConfigModel {
     dmPictureUploadStatus = json['dm_picture_upload_status'] == 1 ? true : false;
     additionalChargeName = json['additional_charge_name'];
     webSocketUri = json['websocket_url'];
-    webSocketPort = json['websocket_port'];
+    webSocketPort = json['websocket_port'].toString();
     webSocketKey = json['websocket_key'];
+    websocketScheme = json['websocket_scheme'];
     webSocketStatus = json['websocket_status'] == 1;
     disbursementType = json['disbursement_type'];
     if (json['active_payment_method_list'] != null) {
@@ -162,12 +204,39 @@ class ConfigModel {
       });
     }
     minAmountToPayDm = json['min_amount_to_pay_dm']?.toDouble();
+    minAmountToPayRider = json['min_amount_to_pay_rider']?.toDouble();
     firebaseOtpVerification = json['firebase_otp_verification'] == 1;
     parcelCancellationStatus = json['parcel_cancellation_status'];
     parcelCancellationBasicSetup = json['parcel_cancellation_basic_setup'] != null ? ParcelCancellationBasicSetup.fromJson(json['parcel_cancellation_basic_setup']) : null;
     parcelReturnTimeFee = json['parcel_return_time_fee'] != null ? ParcelReturnTimeFee.fromJson(json['parcel_return_time_fee']) : null;
-    dmLoyalityPointData = json['dm_loyality_point_data'] != null ? DmLoyalityPointData.fromJson(json['dm_loyality_point_data']) : null;
-    dmReferralData = json['dm_referral_data'] != null ? DmReferralData.fromJson(json['dm_referral_data']) : null;
+    dmLoyalityPointData = json['dm_loyality_point_data'] != null ? LoyalityPointData.fromJson(json['dm_loyality_point_data']) : null;
+    riderLoyalityPointData = json['rider_loyality_point_data'] != null ? LoyalityPointData.fromJson(json['rider_loyality_point_data']) : null;
+    dmReferralData = json['dm_referral_data'] != null ? ReferralData.fromJson(json['dm_referral_data']) : null;
+    riderReferralData = json['rider_referral_data'] != null ? ReferralData.fromJson(json['rider_referral_data']) : null;
+
+    vehicleFuelTypes = json['vehicle_fuel_types'] !=null ? json['vehicle_fuel_types'].cast<String>() : [];
+    vehicleTransmissionTypes = json['vehicle_transmission_types'] != null ? json['vehicle_transmission_types'].cast<String>() : [];
+    safetyFeatureStatus = int.tryParse(json['safety_feature_status'].toString());
+    safetyFeatureMinimumTripDelayTime = json['ride_safety_delay_time'];
+    safetyFeatureMinimumTripDelayTimeType = json['ride_safety_delay_time_format'];
+    afterTripCompleteSafetyFeatureSetTime = int.tryParse(json['safety_feature_after_ride_complete_time'].toString());
+    safetyFeatureEmergencyGovtNumber = json['emergency_govt_number'];
+    bidOnFare = int.tryParse(json['bid_on_fare'].toString());
+    otpConfirmationForTrip = int.tryParse( json['ride_otp_confirmation'].toString());
+    riderLevelStatus = int.tryParse(json['rider_level_status'].toString());
+    riderCanReviewCustomer = json['rider_can_review_customer'] == 1;
+    if (json['rider_faqs'] != null) {
+      riderFaqs = <RiderFaqs>[];
+      json['rider_faqs'].forEach((v) { riderFaqs!.add(RiderFaqs.fromJson(v)); });
+    }
+    if(json['rider_completion_radius'] != null){
+      try{
+        completionRadius = json['rider_completion_radius'].toDouble();
+      }catch(e){
+        completionRadius = double.parse(json['rider_completion_radius'].toString());
+      }
+    }
+    showRiderEarning = json['show_rider_earning'];
   }
 
   Map<String, dynamic> toJson() {
@@ -206,7 +275,6 @@ class ConfigModel {
     }
     data['toggle_veg_non_veg'] = toggleVegNonVeg;
     data['toggle_dm_registration'] = toggleDmRegistration;
-    data['toggle_store_registration'] = toggleStoreRegistration;
     data['schedule_order_slot_duration'] = scheduleOrderSlotDuration;
     data['digit_after_decimal_point'] = digitAfterDecimalPoint;
     if (moduleConfig != null) {
@@ -219,6 +287,7 @@ class ConfigModel {
     data['websocket_url'] = webSocketUri;
     data['websocket_port'] = webSocketPort;
     data['websocket_key'] = webSocketKey;
+    data['websocket_scheme'] = websocketScheme;
     data['websocket_status'] = webSocketStatus;
     data['disbursement_type'] = disbursementType;
     if (activePaymentMethodList != null) {
@@ -239,6 +308,40 @@ class ConfigModel {
     if (dmReferralData != null) {
       data['dm_referral_data'] = dmReferralData!.toJson();
     }
+    return data;
+  }
+}
+
+class RiderFaqs {
+  int? id;
+  String? question;
+  String? answer;
+  String? questionAnswerFor;
+  int? isActive;
+  String? createdAt;
+  String? updatedAt;
+
+  RiderFaqs({this.id, this.question, this.answer, this.questionAnswerFor, this.isActive, this.createdAt, this.updatedAt});
+
+  RiderFaqs.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    question = json['question'];
+    answer = json['answer'];
+    questionAnswerFor = json['question_answer_for'];
+    isActive = json['is_active'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['id'] = this.id;
+    data['question'] = this.question;
+    data['answer'] = this.answer;
+    data['question_answer_for'] = this.questionAnswerFor;
+    data['is_active'] = this.isActive;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
     return data;
   }
 }
@@ -451,49 +554,44 @@ class ParcelReturnTimeFee {
   }
 }
 
-class DmLoyalityPointData {
-  bool? dmLoyalityPointStatus;
-  int? dmLoyalityPointPerOrder;
-  int? dmLoyalityPointConversionRate;
-  int? dmMinLoyalityPointToConvert;
+class LoyalityPointData {
+  bool? loyalityPointStatus;
+  int? loyalityPointConversionRate;
+  int? minLoyalityPointToConvert;
 
-  DmLoyalityPointData({this.dmLoyalityPointStatus, this.dmLoyalityPointPerOrder, this.dmLoyalityPointConversionRate, this.dmMinLoyalityPointToConvert});
+  LoyalityPointData({this.loyalityPointStatus, this.loyalityPointConversionRate, this.minLoyalityPointToConvert});
 
-  DmLoyalityPointData.fromJson(Map<String, dynamic> json) {
-    dmLoyalityPointStatus = json['dm_loyality_point_status']??false;
-    dmLoyalityPointPerOrder = json['dm_loyality_point_per_order'];
-    dmLoyalityPointConversionRate = json['dm_loyality_point_conversion_rate'];
-    dmMinLoyalityPointToConvert = json['dm_min_loyality_point_to_convert'];
+  LoyalityPointData.fromJson(Map<String, dynamic> json) {
+    loyalityPointStatus = json['loyality_point_status']??false;
+    loyalityPointConversionRate = json['loyality_point_conversion_rate'];
+    minLoyalityPointToConvert = json['min_loyality_point_to_convert'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['dm_loyality_point_status'] = dmLoyalityPointStatus;
-    data['dm_loyality_point_per_order'] = dmLoyalityPointPerOrder;
-    data['dm_loyality_point_conversion_rate'] = dmLoyalityPointConversionRate;
-    data['dm_min_loyality_point_to_convert'] = dmMinLoyalityPointToConvert;
+    data['loyality_point_status'] = loyalityPointStatus;
+    data['loyality_point_conversion_rate'] = loyalityPointConversionRate;
+    data['min_loyality_point_to_convert'] = minLoyalityPointToConvert;
     return data;
   }
 }
 
-class DmReferralData {
-  bool? dmReferalStatus;
-  double? dmReferalAmount;
-  double? dmReferalBonus;
+class ReferralData {
+  bool? referalStatus;
+  double? referalAmount;
 
-  DmReferralData({this.dmReferalStatus, this.dmReferalAmount, this.dmReferalBonus});
 
-  DmReferralData.fromJson(Map<String, dynamic> json) {
-    dmReferalStatus = json['dm_referal_status'];
-    dmReferalAmount = json['dm_referal_amount']?.toDouble();
-    dmReferalBonus = json['dm_referal_bonus']?.toDouble();
+  ReferralData({this.referalStatus, this.referalAmount});
+
+  ReferralData.fromJson(Map<String, dynamic> json) {
+    referalStatus = json['referal_status'];
+    referalAmount = json['referal_amount']?.toDouble();
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['dm_referal_status'] = dmReferalStatus;
-    data['dm_referal_amount'] = dmReferalAmount;
-    data['dm_referal_bonus'] = dmReferalBonus;
+    data['referal_status'] = referalStatus;
+    data['referal_amount'] = referalAmount;
     return data;
   }
 }

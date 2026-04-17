@@ -1,4 +1,5 @@
-import 'package:sixam_mart_delivery/features/order/controllers/order_controller.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/controllers/order_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/controllers/ride_controller.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
@@ -13,8 +14,9 @@ class ConfirmationDialogWidget extends StatelessWidget {
   final Function onYesPressed;
   final bool isLogOut;
   final bool hasCancel;
+  final Color? iconColor;
   const ConfirmationDialogWidget({super.key, required this.icon, this.iconSize = 50, this.title, required this.description, required this.onYesPressed,
-    this.isLogOut = false, this.hasCancel = true});
+    this.isLogOut = false, this.hasCancel = true, this.iconColor});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class ConfirmationDialogWidget extends StatelessWidget {
 
           Padding(
             padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
-            child: Image.asset(icon, width: iconSize, height: iconSize),
+            child: Image.asset(icon, width: iconSize, height: iconSize, color: iconColor),
           ),
 
           title != null ? Padding(
@@ -44,28 +46,31 @@ class ConfirmationDialogWidget extends StatelessWidget {
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           GetBuilder<OrderController>(builder: (orderController) {
-            return !orderController.isLoading ? Row(children: [
+            return GetBuilder<RideController>(builder: (rideController) {
+              return !orderController.isLoading && !rideController.isLoading ? Row(children: [
 
-              hasCancel ? Expanded(child: TextButton(
-                onPressed: () => isLogOut ? onYesPressed() : Get.back(),
-                style: TextButton.styleFrom(
-                  backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.3), minimumSize: const Size(1170, 40), padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),
-                ),
-                child: Text(
-                  isLogOut ? 'yes'.tr : 'no'.tr, textAlign: TextAlign.center,
-                  style: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color),
-                ),
-              )) : const SizedBox(),
-              SizedBox(width: hasCancel ? Dimensions.paddingSizeLarge : 0),
+                hasCancel ? Expanded(child: TextButton(
+                  onPressed: () => isLogOut ? onYesPressed() : Get.back(),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.3), minimumSize: const Size(1170, 40), padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),
+                  ),
+                  child: Text(
+                    isLogOut ? 'yes'.tr : 'no'.tr, textAlign: TextAlign.center,
+                    style: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color),
+                  ),
+                )) : const SizedBox(),
+                SizedBox(width: hasCancel ? Dimensions.paddingSizeLarge : 0),
 
-              Expanded(child: CustomButtonWidget(
-                buttonText: isLogOut ? 'no'.tr : hasCancel ? 'yes'.tr : 'ok'.tr,
-                onPressed: () => isLogOut ? Get.back() : onYesPressed(),
-                height: 40,
-              )),
+                Expanded(child: CustomButtonWidget(
+                  buttonText: isLogOut ? 'no'.tr : hasCancel ? 'yes'.tr : 'ok'.tr,
+                  onPressed: () => isLogOut ? Get.back() : onYesPressed(),
+                  height: 40,
+                )),
 
-            ]) : const Center(child: CircularProgressIndicator());
+              ]) : const SizedBox(height: 48, child: Center(child: CircularProgressIndicator()));
+            }
+            );
           }),
 
         ]),

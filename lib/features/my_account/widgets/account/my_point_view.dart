@@ -8,7 +8,9 @@ import 'package:sixam_mart_delivery/features/my_account/widgets/account/point_to
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/date_converter_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
@@ -21,6 +23,7 @@ class MyPointView extends StatefulWidget {
 
 class _MyPointViewState extends State<MyPointView> {
   final ScrollController scrollController = ScrollController();
+  bool isRideActive = AppConstants.appMode == AppMode.ride;
 
   @override
   void initState() {
@@ -38,7 +41,10 @@ class _MyPointViewState extends State<MyPointView> {
   
   @override
   Widget build(BuildContext context) {
-    if(!Get.find<SplashController>().configModel!.dmLoyalityPointData!.dmLoyalityPointStatus!) {
+    var config = Get.find<SplashController>().configModel;
+    bool loyaltyPointStatus = isRideActive ? (config!.riderLoyalityPointData?.loyalityPointStatus ?? false) : ((config!.dmLoyalityPointData?.loyalityPointStatus ?? false)) ;
+
+    if(!loyaltyPointStatus) {
       return Expanded(child: emptyView('your_loyalty_points_are_safe'.tr, context));
     }
     return Expanded(
@@ -98,9 +104,13 @@ class _MyPointViewState extends State<MyPointView> {
 
                         InkWell(
                           onTap: () {
-                            if(Get.find<SplashController>().configModel?.dmLoyalityPointData?.dmLoyalityPointStatus == true){
+
+                            var config = Get.find<SplashController>().configModel;
+                            bool loyaltyPointStatus = isRideActive ? (config!.riderLoyalityPointData?.loyalityPointStatus ?? false) : ((config!.dmLoyalityPointData?.loyalityPointStatus ?? false)) ;
+
+                            if(loyaltyPointStatus){
                               showDialog(barrierDismissible: false,
-                                context: context, builder: (_) => const PointToWalletMoneyWidget(),
+                                context: context, builder: (_) =>  PointToWalletMoneyWidget(isRideActive: isRideActive),
                               );
                             }else{
                               showCustomSnackBar('point_conversion_is_currently_unavailable'.tr);

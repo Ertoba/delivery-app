@@ -9,6 +9,7 @@ import 'package:sixam_mart_delivery/features/chat/domain/models/conversation_mod
 import 'package:sixam_mart_delivery/features/chat/domain/models/message_model.dart';
 import 'package:sixam_mart_delivery/features/chat/domain/services/chat_service_interface.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 
 import '../../../common/widgets/custom_snackbar_widget.dart';
 import '../../../helper/date_converter_helper.dart';
@@ -87,6 +88,15 @@ class ChatController extends GetxController implements GetxService {
   bool _singleFIleCrossMaxLimit = false;
   bool get singleFIleCrossMaxLimit => _singleFIleCrossMaxLimit;
 
+  bool showFaqQuestions = false;
+
+  void updateShowFaq(bool action, {bool isUpdate = false}){
+    showFaqQuestions = action;
+    if(isUpdate){
+      update();
+    }
+  }
+
   Future<void> getConversationList(int offset, {String type = ''}) async{
     _searchConversationModel = null;
     _conversationModel = null;
@@ -127,7 +137,7 @@ class ChatController extends GetxController implements GetxService {
 
     if (messageModel != null) {
       if (offset == 1) {
-        if(Get.find<ProfileController>().profileModel == null) {
+        if(Get.find<ProfileController>().profileModel == null || Get.find<ProfileController>().profileModel?.userinfo == null) {
           await Get.find<ProfileController>().getProfile();
         }
         _messageModel = messageModel;
@@ -140,6 +150,13 @@ class ChatController extends GetxController implements GetxService {
           User? receiver = _messageModel!.conversation!.receiver;
           _messageModel!.conversation!.receiver = _messageModel!.conversation!.sender;
           _messageModel!.conversation!.sender = receiver;
+        }else if(_messageModel!.conversation != null && _messageModel!.conversation!.receiverType == 'admin') {
+          User? receiver = User(
+            id: 0, fName: Get.find<SplashController>().configModel!.businessName, lName: '',
+            imageFullUrl: Get.find<SplashController>().configModel!.logo,
+            phone: Get.find<SplashController>().configModel!.phone
+          );
+          _messageModel!.conversation!.receiver = receiver;
         }
       }else {
         _messageModel!.totalSize = messageModel.totalSize;
@@ -152,7 +169,7 @@ class ChatController extends GetxController implements GetxService {
 
   }
 
-  Future<bool> sendMessage({required String message, required NotificationBodyModel? notificationBody, required int? conversationId}) async {
+  Future<bool> sendMessage({required String message, required NotificationBodyModel? notificationBody, required int? conversationId, bool fromFaq = false}) async {
     bool isSuccess = false;
     _isLoading = true;
     update();
@@ -170,7 +187,15 @@ class ChatController extends GetxController implements GetxService {
     if(_pickedVideoFile != null) {
       allFiles.addAll(chatServiceInterface.processMultipartVideo(_pickedVideoFile));
     }
-    MessageModel? messageModel = await chatServiceInterface.processSendMessage(notificationBody, allFiles, message, conversationId);
+    MessageModel? messageModel;
+
+    if(!fromFaq){
+      messageModel = await chatServiceInterface.processSendMessage(notificationBody, allFiles, message, conversationId);
+    }else{
+      messageModel = await chatServiceInterface.sendFaqMessage(questionId: message);
+    }
+
+
 
     if (messageModel != null) {
       _imageFiles = [];
@@ -189,6 +214,14 @@ class ChatController extends GetxController implements GetxService {
         User? receiver = _messageModel!.conversation!.receiver;
         _messageModel!.conversation!.receiver = _messageModel!.conversation!.sender;
         _messageModel!.conversation!.sender = receiver;
+      }
+      else if(_messageModel!.conversation != null && _messageModel!.conversation!.receiverType == 'admin') {
+        User? receiver = User(
+          id: 0, fName: Get.find<SplashController>().configModel!.businessName, lName: '',
+          imageFullUrl: Get.find<SplashController>().configModel!.logo,
+          phone: Get.find<SplashController>().configModel!.phone
+        );
+        _messageModel!.conversation!.receiver = receiver;
       }
       isSuccess = true;
     }

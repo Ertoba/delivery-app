@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 
@@ -31,3 +32,10 @@ const robotoBlack = TextStyle(
   fontWeight: FontWeight.w900,
   fontSize: Dimensions.fontSizeDefault,
 );
+
+Color getStatusButtonColor(String? status){
+  return status == "completed" ? Theme.of(Get.context!).primaryColor
+      : status == "cancelled" ? Theme.of(Get.context!).colorScheme.error
+      : status == "ongoing" ? Colors.orange
+      :  status == "accepted" ? Colors.blue : Theme.of(Get.context!).hintColor;
+}

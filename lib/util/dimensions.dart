@@ -12,6 +12,7 @@ class Dimensions {
   static const double paddingSizeLarge = 20.0;
   static const double paddingSizeExtraLarge = 25.0;
   static const double paddingSizeOverLarge = 30.0;
+  static const double paddingSizeExtraOverLarge = 35.0;
 
   static const double radiusSmall = 5.0;
   static const double radiusMedium = 8.0;

@@ -8,15 +8,24 @@ import 'package:sixam_mart_delivery/features/auth/controllers/auth_controller.da
 import 'package:sixam_mart_delivery/features/home/widgets/location_access_dialog.dart';
 import 'package:sixam_mart_delivery/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart_delivery/features/language/widgets/language_bottom_sheet_widget.dart';
-import 'package:sixam_mart_delivery/features/order/controllers/order_controller.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/controllers/order_controller.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/profile/widgets/notification_status_change_bottom_sheet.dart';
+import 'package:sixam_mart_delivery/features/profile/widgets/profile_level_details_widget.dart';
 import 'package:sixam_mart_delivery/features/refer_and_earn/screens/refer_and_earn_screen.dart';
+import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/screens/vehicle_details_screen.dart';
+import 'package:sixam_mart_delivery/features/ride_module/help_and_support/screens/help_and_support_screen.dart';
+import 'package:sixam_mart_delivery/features/ride_module/leaderboard/screens/leaderboard_screen.dart';
+import 'package:sixam_mart_delivery/features/ride_module/review/screens/review_screen.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/controllers/ride_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/safety/screen/safety_policy_screen.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/common/controllers/theme_controller.dart';
+import 'package:sixam_mart_delivery/helper/pusher_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/confirmation_dialog_widget.dart';
@@ -37,6 +46,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late final AppLifecycleListener _listener;
 
+  bool isRideActive = AppConstants.appMode == AppMode.ride;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +56,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       onStateChange: _onStateChanged,
     );
     Get.find<ProfileController>().getProfile();
+    if(isRideActive){
+      Get.find<ProfileController>().getProfileLevelInfo();
+    }
   }
 
   void _onStateChanged(AppLifecycleState state) {
@@ -85,9 +99,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: Theme.of(context).cardColor,
       body: GetBuilder<ProfileController>(builder: (profileController) {
 
-        bool showReferAndEarn = Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.earnings == 1
-            && (Get.find<SplashController>().configModel?.dmReferralData?.dmReferalStatus == true
-                || (Get.find<ProfileController>().profileModel?.referalEarning != null && Get.find<ProfileController>().profileModel!.referalEarning! > 0));
+        var config = Get.find<SplashController>().configModel;
+
+        bool showReferAndEarn = profileController.profileModel != null && profileController.profileModel!.earnings == 1
+            && (isRideActive ? (config?.riderReferralData?.referalStatus ?? false) : (config?.dmReferralData?.referalStatus ?? false));
+
 
         return profileController.profileModel == null ? const Center(child: CircularProgressIndicator()) : ProfileBgWidget(
           backButton: false,
@@ -97,10 +113,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
-            child: ClipOval(child: CustomImageWidget(
-              image: '${profileController.profileModel != null ? profileController.profileModel!.imageFullUrl : ''}',
-              height: 100, width: 100, fit: BoxFit.cover,
-            )),
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              clipBehavior: Clip.none,
+              children: [
+                ClipOval(child: CustomImageWidget(
+                  image: '${profileController.profileModel != null ? profileController.profileModel!.imageFullUrl : ''}',
+                  height: 100, width: 100, fit: BoxFit.cover,
+                )),
+
+                if(isRideActive && config?.riderLevelStatus == 1 ) Positioned(
+                  bottom: -5,
+                  child: InkWell(
+                    onTap: () {
+                      Get.find<ProfileController>().getProfileLevelInfo();
+                      Get.bottomSheet(const ProfileLevelDetailsWidget());
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 2,
+                        horizontal: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        boxShadow: [BoxShadow(color: Colors.grey[Get.isDarkMode ? 850 : 200]!, spreadRadius: 1, blurRadius: 5)],
+                        borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      ),
+                      child: Text('${profileController.levelModel?.data?.currentLevel?.name}',
+                          style: robotoRegular.copyWith(color: Theme.of(context).cardColor, fontSize: 12)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           mainWidget: SingleChildScrollView(physics: const BouncingScrollPhysics(), child: Center(child: Container(
             width: 1170, color: Theme.of(context).cardColor,
@@ -111,123 +156,152 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 '${profileController.profileModel!.fName} ${profileController.profileModel!.lName}',
                 style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 5),
+              if(isRideActive) Row( mainAxisSize: MainAxisSize.min, children: [
+                Text('${profileController.profileModel!.avgRating.toString()} ',),
+
+                const Icon(Icons.star_rounded, color: Colors.orange, size: 16),
+
+                Text('(${'reviews'.tr} ${profileController.profileModel?.ratingCount})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor.withValues(alpha: 0.5))),
+                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+              ]),
+              const SizedBox(height: 15),
 
               Row(children: [
                 ProfileCardWidget(title: 'days_since_joining'.tr, data: '${profileController.profileModel!.memberSinceDays}'),
                 const SizedBox(width: Dimensions.paddingSizeSmall),
-                ProfileCardWidget(title: 'order_completed'.tr, data: profileController.profileModel!.orderCount.toString()),
+                isRideActive
+                    ? ProfileCardWidget(title: 'total_ride'.tr, data: profileController.profileModel!.totalRides.toString())
+                    : ProfileCardWidget(title: 'order_completed'.tr, data: profileController.profileModel!.orderCount.toString()),
               ]),
               const SizedBox(height: 30),
 
-              InkWell(
-                onTap: () {
-                  showBgNotificationBottomSheet(profileController.backgroundNotification);
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: Dimensions.paddingSizeSmall,
-                    vertical: Dimensions.paddingSizeExtraSmall,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [BoxShadow(color: Colors.grey[Get.isDarkMode ? 850 : 200]!, spreadRadius: 1, blurRadius: 5)],
-                  ),
-                  child: Row(children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Dimensions.paddingSizeSmall,
+                  vertical: Dimensions.paddingSizeExtraSmall,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(5),
+                  boxShadow: [BoxShadow(color: Colors.grey[Get.isDarkMode ? 850 : 200]!, spreadRadius: 1, blurRadius: 5)],
+                ),
+                child: Row(children: [
 
-                    Image.asset(Images.online, height: 25, width: 25, color: Theme.of(context).disabledColor),
-                    const SizedBox(width: Dimensions.paddingSizeSmall),
+                  Image.asset(Images.online, height: 25, width: 25, color: Theme.of(context).disabledColor),
+                  const SizedBox(width: Dimensions.paddingSizeSmall),
 
-                    Expanded(child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('online_status'.tr, style: robotoRegular),
-                        Text('manage_your_delivery_availability'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-                      ],
-                    )),
+                  Expanded(child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('online_status'.tr, style: robotoRegular),
+                      Text('manage_your_delivery_availability'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+                    ],
+                  )),
 
-                    GetBuilder<ProfileController>(builder: (profileController) {
-                      return GetBuilder<OrderController>(builder: (orderController) {
-                        return (profileController.profileModel != null && orderController.currentOrderList != null) ? Transform.scale(
-                          scale: 0.7,
-                          child: CupertinoSwitch(
-                            value: profileController.profileModel!.active == 1,
-                            activeTrackColor: Theme.of(context).primaryColor,
-                            inactiveTrackColor: Theme.of(context).primaryColor.withValues(alpha: 0.5),
-                            onChanged: (bool isActive) async {
-                              if(!isActive && orderController.currentOrderList!.isNotEmpty) {
-                                showCustomBottomSheet(
-                                  child: CustomConfirmationBottomSheet(
-                                    title: 'you_cant_go_offline'.tr,
-                                    description: 'you_can_not_go_offline_now'.tr,
-                                    buttonWidget: Padding(
-                                      padding: const EdgeInsets.only(bottom: 20, top: 10),
-                                      child: CustomButtonWidget(
-                                        width: 150,
-                                        onPressed: () {
-                                          Get.back();
-                                        },
-                                        buttonText: 'okay'.tr,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }else {
-                                if(!isActive) {
+                  GetBuilder<ProfileController>(builder: (profileController) {
+                    return GetBuilder<RideController>(builder: (rideController) {
+                        return GetBuilder<OrderController>(builder: (orderController) {
+                          bool isRideActive = AppConstants.appMode == AppMode.ride;
+                          bool haveRunningRide = rideController.lastRideDetails != null && rideController.lastRideDetails!.isNotEmpty && rideController.lastRideDetails![0].currentStatus != 'completed' && rideController.lastRideDetails![0].currentStatus != 'cancelled';
+                          return (profileController.profileModel != null) ? Transform.scale(
+                            scale: 0.7,
+                            child: CupertinoSwitch(
+                              value: profileController.profileModel!.active == 1,
+                              activeTrackColor: Theme.of(context).primaryColor,
+                              inactiveTrackColor: Theme.of(context).primaryColor.withValues(alpha: 0.5),
+                              onChanged: (bool isActive) async {
+                                if(!isRideActive && !isActive && (orderController.currentOrderList?.isNotEmpty ?? false)) {
                                   showCustomBottomSheet(
                                     child: CustomConfirmationBottomSheet(
-                                      title: 'go_offline'.tr,
-                                      description: 'are_you_sure_to_offline'.tr,
-                                      image: Images.dmOfflineIcon,
+                                      title: 'you_cant_go_offline'.tr,
+                                      description: 'you_can_not_go_offline_now'.tr,
                                       buttonWidget: Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 40, right: 40, bottom: 20, top: 10,
+                                        padding: const EdgeInsets.only(bottom: 20, top: 10),
+                                        child: CustomButtonWidget(
+                                          width: 150,
+                                          onPressed: () {
+                                            Get.back();
+                                          },
+                                          buttonText: 'okay'.tr,
                                         ),
-                                        child: Row(children: [
-
-                                          Expanded(
-                                            child: CustomButtonWidget(
-                                              onPressed: () {
-                                                profileController.updateActiveStatus();
-                                              },
-                                              buttonText: 'yes_proceed'.tr,
-                                            ),
-                                          ),
-                                          const SizedBox(width: Dimensions.paddingSizeDefault),
-
-                                          Expanded(
-                                            child: CustomButtonWidget(
-                                              onPressed: () {
-                                                Get.back();
-                                              },
-                                              buttonText: 'cancel'.tr,
-                                              backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.1),
-                                              fontColor: Theme.of(context).disabledColor,
-                                              isBorder: true,
-                                            ),
-                                          ),
-
-                                        ]),
                                       ),
                                     ),
                                   );
-                                }else {
-                                  LocationPermission permission = await Geolocator.checkPermission();
-                                  if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
-                                    _checkPermission(() => profileController.updateActiveStatus());
+                                } else if(isRideActive && !isActive && haveRunningRide) {
+                                  showCustomBottomSheet(
+                                    child: CustomConfirmationBottomSheet(
+                                      title: 'you_cant_go_offline'.tr,
+                                      description: 'you_can_not_go_offline_now_for_ride'.tr,
+                                      buttonWidget: Padding(
+                                        padding: const EdgeInsets.only(bottom: 20, top: 10),
+                                        child: CustomButtonWidget(
+                                          width: 150,
+                                          onPressed: () {
+                                            Get.back();
+                                          },
+                                          buttonText: 'okay'.tr,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+
+                                } else {
+                                  if(!isActive) {
+                                    showCustomBottomSheet(
+                                      child: CustomConfirmationBottomSheet(
+                                        title: 'go_offline'.tr,
+                                        description: 'are_you_sure_to_offline'.tr,
+                                        image: Images.dmOfflineIcon,
+                                        buttonWidget: Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 40, right: 40, bottom: 20, top: 10,
+                                          ),
+                                          child: Row(children: [
+
+                                            Expanded(
+                                              child: CustomButtonWidget(
+                                                onPressed: () {
+                                                  profileController.updateActiveStatus();
+                                                },
+                                                buttonText: 'yes_proceed'.tr,
+                                              ),
+                                            ),
+                                            const SizedBox(width: Dimensions.paddingSizeDefault),
+
+                                            Expanded(
+                                              child: CustomButtonWidget(
+                                                onPressed: () {
+                                                  Get.back();
+                                                },
+                                                buttonText: 'cancel'.tr,
+                                                backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.1),
+                                                fontColor: Theme.of(context).disabledColor,
+                                                isBorder: true,
+                                              ),
+                                            ),
+
+                                          ]),
+                                        ),
+                                      ),
+                                    );
                                   }else {
-                                    profileController.updateActiveStatus();
+                                    LocationPermission permission = await Geolocator.checkPermission();
+                                    if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
+                                      _checkPermission(() => profileController.updateActiveStatus());
+                                    }else {
+                                      profileController.updateActiveStatus();
+                                    }
                                   }
                                 }
-                              }
-                            },
-                          ),
-                        ) : const SizedBox();
-                      });
-                    }),
-                  ]),
-                ),
+                              },
+                            ),
+                          ) : const SizedBox();
+                        });
+                      }
+                    );
+                  }),
+                ]),
               ),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
@@ -284,6 +358,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ) : SizedBox(),
               SizedBox(height: GetPlatform.isAndroid ? Dimensions.paddingSizeSmall : 0),
 
+              if(profileController.profileModel?.vehicle != null && isRideActive) Padding(
+                padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                child: ProfileButtonWidget(iconImage: Images.car, title: 'vehicle_details'.tr, onTap: () {
+                  Get.to(()=>  VehicleDetailsScreen());
+                }),
+              ),
 
               ProfileButtonWidget(iconImage: Images.security, title: 'change_password'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getResetPasswordRoute('', '', 'password-change'));
@@ -302,6 +382,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               ProfileButtonWidget(iconImage: Images.editUser, title: 'edit_profile'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getUpdateProfileRoute());
+              }),
+              const SizedBox(height: Dimensions.paddingSizeSmall),
+
+              if(isRideActive) Padding(
+                padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                child: ProfileButtonWidget(iconImage: Images.noReview, title: 'my_reviews'.tr, onTap: () {
+                  Get.to(()=> const ReviewScreen());
+                }),
+              ),
+
+              if(isRideActive) Padding(
+                padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                child: ProfileButtonWidget(iconImage: Images.leaderBoardIcon, title: 'leader_board'.tr, onTap: () {
+                  Get.to(()=> const LeaderboardScreen());
+                }),
+              ),
+
+              ProfileButtonWidget(iconImage: Images.support, title: 'help_and_support'.tr, onTap: () {
+                Get.to(()=> const HelpAndSupportScreen());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
@@ -334,11 +433,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   }),
                 ),
 
-              if(showReferAndEarn)
-              Padding(
+              if(showReferAndEarn)Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
                 child: ProfileButtonWidget(iconImage: Images.earning, title: 'refer_and_earn'.tr, onTap: () {
                   Get.to(()=> const ReferAndEarnScreen());
+                }),
+              ),
+
+              if(isRideActive) Padding(
+                padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                child: ProfileButtonWidget(iconImage: Images.shieldTick, title: 'safety'.tr, onTap: () {
+                  Get.to(()=> const SafetyPolicyScreen());
                 }),
               ),
 
@@ -367,6 +472,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ProfileButtonWidget(icon: Icons.logout, title: 'logout'.tr, onTap: () {
                 Get.back();
                 Get.dialog(ConfirmationDialogWidget(icon: Images.support, description: 'are_you_sure_to_logout'.tr, isLogOut: true, onYesPressed: () {
+                  PusherHelper().pusherDisconnectPusher();
                   Get.find<AuthController>().clearSharedData();
                   Get.find<ProfileController>().stopLocationRecord();
                   Get.offAllNamed(RouteHelper.getSignInRoute());

@@ -1,24 +1,28 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:sixam_mart_delivery/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart_delivery/features/order/controllers/order_controller.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/controllers/order_controller.dart';
 import 'package:sixam_mart_delivery/features/disbursement/helper/disbursement_helper.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/screens/pending_ride_list_screen.dart';
+import 'package:sixam_mart_delivery/features/ride_module/ride_order/screens/ride_order_screen.dart';
 import 'package:sixam_mart_delivery/helper/notification_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/main.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_alert_dialog_widget.dart';
 import 'package:sixam_mart_delivery/features/dashboard/widgets/bottom_nav_item_widget.dart';
 import 'package:sixam_mart_delivery/features/dashboard/widgets/new_request_dialog_widget.dart';
 import 'package:sixam_mart_delivery/features/home/screens/home_screen.dart';
 import 'package:sixam_mart_delivery/features/profile/screens/profile_screen.dart';
-import 'package:sixam_mart_delivery/features/order/screens/order_request_screen.dart';
-import 'package:sixam_mart_delivery/features/order/screens/order_screen.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/screens/order_request_screen.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/screens/order_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -38,7 +42,7 @@ class DashboardScreenState extends State<DashboardScreen> {
   late StreamSubscription _stream;
   DisbursementHelper disbursementHelper = DisbursementHelper();
   bool _canExit = false;
-
+  bool isRideActive = AppConstants.appMode == AppMode.ride;
   @override
   void initState() {
     super.initState();
@@ -48,8 +52,12 @@ class DashboardScreenState extends State<DashboardScreen> {
 
     _screens = [
       HomeScreen(onNavigateToOrders: () => _setPage(2)),
-      OrderRequestScreen(onTap: () => _setPage(0)),
-      const OrderScreen(),
+      isRideActive
+          ? RideRequestScreen(onTap: () => _setPage(0))
+          : OrderRequestScreen(onTap: () => _setPage(0)),
+      isRideActive
+          ? RideOrderScreen()
+          : const OrderScreen(),
       const ProfileScreen(),
     ];
 
@@ -61,6 +69,7 @@ class DashboardScreenState extends State<DashboardScreen> {
       String? type = message.data['body_loc_key'] ?? message.data['type'];
       String? orderID = message.data['title_loc_key'] ?? message.data['order_id'];
       bool isParcel = (message.data['order_type'] == 'parcel_order');
+      bool isPrescription = (message.data['order_type'] == 'prescription');
       if(type != 'assign' && type != 'new_order' && type != 'message' && type != 'order_request' && type != 'order_status') {
         NotificationHelper.showNotification(message, flutterLocalNotificationsPlugin);
       }
@@ -68,12 +77,12 @@ class DashboardScreenState extends State<DashboardScreen> {
         Get.find<OrderController>().getRunningOrders(Get.find<OrderController>().offset, status: 'all');
         Get.find<OrderController>().getOrderCount(Get.find<OrderController>().orderType);
         Get.find<OrderController>().getLatestOrders();
-        Get.dialog(NewRequestDialogWidget(isRequest: true, onTap: () => _navigateRequestPage(), orderId: int.parse(message.data['order_id'].toString()), isParcel: isParcel));
+        Get.dialog(NewRequestDialogWidget(isRequest: true, onTap: () => _navigateRequestPage(), orderId: int.parse(message.data['order_id'].toString()), hideItemCount: isParcel || isPrescription));
       }else if(type == 'assign' && orderID != null && orderID.isNotEmpty) {
         Get.find<OrderController>().getRunningOrders(Get.find<OrderController>().offset, status: 'all');
         Get.find<OrderController>().getOrderCount(Get.find<OrderController>().orderType);
         Get.find<OrderController>().getLatestOrders();
-        Get.dialog(NewRequestDialogWidget(isRequest: false, orderId: int.parse(message.data['order_id'].toString()), isParcel: isParcel, onTap: () {
+        Get.dialog(NewRequestDialogWidget(isRequest: false, orderId: int.parse(message.data['order_id'].toString()), hideItemCount: isParcel || isPrescription, onTap: () {
           Get.offAllNamed(RouteHelper.getOrderDetailsRoute(int.parse(orderID), fromNotification: true));
         }));
       }else if(type == 'block') {
@@ -92,15 +101,8 @@ class DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _navigateRequestPage() {
-    if(Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.active == 1
-        && Get.find<OrderController>().currentOrderList != null && Get.find<OrderController>().currentOrderList!.isEmpty) {
+    if(isDeliveryManActive()){
       _setPage(1);
-    }else {
-      if(Get.find<ProfileController>().profileModel == null || Get.find<ProfileController>().profileModel!.active == 0) {
-        Get.dialog(CustomAlertDialogWidget(description: 'you_are_offline_now'.tr, onOkPressed: () => Get.back()));
-      }else {
-        _setPage(1);
-      }
     }
   }
 
@@ -156,7 +158,7 @@ class DashboardScreenState extends State<DashboardScreen> {
             BottomNavItemWidget(iconData: Images.request, label: 'request'.tr, isSelected: _pageIndex == 1, pageIndex: 1, onTap: () {
               _navigateRequestPage();
             }),
-            BottomNavItemWidget(iconData: Images.bag, label: 'orders'.tr, isSelected: _pageIndex == 2, onTap: () => _setPage(2)),
+            BottomNavItemWidget(iconData: Images.bag, label: isRideActive ? "history".tr : 'orders'.tr, isSelected: _pageIndex == 2, onTap: () => _setPage(2)),
             BottomNavItemWidget(iconData: Images.userP, label: 'profile'.tr, isSelected: _pageIndex == 3, onTap: () => _setPage(3)),
           ]),
         ),
@@ -177,5 +179,23 @@ class DashboardScreenState extends State<DashboardScreen> {
       _pageController!.jumpToPage(pageIndex);
       _pageIndex = pageIndex;
     });
+  }
+}
+
+bool isDeliveryManActive({bool showPopUp = true}){
+  if(Get.find<ProfileController>().profileModel != null && Get.find<ProfileController>().profileModel!.active == 1
+      && Get.find<OrderController>().currentOrderList != null && Get.find<OrderController>().currentOrderList!.isEmpty) {
+    return true;
+  }else {
+    if(Get.find<ProfileController>().profileModel == null || Get.find<ProfileController>().profileModel!.active == 0) {
+      if(showPopUp){
+        WidgetsBinding.instance.addPostFrameCallback((_){
+          Get.dialog(CustomAlertDialogWidget(description: 'you_are_offline_now'.tr, onOkPressed: () => Get.back()));
+        });
+      }
+      return false;
+    }else {
+      return true;
+    }
   }
 }

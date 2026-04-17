@@ -1,5 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_delivery/api/api_client.dart';
@@ -7,6 +7,7 @@ import 'package:sixam_mart_delivery/features/auth/domain/models/delivery_man_bod
 import 'package:sixam_mart_delivery/features/auth/domain/models/vehicle_model.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/repositories/auth_repository_interface.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 
 class AuthRepository implements AuthRepositoryInterface {
   final ApiClient apiClient;
@@ -14,8 +15,8 @@ class AuthRepository implements AuthRepositoryInterface {
   AuthRepository({required this.apiClient, required this.sharedPreferences});
 
   @override
-  Future<Response> login(String phone, String password) async {
-    return await apiClient.postData(AppConstants.loginUri, {"phone": phone, "password": password}, handleError: false);
+  Future<Response> login(String phone, String password, String type) async {
+    return await apiClient.postData(AppConstants.loginUri, {"phone": phone, "password": password, "type": type}, handleError: false);
   }
 
   @override
@@ -51,7 +52,11 @@ class AuthRepository implements AuthRepositoryInterface {
       deviceToken = await _saveDeviceToken();
     }
     if(!GetPlatform.isWeb) {
-      FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
+      if(AppConstants.appMode == AppMode.delivery){
+        FirebaseMessaging.instance.subscribeToTopic(AppConstants.topicDeliveryman);
+      }else{
+        FirebaseMessaging.instance.subscribeToTopic(AppConstants.topicRider);
+      }
       FirebaseMessaging.instance.subscribeToTopic(sharedPreferences.getString(AppConstants.zoneTopic)!);
       FirebaseMessaging.instance.subscribeToTopic(sharedPreferences.getString(AppConstants.vehicleWiseTopic)!);
     }
@@ -61,12 +66,7 @@ class AuthRepository implements AuthRepositoryInterface {
   Future<String?> _saveDeviceToken() async {
     String? deviceToken = '';
     if(!GetPlatform.isWeb) {
-      try {
-        deviceToken = await FirebaseMessaging.instance.getToken()
-            .timeout(const Duration(seconds: 10));
-      } catch (_) {
-        deviceToken = null;
-      }
+      deviceToken = (await FirebaseMessaging.instance.getToken())!;
     }
     debugPrint('----Device Token----- $deviceToken');
     return deviceToken;
@@ -95,9 +95,20 @@ class AuthRepository implements AuthRepositoryInterface {
   @override
   Future<bool> clearSharedData() async {
     if(!GetPlatform.isWeb) {
-      await FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topic);
-      FirebaseMessaging.instance.unsubscribeFromTopic(sharedPreferences.getString(AppConstants.zoneTopic)!);
-      FirebaseMessaging.instance.unsubscribeFromTopic(sharedPreferences.getString(AppConstants.vehicleWiseTopic)!);
+
+      try{
+        if(AppConstants.appMode == AppMode.delivery){
+          await FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topicDeliveryman);
+        }else{
+          await FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topicRider);
+        }
+        FirebaseMessaging.instance.unsubscribeFromTopic(sharedPreferences.getString(AppConstants.zoneTopic)!);
+        FirebaseMessaging.instance.unsubscribeFromTopic(sharedPreferences.getString(AppConstants.vehicleWiseTopic)!);
+      }catch(e){
+        if (kDebugMode) {
+          print("");
+        }
+      }
       apiClient.postData(AppConstants.tokenUri, {"_method": "put", "token": getUserToken()}, handleError: false);
     }
     await sharedPreferences.remove(AppConstants.token);
@@ -151,7 +162,8 @@ class AuthRepository implements AuthRepositoryInterface {
     }else {
       if(!GetPlatform.isWeb) {
         apiClient.postData(AppConstants.tokenUri, {"_method": "put", "token": getUserToken()}, handleError: false);
-        FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topic);
+        FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topicDeliveryman);
+        FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topicRider);
         FirebaseMessaging.instance.unsubscribeFromTopic(sharedPreferences.getString(AppConstants.zoneTopic)!);
         FirebaseMessaging.instance.unsubscribeFromTopic(sharedPreferences.getString(AppConstants.vehicleWiseTopic)!);
       }
@@ -165,6 +177,16 @@ class AuthRepository implements AuthRepositoryInterface {
     await sharedPreferences.remove(AppConstants.userCountryDialCode);
     await sharedPreferences.remove(AppConstants.userCountryCode);
     return await sharedPreferences.remove(AppConstants.userNumber);
+  }
+
+  @override
+  Future<void> saveRideCreatedTime(DateTime dateTime) async {
+    await sharedPreferences.setString('DateTime', dateTime.toString());
+  }
+
+  @override
+  Future<String> remainingTime() async {
+    return  sharedPreferences.getString('DateTime') ?? '';
   }
 
   @override

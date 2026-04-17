@@ -8,7 +8,9 @@ import 'package:sixam_mart_delivery/features/refer_and_earn/controllers/refer_an
 import 'package:sixam_mart_delivery/features/refer_and_earn/widgets/referral_earn_bottomsheet_widget.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:share_plus/share_plus.dart';
@@ -19,10 +21,16 @@ class ReferralDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    var config = Get.find<SplashController>().configModel;
+    bool isRideActive = AppConstants.appMode == AppMode.ride;
+    double referralAmount = isRideActive ? (config?.riderReferralData?.referalAmount ?? 0) :  (config?.dmReferralData?.referalAmount ?? 0);
+
     return Expanded(
       child: GetBuilder<ReferAndEarnController>(builder: (referAndEarnController){
-        return (Get.find<SplashController>().configModel?.dmReferralData?.dmReferalStatus??false) ?
-        SingleChildScrollView(
+        var config = Get.find<SplashController>().configModel;
+        bool referralStatus = isRideActive ? (config?.riderReferralData?.referalStatus ?? false) : (config?.dmReferralData?.referalStatus ?? false);
+        return referralStatus ? SingleChildScrollView(
           child: Column(children: [
             const SizedBox(height: Dimensions.paddingSizeDefault),
             Image.asset(Images.homeReferralIcon,height: 120, width: 120),
@@ -40,7 +48,7 @@ class ReferralDetails extends StatelessWidget {
                     fontSize: Dimensions.fontSizeDefault, height: 1.5,
                   ),
                   children: [TextSpan(
-                    text: '  ${PriceConverterHelper.convertPrice(Get.find<SplashController>().configModel?.dmReferralData?.dmReferalAmount ?? 0)}  ',
+                    text: '  ${PriceConverterHelper.convertPrice(referralAmount)}  ',
                     style: robotoBold,
                   ),
                     TextSpan(
@@ -219,9 +227,7 @@ class ReferralDetails extends StatelessWidget {
             const SizedBox(height: 30),
 
           ]),
-        )
-            :
-        Column(children: [
+        ) : Column(children: [
           const SizedBox(height: 100),
 
           Image.asset(Images.homeReferralIcon,height: 140,width: 140),

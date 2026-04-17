@@ -12,8 +12,8 @@ class AuthService implements AuthServiceInterface {
   AuthService({required this.authRepositoryInterface});
 
   @override
-  Future<Response> login(String phone, String password) async {
-    return await authRepositoryInterface.login(phone, password);
+  Future<Response> login(String phone, String password, String type) async {
+    return await authRepositoryInterface.login(phone, password, type);
   }
 
   @override
@@ -123,6 +123,16 @@ class AuthService implements AuthServiceInterface {
       });
     }
     return pickImage;
+  }
+
+  @override
+  Future saveRideCreatedTime(DateTime dateTime) async {
+    authRepositoryInterface.saveRideCreatedTime(dateTime);
+  }
+
+  @override
+  Future remainingTime() {
+    return  authRepositoryInterface.remainingTime();
   }
 
 }

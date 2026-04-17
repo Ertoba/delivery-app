@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,9 +8,8 @@ import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/address/domain/models/record_location_body_model.dart';
 import 'package:sixam_mart_delivery/features/profile/domain/models/profile_model.dart';
 import 'package:sixam_mart_delivery/features/profile/domain/repositories/profile_repository_interface.dart';
+import 'package:sixam_mart_delivery/helper/pusher_helper.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
-import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ProfileRepository implements ProfileRepositoryInterface {
   final ApiClient apiClient;
@@ -56,32 +56,38 @@ class ProfileRepository implements ProfileRepositoryInterface {
   }
 
   @override
-  Future<void> recordWebSocketLocation(RecordLocationBodyModel recordLocationBody) async {
+  Future<void> recordWebSocketLocation(RecordLocationBodyModel recordLocationBody, String zoneId) async {
+    apiClient.updateHeader(_getUserToken(), sharedPreferences.getString(AppConstants.languageCode), zoneId: zoneId);
+    sharedPreferences.setString(AppConstants.cacheZoneId, zoneId);
     recordLocationBody.token = _getUserToken();
-
-    String uri = '${Get.find<SplashController>().configModel!.webSocketUri!}:${Get.find<SplashController>().configModel!.webSocketPort!}/app/6ammart?protocol=7&client=js&version=8.4.0-rc2&flash=false';
-    final wsUrl = Uri.parse(uri);
-    var channel = WebSocketChannel.connect(wsUrl);
-    String data = '''{
-      "event": "client-location-update",
-      "channel": "private-user-location",
-      "data": {
-        "token":"${_getUserToken()}",
-        "latitude": "${recordLocationBody.latitude}",
-        "longitude": "${recordLocationBody.longitude}",
-        "location": "${recordLocationBody.location}"
-      }
-    }''';
-
-    // channel.sink.add(jsonEncode(recordLocationBody));
-    channel.sink.add(data);
-    channel.sink.close();
+    PusherHelper.recordLocationViaPusher(
+      token: _getUserToken(),
+      latitude: recordLocationBody.latitude ?? 0.0,
+      longitude: recordLocationBody.longitude ?? 0.0,
+      location: recordLocationBody.location ?? '',
+    );
   }
 
   @override
-  Future<Response> recordLocation(RecordLocationBodyModel recordLocationBody) {
+  Future<Response> recordLocation(RecordLocationBodyModel recordLocationBody, String zoneId) {
     recordLocationBody.token = _getUserToken();
+    apiClient.updateHeader(_getUserToken(), sharedPreferences.getString(AppConstants.languageCode), zoneId: zoneId);
+    sharedPreferences.setString(AppConstants.cacheZoneId, zoneId);
     return apiClient.postData(AppConstants.recordLocationUri, recordLocationBody.toJson());
+  }
+
+  @override
+  Future<String> getZoneId(Position locationResult) async {
+    Response response = await apiClient.getData(
+      "${AppConstants.getZoneId}?token=${_getUserToken()}&lat=${locationResult.latitude}&lng=${locationResult.longitude}",
+      handleError: false,
+    );
+
+    String zoneId = "";
+    if (response.statusCode == 200) {
+      zoneId = response.body['data']['id'].toString();
+    }
+    return zoneId;
   }
 
   @override
@@ -98,6 +104,11 @@ class ProfileRepository implements ProfileRepositoryInterface {
 
   String _getUserToken() {
     return sharedPreferences.getString(AppConstants.token) ?? "";
+  }
+
+  @override
+  Future<Response> getProfileLevelInfo() async {
+    return apiClient.getData('${AppConstants.getProfileLevel}?token=${_getUserToken()}');
   }
 
   @override

@@ -30,7 +30,6 @@ class TitleWidget extends StatelessWidget {
           ),
         ),
       ) : const SizedBox(),
-
     ]);
   }
 }

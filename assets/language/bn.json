@@ -638,5 +638,10 @@
   "amount_collect_from_customer": "গ্রাহকের কাছ থেকে সংগ্রহযোগ্য পরিমাণ",
   "already_paid_digitally": "ডিজিটালি ইতোমধ্যে পরিশোধ করা হয়েছে",
   "schedule": "সময়সূচি",
-  "you_can_pay_the_amount_to_the_admin": "আপনি এই পরিমাণ অ্যাডমিনকে পরিশোধ করতে পারেন"
+  "you_can_pay_the_amount_to_the_admin": "আপনি এই পরিমাণ অ্যাডমিনকে পরিশোধ করতে পারেন",
+  "for" : "জন্য",
+  "from_customer_to_store_distance": "গ্রাহক থেকে দোকানের দূরত্ব",
+  "your_distance_from_store": "দোকান থেকে আপনার দূরত্ব",
+  "order_date": "অর্ডারের তারিখ"
+
 }

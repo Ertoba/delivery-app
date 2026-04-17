@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/features/chat/domain/models/conversation_model.dart';
 import 'package:sixam_mart_delivery/features/chat/domain/models/message_model.dart';
-import 'package:sixam_mart_delivery/helper/date_converter_helper.dart';
+import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_image_widget.dart';
 import 'package:sixam_mart_delivery/features/chat/widgets/image_diaglog_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../common/widgets/custom_snackbar_widget.dart';
 import '../../language/controllers/language_controller.dart';
-import '../../profile/controllers/profile_controller.dart';
 import '../controllers/chat_controller.dart';
 
 class MessageBubbleWidget extends StatelessWidget {
@@ -32,6 +31,12 @@ class MessageBubbleWidget extends StatelessWidget {
     String previousMessageHasChatTime = previousMessage != null ? chatController.getChatTime(previousMessage!.createdAt!, message.createdAt) : "";
     bool isSameUserWithPreviousMessage = _isSameUserWithPreviousMessage(previousMessage, message);
     bool isSameUserWithNextMessage = _isSameUserWithNextMessage(message, nextMessage);
+
+    if(userType == AppConstants.admin) {
+      isReply = message.senderId != Get.find<ProfileController>().profileModel!.userinfo!.id;
+    }
+
+    print("User Type -----> $userType");
 
     return (isReply) ? Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall)),

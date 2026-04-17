@@ -32,13 +32,9 @@ class SplashController extends GetxController implements GetxService {
     Response response = await splashServiceInterface.getConfigData();
     bool isSuccess = false;
     if(response.statusCode == 200) {
-      try {
-        _data = response.body;
-        _configModel = ConfigModel.fromJson(response.body);
-        isSuccess = true;
-      } catch(e) {
-        isSuccess = false;
-      }
+      _data = response.body;
+      _configModel = ConfigModel.fromJson(response.body);
+      isSuccess = true;
     }else {
       isSuccess = false;
     }
@@ -58,6 +54,17 @@ class SplashController extends GetxController implements GetxService {
 
   void setFirstTimeConnectionCheck(bool isChecked) {
     _firstTimeConnectionCheck = isChecked;
+  }
+
+
+
+  /// Rider module pusher config
+
+  String? _pusherConnectionStatus;
+  String? get pusherConnectionStatus => _pusherConnectionStatus;
+
+  void setPusherStatus(String? connection){
+    _pusherConnectionStatus = connection;
   }
 
 }

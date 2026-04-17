@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_asset_image_widget.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
@@ -12,10 +14,12 @@ class DmRegistrationSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    bool isRideActive = AppConstants.appMode == AppMode.ride;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'delivery_man_registration'.tr,
+        title: Text( isRideActive ? "rider_registration".tr : 'delivery_man_registration'.tr,
           style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.bodyLarge!.color),
         ),
         centerTitle: true,

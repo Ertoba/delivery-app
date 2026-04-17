@@ -17,30 +17,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'helper/get_di.dart' as di;
-import 'package:intl/date_symbol_data_local.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('ka', null);
 
-  if(!GetPlatform.isWeb) {
-    try {
-      if(GetPlatform.isAndroid) {
-        await Firebase.initializeApp(
-          options: const FirebaseOptions(
-            apiKey: "AIzaSyCc3OCd5I2xSlnftZ4bFAbuCzMhgQHLivA",
-            appId: "1:491987943015:android:fe79b69339834d5c8f1ec2",
-            messagingSenderId: "491987943015",
-            projectId: "stackmart-500c7",
-          ),
-        );
-      }else {
-        await Firebase.initializeApp();
-      }
-    } catch(_) {}
-  }
+  try {
+    if(GetPlatform.isAndroid) {
+      await Firebase.initializeApp(
+        options: const FirebaseOptions(
+          apiKey: "AIzaSyCc3OCd5I2xSlnftZ4bFAbuCzMhgQHLivA",
+          appId: "1:491987943015:android:fe79b69339834d5c8f1ec2",
+          messagingSenderId: "491987943015",
+          projectId: "stackmart-500c7",
+        ),
+      );
+    } else {
+      await Firebase.initializeApp();
+    }
+  } catch (_) {}
 
   Map<String, Map<String, String>> languages = await di.init();
 

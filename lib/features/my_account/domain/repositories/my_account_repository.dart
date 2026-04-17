@@ -165,8 +165,8 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
   }
 
   @override
-  Future<Response> convertPoint(String point) async {
-    return await apiClient.getData('${AppConstants.pointConvertUri}?points=$point&token=${_getUserToken()}');
+  Future<Response> convertPoint(String point, {required bool isRideActive}) async {
+    return await apiClient.getData('${isRideActive ? AppConstants.riderPointConvertUri : AppConstants.dmPointConvertUri}?points=$point&token=${_getUserToken()}');
   }
 
   @override

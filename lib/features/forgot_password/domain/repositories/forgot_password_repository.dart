@@ -12,29 +12,16 @@ import 'package:sixam_mart_delivery/features/forgot_password/domain/repositories
 class ForgotPasswordRepository implements ForgotPasswordRepositoryInterface {
   final ApiClient apiClient;
   final SharedPreferences sharedPreferences;
-  ForgotPasswordRepository({
-    required this.apiClient,
-    required this.sharedPreferences,
-  });
+  ForgotPasswordRepository({required this.apiClient, required this.sharedPreferences});
 
   @override
-  Future<ResponseModel> changePassword(
-    ProfileModel userInfoModel,
-    String password,
-  ) async {
+  Future<ResponseModel> changePassword(ProfileModel userInfoModel, String password) async {
     ResponseModel responseModel;
-    Response response = await apiClient
-        .postData(AppConstants.updateProfileUri, {
-          '_method': 'put',
-          'f_name': userInfoModel.fName,
-          'l_name': userInfoModel.lName,
-          'email': userInfoModel.email,
-          'password': password,
-          'token': _getUserToken(),
-        }, handleError: false);
-    if (response.statusCode == 200) {
+    Response response = await apiClient.postData(AppConstants.updateProfileUri, {'_method': 'put', 'f_name': userInfoModel.fName,
+      'l_name': userInfoModel.lName, 'email': userInfoModel.email, 'password': password, 'token': _getUserToken()}, handleError: false);
+    if(response.statusCode == 200) {
       responseModel = ResponseModel(true, response.body["message"]);
-    } else {
+    }else{
       responseModel = ResponseModel(false, response.statusText);
     }
     return responseModel;
@@ -42,39 +29,9 @@ class ForgotPasswordRepository implements ForgotPasswordRepositoryInterface {
 
   @override
   Future<ResponseModel> forgetPassword(String? phone) async {
-    try {
-      ResponseModel responseModel;
-      final String? deviceToken = await _saveDeviceToken();
-      final Map<String, dynamic> requestBody = {"phone": phone};
-
-      if (deviceToken != null && deviceToken.isNotEmpty) {
-        requestBody["fcm_token"] = deviceToken;
-      }
-
-      Response response = await apiClient.postData(
-        AppConstants.forgetPasswordUri,
-        requestBody,
-        handleError: false,
-      );
-      if (response.statusCode == 200) {
-        responseModel = ResponseModel(true, response.body["message"]);
-      } else {
-        responseModel = ResponseModel(false, response.statusText);
-      }
-      return responseModel;
-    } catch (e) {
-      debugPrint('----Forgot Password Error----- $e');
-      return ResponseModel(false, 'connection_to_api_server_failed'.tr);
-    }
-  }
-
-  @override
-  Future<ResponseModel> verifyToken(String? phone, String token) async {
     ResponseModel responseModel;
-    Response response = await apiClient.postData(AppConstants.verifyTokenUri, {
-      "phone": phone,
-      "reset_token": token,
-    }, handleError: false);
+    String? deviceToken = await _saveDeviceToken();
+    Response response = await apiClient.postData(AppConstants.forgetPasswordUri, {"phone": phone, "fcm_token" : deviceToken}, handleError: false);
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, response.body["message"]);
     } else {
@@ -84,18 +41,26 @@ class ForgotPasswordRepository implements ForgotPasswordRepositoryInterface {
   }
 
   @override
-  Future<ResponseModel> verifyFirebaseOtp({
-    required String phoneNumber,
-    required String session,
-    required String otp,
-  }) async {
-    Response response = await apiClient
-        .postData(AppConstants.firebaseAuthVerify, {
-          'sessionInfo': session,
-          'phoneNumber': phoneNumber,
-          'code': otp,
-          'is_reset_token': 1,
-        });
+  Future<ResponseModel> verifyToken(String? phone, String token) async {
+    ResponseModel responseModel;
+    Response response = await apiClient.postData(AppConstants.verifyTokenUri, {"phone": phone, "reset_token": token}, handleError: false);
+    if (response.statusCode == 200) {
+      responseModel = ResponseModel(true, response.body["message"]);
+    } else {
+      responseModel = ResponseModel(false, response.statusText);
+    }
+    return responseModel;
+  }
+
+  @override
+  Future<ResponseModel> verifyFirebaseOtp({required String phoneNumber, required String session, required String otp}) async {
+    Response response = await apiClient.postData(AppConstants.firebaseAuthVerify,
+      {'sessionInfo' : session,
+        'phoneNumber' : phoneNumber,
+        'code' : otp,
+        'is_reset_token' : 1,
+      },
+    );
     if (response.statusCode == 200) {
       return ResponseModel(true, response.body["message"]);
     } else {
@@ -104,31 +69,10 @@ class ForgotPasswordRepository implements ForgotPasswordRepositoryInterface {
   }
 
   @override
-  Future<ResponseModel> resetPassword(
-    String? resetToken,
-    String phone,
-    String password,
-    String confirmPassword,
-  ) async {
+  Future<ResponseModel> resetPassword(String? resetToken, String phone, String password, String confirmPassword) async {
     ResponseModel responseModel;
-    final Map<String, dynamic> requestBody = {
-      "phone": phone,
-      "reset_token": resetToken,
-      "password": password,
-      "confirm_password": confirmPassword,
-    };
-    requestBody.removeWhere((key, value) {
-      if (value == null) {
-        return true;
-      }
-      final String normalizedValue = value.toString().trim().toLowerCase();
-      return normalizedValue.isEmpty || normalizedValue == 'null';
-    });
-    Response response = await apiClient.putData(
-      AppConstants.resetPasswordUri,
-      requestBody,
-      handleError: false,
-    );
+    Response response = await apiClient.postData(AppConstants.resetPasswordUri,
+      {"_method": "put", "phone": phone, "reset_token": resetToken, "password": password, "confirm_password": confirmPassword}, handleError: false);
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, response.body["message"]);
     } else {
@@ -142,20 +86,12 @@ class ForgotPasswordRepository implements ForgotPasswordRepositoryInterface {
   }
 
   Future<String?> _saveDeviceToken() async {
-    if (GetPlatform.isWeb) {
-      return null;
+    String? deviceToken = '';
+    if(!GetPlatform.isWeb) {
+      deviceToken = (await FirebaseMessaging.instance.getToken())!;
     }
-
-    try {
-      final String? deviceToken = await FirebaseMessaging.instance
-          .getToken()
-          .timeout(const Duration(seconds: 8), onTimeout: () => null);
-      debugPrint('----Device Token----- $deviceToken');
-      return deviceToken;
-    } catch (e) {
-      debugPrint('----Device Token Error----- $e');
-      return null;
-    }
+    debugPrint('----Device Token----- $deviceToken');
+    return deviceToken;
   }
 
   @override
@@ -182,4 +118,5 @@ class ForgotPasswordRepository implements ForgotPasswordRepositoryInterface {
   Future update(Map<String, dynamic> body) {
     throw UnimplementedError();
   }
+
 }

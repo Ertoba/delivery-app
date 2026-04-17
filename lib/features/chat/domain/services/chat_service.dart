@@ -39,6 +39,9 @@ class ChatService implements ChatServiceInterface {
     }else if(notificationBody.vendorId != null || notificationBody.type == AppConstants.vendor) {
       messageModel = await getMessages(offset, notificationBody.vendorId, AppConstants.vendor, conversationID);
     }
+    else if (notificationBody.adminId != null) {
+      messageModel = await getMessages(offset, null, AppConstants.admin, null);
+    }
     return messageModel;
   }
 
@@ -59,7 +62,15 @@ class ChatService implements ChatServiceInterface {
     }else if(notificationBody != null && (notificationBody.vendorId != null || notificationBody.type == AppConstants.vendor)){
       messageModel = await sendMessage(message, chatImage, conversationId, notificationBody.vendorId, AppConstants.vendor);
     }
+    else if(notificationBody != null && (notificationBody.adminId != null || notificationBody.type == AppConstants.admin)){
+      messageModel = await sendMessage(message, chatImage, null, notificationBody.vendorId, AppConstants.admin);
+    }
     return messageModel;
+  }
+
+  @override
+  Future<MessageModel?> sendFaqMessage({String? questionId}) async {
+    return await chatRepositoryInterface.sendFaqMessage(questionId: questionId);
   }
 
   @override

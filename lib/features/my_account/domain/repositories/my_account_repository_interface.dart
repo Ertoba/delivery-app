@@ -15,5 +15,5 @@ abstract class MyAccountRepositoryInterface implements RepositoryInterface {
   Future<Response> downloadEarningInvoice({required int dmId, String? earningType});
   Future<List<WithdrawRequestModel>?> getWithdrawRequestList();
   Future<Response?> getLoyaltyPointList({String? offset, String? dateRange, String? startDate, String? endDate, String? transactionType, bool? fromFilter});
-  Future<Response> convertPoint(String point);
+  Future<Response> convertPoint(String point,{required bool isRideActive});
 }

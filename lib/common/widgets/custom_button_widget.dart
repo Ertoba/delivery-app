@@ -20,8 +20,12 @@ class CustomButtonWidget extends StatelessWidget {
   final bool isBorder;
   final Color? disabledColor;
   final Color? disabledFontColor;
+  final double borderWidth;
+  final Color? borderColor;
+  final Color? textColor;
   const CustomButtonWidget({super.key, this.onPressed, required this.buttonText, this.transparent = false, this.margin, this.width, this.height,
-    this.fontSize, this.radius = 10, this.icon, this.backgroundColor, this.fontColor, this.isLoading = false, this.isBold = true, this.isBorder = false, this.disabledColor, this.disabledFontColor});
+    this.fontSize, this.radius = 10, this.icon, this.backgroundColor, this.fontColor, this.isLoading = false, this.isBold = true, this.isBorder = false, this.disabledColor, this.disabledFontColor, this.borderColor, this.borderWidth = 1, this.textColor
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +35,7 @@ class CustomButtonWidget extends StatelessWidget {
       padding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius),
-        side: isBorder ? BorderSide(color: Theme.of(context).disabledColor.withValues(alpha: 0.5)) : BorderSide.none,
+        side: isBorder ? BorderSide(color: borderColor ??  Theme.of(context).disabledColor.withValues(alpha: 0.5), width: borderWidth) : BorderSide.none,
       ),
     );
 

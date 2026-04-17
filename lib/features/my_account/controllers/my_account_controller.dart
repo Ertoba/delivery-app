@@ -122,10 +122,10 @@ class MyAccountController extends GetxController implements GetxService {
     return response;
   }
 
-  Future<Response> convertPoint(String point) async {
+  Future<Response> convertPoint(String point, {required bool isRideActive}) async {
     _isLoading = true;
     update();
-    Response response = await myAccountServiceInterface.convertPoint(point);
+    Response response = await myAccountServiceInterface.convertPoint(point, isRideActive: isRideActive);
     if (response.statusCode == 200) {
       await getLoyaltyPointList(offset: 1, dateRange: 'this_year', startDate: null, endDate: null, fromFilter: false, transactionType: 'both');
       Get.find<ProfileController>().getProfile();

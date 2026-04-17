@@ -10,7 +10,8 @@ class CustomAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
   final Function? onBackPressed;
   final Widget? actionWidget;
   final TabBar? bottom;
-  const CustomAppBarWidget({super.key, required this.title, this.isBackButtonExist = true, this.onBackPressed, this.actionWidget, this.bottom});
+  final String? subtitle;
+  const CustomAppBarWidget({super.key, required this.title, this.isBackButtonExist = true, this.onBackPressed, this.actionWidget, this.bottom, this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +41,13 @@ class CustomAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
           child: actionWidget ?? const SizedBox(),
         ),
       ],
-      bottom: bottom,
+      bottom: bottom ?? (subtitle != null ? PreferredSize(
+        preferredSize: const Size.fromHeight(50.0),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 5.0),
+          child: Text(subtitle!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault),),
+        ),
+      ) : null),
     );
   }
 

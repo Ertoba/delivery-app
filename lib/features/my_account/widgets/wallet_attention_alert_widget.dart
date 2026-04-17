@@ -5,7 +5,9 @@ import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/payment_method_bottom_sheet_widget.dart';
@@ -45,6 +47,12 @@ class WalletAttentionAlertWidget extends StatelessWidget {
                 children: [
                   TextSpan(
                     recognizer: TapGestureRecognizer()..onTap = () {
+
+                      bool isRideActive = AppConstants.appMode == AppMode.ride;
+                      final config = Get.find<SplashController>().configModel;
+                      double minimumPayableAmount = isRideActive ? (config?.minAmountToPayRider ?? 0) : (config?.minAmountToPayDm ?? 0);
+
+
                       if(profileController.profileModel!.showPayNowButton!) {
                         showModalBottomSheet(
                           isScrollControlled: true, useRootNavigator: true, context: context,
@@ -62,8 +70,8 @@ class WalletAttentionAlertWidget extends StatelessWidget {
                       } else {
                         if(Get.find<SplashController>().configModel!.activePaymentMethodList!.isEmpty || !Get.find<SplashController>().configModel!.digitalPayment!){
                           showCustomSnackBar('currently_there_are_no_payment_options_available_please_contact_admin_regarding_any_payment_process_or_queries'.tr);
-                        }else if(Get.find<SplashController>().configModel!.minAmountToPayDm! > profileController.profileModel!.payableBalance!){
-                          showCustomSnackBar('${'you_do_not_have_sufficient_balance_to_pay_the_minimum_payable_balance_is'.tr} ${PriceConverterHelper.convertPrice(Get.find<SplashController>().configModel!.minAmountToPayDm)}');
+                        }else if(minimumPayableAmount > profileController.profileModel!.payableBalance!){
+                          showCustomSnackBar('${'you_do_not_have_sufficient_balance_to_pay_the_minimum_payable_balance_is'.tr} ${PriceConverterHelper.convertPrice(minimumPayableAmount)}');
                         }
                       }
                     },

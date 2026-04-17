@@ -30,10 +30,11 @@ class ApiClient extends GetxService {
     updateHeader(token, sharedPreferences.getString(AppConstants.languageCode));
   }
 
-  void updateHeader(String? token, String? languageCode) {
+  void updateHeader(String? token, String? languageCode, {String? zoneId}) {
     _mainHeaders = {
       'Content-Type': 'application/json; charset=UTF-8',
       AppConstants.localizationKey: languageCode ?? AppConstants.languages[0].languageCode!,
+      'zoneId': zoneId??'${sharedPreferences.getString(AppConstants.cacheZoneId)}',
       'Authorization': 'Bearer $token'
     };
   }
@@ -145,8 +146,8 @@ class ApiClient extends GetxService {
     }else if(response0.statusCode != 200 && response0.body == null) {
       response0 = const Response(statusCode: 0, statusText: noInternetMessage);
     }
-    //debugPrint('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
-    debugPrint('====> API Response: [${response0.statusCode}] $uri}');
+    debugPrint('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
+    // debugPrint('====> API Response: [${response0.statusCode}] $uri}');
     if(handleError) {
       if(response0.statusCode == 200) {
         return response0;
