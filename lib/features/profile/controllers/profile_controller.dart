@@ -31,6 +31,14 @@ class ProfileController extends GetxController implements GetxService {
   RecordLocationBodyModel? get recordLocationBody => _recordLocation;
 
   Timer? _timer;
+  StreamSubscription<Position>? _positionSubscription;
+  Position? _latestPosition;
+  bool _isRecordingLocation = false;
+
+  static const LocationSettings _locationSettings = LocationSettings(
+    accuracy: LocationAccuracy.bestForNavigation,
+    distanceFilter: 5,
+  );
 
   bool _backgroundNotification = true;
   bool get backgroundNotification => _backgroundNotification;
@@ -134,6 +142,13 @@ class ProfileController extends GetxController implements GetxService {
   }
 
   void startLocationRecord() {
+    _positionSubscription?.cancel();
+    _positionSubscription =
+        Geolocator.getPositionStream(
+          locationSettings: _locationSettings,
+        ).listen((Position position) {
+          _latestPosition = position;
+        }, onError: (_) {});
     recordLocation();
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
@@ -143,33 +158,54 @@ class ProfileController extends GetxController implements GetxService {
 
   void stopLocationRecord() {
     _timer?.cancel();
+    _timer = null;
+    _positionSubscription?.cancel();
+    _positionSubscription = null;
+    _latestPosition = null;
   }
 
   Future<void> recordLocation() async {
-    final Position locationResult = await Geolocator.getCurrentPosition();
-    String address = await profileServiceInterface.addressPlaceMark(
-      locationResult,
-    );
-    String zoneId = await profileServiceInterface.getZoneId(locationResult);
-
-    _recordLocation = RecordLocationBodyModel(
-      location: address,
-      latitude: locationResult.latitude,
-      longitude: locationResult.longitude,
-      zoneId: zoneId,
-    );
-
-    List<String> status = ['accepted', 'ongoing'];
-    if (Get.find<RideController>().tripDetail != null &&
-        status.contains(Get.find<RiderMapController>().currentRideState.name) &&
-        Get.find<AuthController>().getUserToken() != '') {
-      Get.find<RideController>().remainingDistance(
-        Get.find<RideController>().tripDetail!.id!,
-      );
+    if (_isRecordingLocation) {
+      return;
     }
 
-    if (Get.find<AuthController>().isLoggedIn()) {
-      await profileServiceInterface.recordLocation(_recordLocation!, zoneId);
+    _isRecordingLocation = true;
+    try {
+      final Position locationResult =
+          _latestPosition ??
+          await Geolocator.getCurrentPosition(
+            locationSettings: _locationSettings,
+          );
+      _latestPosition = locationResult;
+
+      String address = await profileServiceInterface.addressPlaceMark(
+        locationResult,
+      );
+      String zoneId = await profileServiceInterface.getZoneId(locationResult);
+
+      _recordLocation = RecordLocationBodyModel(
+        location: address,
+        latitude: locationResult.latitude,
+        longitude: locationResult.longitude,
+        zoneId: zoneId,
+      );
+
+      List<String> status = ['accepted', 'ongoing'];
+      if (Get.find<RideController>().tripDetail != null &&
+          status.contains(
+            Get.find<RiderMapController>().currentRideState.name,
+          ) &&
+          Get.find<AuthController>().getUserToken() != '') {
+        Get.find<RideController>().remainingDistance(
+          Get.find<RideController>().tripDetail!.id!,
+        );
+      }
+
+      if (Get.find<AuthController>().isLoggedIn()) {
+        await profileServiceInterface.recordLocation(_recordLocation!, zoneId);
+      }
+    } finally {
+      _isRecordingLocation = false;
     }
   }
 
