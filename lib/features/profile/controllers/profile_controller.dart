@@ -35,6 +35,7 @@ class ProfileController extends GetxController implements GetxService {
   Position? _latestPosition;
   bool _isRecordingLocation = false;
 
+  static const Duration _maxCachedPositionAge = Duration(seconds: 15);
   static const LocationSettings _locationSettings = LocationSettings(
     accuracy: LocationAccuracy.bestForNavigation,
     distanceFilter: 5,
@@ -142,18 +143,26 @@ class ProfileController extends GetxController implements GetxService {
   }
 
   void startLocationRecord() {
-    _positionSubscription?.cancel();
-    _positionSubscription =
-        Geolocator.getPositionStream(
-          locationSettings: _locationSettings,
-        ).listen((Position position) {
-          _latestPosition = position;
-        }, onError: (_) {});
+    _startPositionStream();
     recordLocation();
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       recordLocation();
     });
+  }
+
+  void _startPositionStream() {
+    _positionSubscription?.cancel();
+    _positionSubscription =
+        Geolocator.getPositionStream(
+          locationSettings: _locationSettings,
+        ).listen(
+          (Position position) {
+            _latestPosition = position;
+          },
+          onError: (_) {},
+          onDone: () => _positionSubscription = null,
+        );
   }
 
   void stopLocationRecord() {
@@ -171,12 +180,7 @@ class ProfileController extends GetxController implements GetxService {
 
     _isRecordingLocation = true;
     try {
-      final Position locationResult =
-          _latestPosition ??
-          await Geolocator.getCurrentPosition(
-            locationSettings: _locationSettings,
-          );
-      _latestPosition = locationResult;
+      final Position locationResult = await _getLocationForRecording();
 
       String address = await profileServiceInterface.addressPlaceMark(
         locationResult,
@@ -207,6 +211,28 @@ class ProfileController extends GetxController implements GetxService {
     } finally {
       _isRecordingLocation = false;
     }
+  }
+
+  Future<Position> _getLocationForRecording() async {
+    final Position? latestPosition = _latestPosition;
+    if (latestPosition != null && _isFreshPosition(latestPosition)) {
+      return latestPosition;
+    }
+
+    _startPositionStream();
+    final Position locationResult = await Geolocator.getCurrentPosition(
+      locationSettings: _locationSettings,
+    );
+    _latestPosition = locationResult;
+    return locationResult;
+  }
+
+  bool _isFreshPosition(Position position) {
+    final int ageInSeconds = DateTime.now()
+        .difference(position.timestamp)
+        .inSeconds
+        .abs();
+    return ageInSeconds <= _maxCachedPositionAge.inSeconds;
   }
 
   void setBackgroundNotificationActive(bool isActive) {
