@@ -149,10 +149,11 @@ class VerificationScreenState extends State<VerificationScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
 
-                Text(
+                Flexible(child: Text(
                   'did_not_receive_the_code'.tr,
                   style: robotoRegular.copyWith(color: Theme.of(context).disabledColor),
-                ),
+                  overflow: TextOverflow.ellipsis,
+                )),
 
                 !forgotPasswordController.resendOtpLoading ? TextButton(
                   onPressed: _seconds < 1 ? () async {

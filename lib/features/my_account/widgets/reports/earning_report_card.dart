@@ -100,8 +100,8 @@ class EarningReportCard extends StatelessWidget {
             ),
             // const Spacer(),
 
-            Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(DateConverterHelper.utcToDateTime(createdAt), style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
+            Flexible(child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Text(DateConverterHelper.utcToDateTime(createdAt), style: robotoRegular.copyWith(color: Theme.of(context).disabledColor), overflow: TextOverflow.ellipsis, maxLines: 1),
               const SizedBox(height: Dimensions.paddingSizeDefault),
 
               Container(
@@ -114,7 +114,7 @@ class EarningReportCard extends StatelessWidget {
                   color: Theme.of(context).hintColor,
                 ),
               ),
-            ]),
+            ])),
           ]),
         ),
 

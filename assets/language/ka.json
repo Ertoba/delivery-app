@@ -668,5 +668,9 @@
   "notification_loyalty_point_transaction": "ქულების ტრანზაქცია",
   "notification_loyalty_points_earned_prefix": "თქვენ დაგერიცხათ",
   "notification_loyalty_points_converted_prefix": "თქვენ გადაცვალეთ",
-  "notification_loyalty_points_unit": "ქულა"
+  "notification_loyalty_points_unit": "ქულა",
+  "order_date": "შეკვეთის თარიღი",
+  "item_info": "პროდუქტის ინფო",
+  "billing_summary": "გადახდის შეჯამება",
+  "help_and_support": "დახმარება და მხარდაჭერა"
 }
