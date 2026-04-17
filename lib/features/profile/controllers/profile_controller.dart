@@ -4,7 +4,6 @@ import 'package:sixam_mart_delivery/features/auth/controllers/auth_controller.da
 import 'package:sixam_mart_delivery/features/profile/domain/models/level_model.dart';
 import 'package:sixam_mart_delivery/features/ride_module/map/controllers/ride_map_controller.dart';
 import 'package:sixam_mart_delivery/features/ride_module/ride_order/controllers/ride_controller.dart';
-import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/features/address/domain/models/record_location_body_model.dart';
 import 'package:sixam_mart_delivery/features/profile/domain/models/profile_model.dart';
 import 'package:sixam_mart_delivery/helper/pusher_helper.dart';
@@ -39,18 +38,17 @@ class ProfileController extends GetxController implements GetxService {
   LevelModel? _levelModel;
   LevelModel? get levelModel => _levelModel;
 
-  Future<void> getProfileLevelInfo() async{
+  Future<void> getProfileLevelInfo() async {
     Response response = await profileServiceInterface.getProfileLevelInfo();
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       _levelModel = LevelModel.fromJson(response.body);
-
-    }/*else{
+    } /*else{
       ApiChecker.checkApi(response);
     }*/
     update();
   }
 
-  Future<ProfileModel?>  getProfile() async {
+  Future<ProfileModel?> getProfile() async {
     ProfileModel? profileModel = await profileServiceInterface.getProfileInfo();
     if (profileModel != null) {
       _profileModel = profileModel;
@@ -67,10 +65,17 @@ class ProfileController extends GetxController implements GetxService {
     return profileModel;
   }
 
-  Future<bool> updateUserInfo(ProfileModel updateUserModel, String token) async {
+  Future<bool> updateUserInfo(
+    ProfileModel updateUserModel,
+    String token,
+  ) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await profileServiceInterface.updateProfile(updateUserModel, _pickedFile, token);
+    ResponseModel responseModel = await profileServiceInterface.updateProfile(
+      updateUserModel,
+      _pickedFile,
+      token,
+    );
     _isLoading = false;
     if (responseModel.isSuccess) {
       _profileModel = updateUserModel;
@@ -93,7 +98,8 @@ class ProfileController extends GetxController implements GetxService {
   }
 
   Future<bool> updateActiveStatus() async {
-    ResponseModel responseModel = await profileServiceInterface.updateActiveStatus();
+    ResponseModel responseModel = await profileServiceInterface
+        .updateActiveStatus();
     if (responseModel.isSuccess) {
       Get.back();
       _profileModel!.active = _profileModel!.active == 0 ? 1 : 0;
@@ -121,7 +127,7 @@ class ProfileController extends GetxController implements GetxService {
       stopLocationRecord();
       PusherHelper().pusherDisconnectPusher();
       Get.offAllNamed(RouteHelper.getSignInRoute());
-    }else{
+    } else {
       Get.back();
       showCustomSnackBar(responseModel.message, isError: true);
     }
@@ -141,26 +147,29 @@ class ProfileController extends GetxController implements GetxService {
 
   Future<void> recordLocation() async {
     final Position locationResult = await Geolocator.getCurrentPosition();
-    String address = await profileServiceInterface.addressPlaceMark(locationResult);
+    String address = await profileServiceInterface.addressPlaceMark(
+      locationResult,
+    );
     String zoneId = await profileServiceInterface.getZoneId(locationResult);
 
     _recordLocation = RecordLocationBodyModel(
-      location: address, latitude: locationResult.latitude, longitude: locationResult.longitude, zoneId: zoneId
+      location: address,
+      latitude: locationResult.latitude,
+      longitude: locationResult.longitude,
+      zoneId: zoneId,
     );
 
-    List<String> status = ['accepted','ongoing'];
-    if(Get.find<RideController>().tripDetail != null && status.contains(Get.find<RiderMapController>().currentRideState.name) && Get.find<AuthController>().getUserToken() != ''){
-      Get.find<RideController>().remainingDistance(Get.find<RideController>().tripDetail!.id!);
+    List<String> status = ['accepted', 'ongoing'];
+    if (Get.find<RideController>().tripDetail != null &&
+        status.contains(Get.find<RiderMapController>().currentRideState.name) &&
+        Get.find<AuthController>().getUserToken() != '') {
+      Get.find<RideController>().remainingDistance(
+        Get.find<RideController>().tripDetail!.id!,
+      );
     }
 
-    //await profileServiceInterface.recordLocation(_recordLocation!);
-    /// todo Need to integrate Pusher
-    if(Get.find<AuthController>().isLoggedIn()){
-      if(Get.find<SplashController>().configModel!.webSocketStatus!) {
-        await profileServiceInterface.recordWebSocketLocation(_recordLocation!, zoneId);
-      } else {
-        await profileServiceInterface.recordLocation(_recordLocation!, zoneId);
-      }
+    if (Get.find<AuthController>().isLoggedIn()) {
+      await profileServiceInterface.recordLocation(_recordLocation!, zoneId);
     }
   }
 
@@ -168,5 +177,4 @@ class ProfileController extends GetxController implements GetxService {
     _backgroundNotification = isActive;
     update();
   }
-
 }
