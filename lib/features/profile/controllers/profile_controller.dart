@@ -6,6 +6,7 @@ import 'package:sixam_mart_delivery/features/ride_module/map/controllers/ride_ma
 import 'package:sixam_mart_delivery/features/ride_module/ride_order/controllers/ride_controller.dart';
 import 'package:sixam_mart_delivery/features/address/domain/models/record_location_body_model.dart';
 import 'package:sixam_mart_delivery/features/profile/domain/models/profile_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sixam_mart_delivery/helper/pusher_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
@@ -36,10 +37,23 @@ class ProfileController extends GetxController implements GetxService {
   bool _isRecordingLocation = false;
 
   static const Duration _maxCachedPositionAge = Duration(seconds: 15);
-  static const LocationSettings _locationSettings = LocationSettings(
-    accuracy: LocationAccuracy.bestForNavigation,
-    distanceFilter: 5,
-  );
+  static final LocationSettings _locationSettings =
+      defaultTargetPlatform == TargetPlatform.android
+      ? AndroidSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          distanceFilter: 5,
+          intervalDuration: Duration(seconds: 5),
+          foregroundNotificationConfig: ForegroundNotificationConfig(
+            notificationTitle: 'Portal Delivery',
+            notificationText: 'Location tracking is active for deliveries.',
+            enableWakeLock: true,
+            setOngoing: true,
+          ),
+        )
+      : const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          distanceFilter: 5,
+        );
 
   bool _backgroundNotification = true;
   bool get backgroundNotification => _backgroundNotification;
@@ -160,7 +174,9 @@ class ProfileController extends GetxController implements GetxService {
           (Position position) {
             _latestPosition = position;
           },
-          onError: (_) {},
+          onError: (_) {
+            _positionSubscription = null;
+          },
           onDone: () => _positionSubscription = null,
         );
   }
@@ -215,11 +231,14 @@ class ProfileController extends GetxController implements GetxService {
 
   Future<Position> _getLocationForRecording() async {
     final Position? latestPosition = _latestPosition;
-    if (latestPosition != null && _isFreshPosition(latestPosition)) {
+    if (latestPosition != null &&
+        (_positionSubscription != null || _isFreshPosition(latestPosition))) {
       return latestPosition;
     }
 
-    _startPositionStream();
+    if (_positionSubscription == null) {
+      _startPositionStream();
+    }
     final Position locationResult = await Geolocator.getCurrentPosition(
       locationSettings: _locationSettings,
     );
