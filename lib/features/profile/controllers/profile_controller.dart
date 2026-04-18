@@ -39,13 +39,14 @@ class ProfileController extends GetxController implements GetxService {
   String _lastLocationSource = 'unknown';
 
   static const Duration _maxCachedPositionAge = Duration(seconds: 15);
-  static const double _meaningfulLocationDistance = 5;
+  static const Duration _locationRecordInterval = Duration(seconds: 5);
+  static const double _meaningfulLocationDistance = 2;
   static final LocationSettings _locationSettings =
       defaultTargetPlatform == TargetPlatform.android
       ? AndroidSettings(
           accuracy: LocationAccuracy.bestForNavigation,
-          distanceFilter: 5,
-          intervalDuration: Duration(seconds: 5),
+          distanceFilter: 2,
+          intervalDuration: _locationRecordInterval,
           foregroundNotificationConfig: ForegroundNotificationConfig(
             notificationTitle: 'Portal Delivery',
             notificationText: 'Location tracking is active for deliveries.',
@@ -168,7 +169,7 @@ class ProfileController extends GetxController implements GetxService {
     }
 
     recordLocation();
-    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+    _timer = Timer.periodic(_locationRecordInterval, (timer) {
       recordLocation();
     });
   }
