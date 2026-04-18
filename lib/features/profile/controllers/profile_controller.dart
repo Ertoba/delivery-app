@@ -157,9 +157,14 @@ class ProfileController extends GetxController implements GetxService {
   }
 
   void startLocationRecord() {
-    _startPositionStream();
+    if (_positionSubscription == null) {
+      _startPositionStream();
+    }
+    if (_timer?.isActive ?? false) {
+      return;
+    }
+
     recordLocation();
-    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       recordLocation();
     });
@@ -231,19 +236,22 @@ class ProfileController extends GetxController implements GetxService {
 
   Future<Position> _getLocationForRecording() async {
     final Position? latestPosition = _latestPosition;
-    if (latestPosition != null &&
-        (_positionSubscription != null || _isFreshPosition(latestPosition))) {
-      return latestPosition;
-    }
-
     if (_positionSubscription == null) {
       _startPositionStream();
     }
-    final Position locationResult = await Geolocator.getCurrentPosition(
-      locationSettings: _locationSettings,
-    );
-    _latestPosition = locationResult;
-    return locationResult;
+
+    try {
+      final Position locationResult = await Geolocator.getCurrentPosition(
+        locationSettings: _locationSettings,
+      );
+      _latestPosition = locationResult;
+      return locationResult;
+    } catch (_) {
+      if (latestPosition != null && _isFreshPosition(latestPosition)) {
+        return latestPosition;
+      }
+      rethrow;
+    }
   }
 
   bool _isFreshPosition(Position position) {
