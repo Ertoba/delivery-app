@@ -34,9 +34,12 @@ class ProfileController extends GetxController implements GetxService {
   Timer? _timer;
   StreamSubscription<Position>? _positionSubscription;
   Position? _latestPosition;
+  Position? _lastRecordedPosition;
   bool _isRecordingLocation = false;
+  String _lastLocationSource = 'unknown';
 
   static const Duration _maxCachedPositionAge = Duration(seconds: 15);
+  static const double _meaningfulLocationDistance = 5;
   static final LocationSettings _locationSettings =
       defaultTargetPlatform == TargetPlatform.android
       ? AndroidSettings(
@@ -178,8 +181,10 @@ class ProfileController extends GetxController implements GetxService {
         ).listen(
           (Position position) {
             _latestPosition = position;
+            _logPosition('stream', position);
           },
-          onError: (_) {
+          onError: (Object error) {
+            debugPrint('[LOCATION] stream error=$error');
             _positionSubscription = null;
           },
           onDone: () => _positionSubscription = null,
@@ -192,6 +197,8 @@ class ProfileController extends GetxController implements GetxService {
     _positionSubscription?.cancel();
     _positionSubscription = null;
     _latestPosition = null;
+    _lastRecordedPosition = null;
+    _lastLocationSource = 'unknown';
   }
 
   Future<void> recordLocation() async {
@@ -202,6 +209,11 @@ class ProfileController extends GetxController implements GetxService {
     _isRecordingLocation = true;
     try {
       final Position locationResult = await _getLocationForRecording();
+      _logPosition(
+        'record source=$_lastLocationSource',
+        locationResult,
+        previousPosition: _lastRecordedPosition,
+      );
 
       String address = await profileServiceInterface.addressPlaceMark(
         locationResult,
@@ -228,6 +240,7 @@ class ProfileController extends GetxController implements GetxService {
 
       if (Get.find<AuthController>().isLoggedIn()) {
         await profileServiceInterface.recordLocation(_recordLocation!, zoneId);
+        _lastRecordedPosition = locationResult;
       }
     } finally {
       _isRecordingLocation = false;
@@ -244,10 +257,16 @@ class ProfileController extends GetxController implements GetxService {
       final Position locationResult = await Geolocator.getCurrentPosition(
         locationSettings: _locationSettings,
       );
-      _latestPosition = locationResult;
-      return locationResult;
+      _logPosition('current', locationResult, previousPosition: latestPosition);
+      final Position selectedPosition = _selectLocationForRecording(
+        currentPosition: locationResult,
+        streamPosition: latestPosition,
+      );
+      _latestPosition = selectedPosition;
+      return selectedPosition;
     } catch (_) {
       if (latestPosition != null && _isFreshPosition(latestPosition)) {
+        _lastLocationSource = 'stream_fallback';
         return latestPosition;
       }
       rethrow;
@@ -260,6 +279,91 @@ class ProfileController extends GetxController implements GetxService {
         .inSeconds
         .abs();
     return ageInSeconds <= _maxCachedPositionAge.inSeconds;
+  }
+
+  Position _selectLocationForRecording({
+    required Position currentPosition,
+    required Position? streamPosition,
+  }) {
+    _lastLocationSource = 'current';
+
+    if (streamPosition == null || !_isFreshPosition(streamPosition)) {
+      return currentPosition;
+    }
+
+    final int streamAgeMs = _positionAgeInMilliseconds(streamPosition);
+    final int currentAgeMs = _positionAgeInMilliseconds(currentPosition);
+    final double? streamDistance = _distanceFromLastRecordedPosition(
+      streamPosition,
+    );
+    final double? currentDistance = _distanceFromLastRecordedPosition(
+      currentPosition,
+    );
+    final bool streamIsNewer =
+        streamPosition.timestamp.isAfter(currentPosition.timestamp) ||
+        currentAgeMs - streamAgeMs > Duration.millisecondsPerSecond;
+    final bool streamMovedFurther =
+        streamDistance != null &&
+        currentDistance != null &&
+        streamDistance - currentDistance >= _meaningfulLocationDistance;
+
+    if (streamIsNewer || streamMovedFurther) {
+      _lastLocationSource = streamIsNewer ? 'stream_newer' : 'stream_moved';
+      _logPosition(
+        'selected $_lastLocationSource',
+        streamPosition,
+        previousPosition: _lastRecordedPosition,
+      );
+      return streamPosition;
+    }
+
+    return currentPosition;
+  }
+
+  double? _distanceFromLastRecordedPosition(Position position) {
+    final Position? lastPosition = _lastRecordedPosition;
+    if (lastPosition == null) {
+      return null;
+    }
+
+    return Geolocator.distanceBetween(
+      lastPosition.latitude,
+      lastPosition.longitude,
+      position.latitude,
+      position.longitude,
+    );
+  }
+
+  int _positionAgeInMilliseconds(Position position) {
+    return DateTime.now().difference(position.timestamp).inMilliseconds.abs();
+  }
+
+  void _logPosition(
+    String label,
+    Position position, {
+    Position? previousPosition,
+  }) {
+    final double? distance = previousPosition == null
+        ? null
+        : Geolocator.distanceBetween(
+            previousPosition.latitude,
+            previousPosition.longitude,
+            position.latitude,
+            position.longitude,
+          );
+    final String distanceText = distance == null
+        ? '-'
+        : distance.toStringAsFixed(1);
+
+    debugPrint(
+      '[LOCATION] $label '
+      'lat=${position.latitude.toStringAsFixed(7)} '
+      'lng=${position.longitude.toStringAsFixed(7)} '
+      'acc=${position.accuracy.toStringAsFixed(1)}m '
+      'speed=${position.speed.toStringAsFixed(2)}mps '
+      'age=${_positionAgeInMilliseconds(position)}ms '
+      'delta=${distanceText}m',
+    );
   }
 
   void setBackgroundNotificationActive(bool isActive) {
