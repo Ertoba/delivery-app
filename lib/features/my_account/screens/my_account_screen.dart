@@ -17,14 +17,10 @@ class MyAccountScreen extends StatefulWidget {
 }
 
 class _MyAccountScreenState extends State<MyAccountScreen> {
-
   late final MyAccountController _accountController;
   late final ProfileController _profileController;
 
-  List<String> types = [
-    'wallet_overview',
-    'my_point',
-  ];
+  List<String> types = ['wallet_overview', 'my_point'];
   int selectedIndex = 0;
 
   @override
@@ -48,15 +44,17 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     Get.find<DisbursementController>().getWithdrawMethodList();
     _accountController.getLoyaltyPointList(
       offset: 1,
-      startDate: Get.find<MyAccountController>().from, endDate: Get.find<MyAccountController>().to,
+      startDate: Get.find<MyAccountController>().from,
+      endDate: Get.find<MyAccountController>().to,
       fromFilter: false,
       dateRange: Get.find<MyAccountController>().selectedDateType,
-      transactionType: Get.find<MyAccountController>().selectedTransactionType ?? 'both',
+      transactionType:
+          Get.find<MyAccountController>().selectedTransactionType ?? 'both',
     );
   }
 
   Future<void> _refreshData() async {
-    if(selectedIndex == 0) {
+    if (selectedIndex == 0) {
       await Future.wait([
         _profileController.getProfile(),
         _accountController.getWithdrawRequestList(),
@@ -66,13 +64,14 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     } else {
       await _accountController.getLoyaltyPointList(
         offset: 1,
-        startDate: Get.find<MyAccountController>().from, endDate: Get.find<MyAccountController>().to,
+        startDate: Get.find<MyAccountController>().from,
+        endDate: Get.find<MyAccountController>().to,
         fromFilter: false,
         dateRange: Get.find<MyAccountController>().selectedDateType,
-        transactionType: Get.find<MyAccountController>().selectedTransactionType ?? 'both',
+        transactionType:
+            Get.find<MyAccountController>().selectedTransactionType ?? 'both',
       );
     }
-
   }
 
   @override
@@ -84,45 +83,76 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         onRefresh: () async {
           return await _refreshData();
         },
-        child: Column(children: [
-          const SizedBox(height: Dimensions.paddingSizeSmall),
+        child: Column(
+          children: [
+            const SizedBox(height: Dimensions.paddingSizeSmall),
 
-          SizedBox(
-            height: 50,
-            child: ListView.builder(
-              itemCount: types.length,
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-              itemBuilder: (context, index) {
-                bool isSelected = selectedIndex == index;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: Dimensions.paddingSizeExtraSmall),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        selectedIndex = index;
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(50),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
-                        color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).cardColor,
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
-                      alignment: Alignment.center,
-                      child: Text(types[index].tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: isSelected ? Theme.of(context).cardColor : Theme.of(context).textTheme.bodyLarge!.color)),
+            SizedBox(
+              height: 50,
+              child: ListView.builder(
+                itemCount: types.length,
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Dimensions.paddingSizeSmall,
+                ),
+                itemBuilder: (context, index) {
+                  bool isSelected = selectedIndex == index;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: Dimensions.paddingSizeExtraSmall,
+                      horizontal: Dimensions.paddingSizeExtraSmall,
                     ),
-                  ),
-                );
-              }),
-          ),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex = index;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(50),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).disabledColor.withValues(alpha: 0.5),
+                          ),
+                          color: isSelected
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context).cardColor,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: Dimensions.paddingSizeLarge,
+                        ),
+                        alignment: Alignment.center,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            types[index].tr,
+                            maxLines: 1,
+                            style: robotoMedium.copyWith(
+                              fontSize: Dimensions.fontSizeDefault,
+                              color: isSelected
+                                  ? Theme.of(context).cardColor
+                                  : Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge!.color,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
 
-          selectedIndex == 0 ? const WalletOverviewWidget() : const MyPointView(),
-        ]),
+            selectedIndex == 0
+                ? const WalletOverviewWidget()
+                : const MyPointView(),
+          ],
+        ),
       ),
-
     );
   }
 }

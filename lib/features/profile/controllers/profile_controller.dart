@@ -48,8 +48,9 @@ class ProfileController extends GetxController implements GetxService {
           distanceFilter: 2,
           intervalDuration: _locationRecordInterval,
           foregroundNotificationConfig: ForegroundNotificationConfig(
-            notificationTitle: 'Portal Delivery',
-            notificationText: 'Location tracking is active for deliveries.',
+            notificationTitle: 'მილი კურიერი',
+            notificationText:
+                'შეკვეთების შესრულებისას ლოკაციის გაზიარება აქტიურია.',
             enableWakeLock: true,
             setOngoing: true,
           ),
