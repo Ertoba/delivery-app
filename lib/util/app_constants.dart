@@ -7,7 +7,7 @@ class AppConstants {
   static const double appVersion = 3.8; ///Flutter sdk 3.41.6
   static const String fontFamily = 'Roboto';
   static const AppMode appMode = AppMode.delivery;
-  static const String baseUrl = 'https://portal.crypt.ge';
+  static const String baseUrl = 'https://mili.ge';
 
   static const String polylineMapKey = 'YOUR_MAP_KEY_HERE';
   static const String configUri = '/api/v1/config';
