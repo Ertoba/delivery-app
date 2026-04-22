@@ -19,8 +19,16 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
-  Future<ResponseModel> updateProfile(ProfileModel userInfoModel, XFile? data, String token) async {
-    return await profileRepositoryInterface.updateProfile(userInfoModel, data, token);
+  Future<ResponseModel> updateProfile(
+    ProfileModel userInfoModel,
+    XFile? data,
+    String token,
+  ) async {
+    return await profileRepositoryInterface.updateProfile(
+      userInfoModel,
+      data,
+      token,
+    );
   }
 
   @override
@@ -29,15 +37,26 @@ class ProfileService implements ProfileServiceInterface {
   }
 
   @override
-  Future<void> recordWebSocketLocation(RecordLocationBodyModel recordLocationBody, String zoneId) async {
-    await profileRepositoryInterface.recordWebSocketLocation(recordLocationBody, zoneId );
+  Future<void> recordWebSocketLocation(
+    RecordLocationBodyModel recordLocationBody,
+    String zoneId,
+  ) async {
+    await profileRepositoryInterface.recordWebSocketLocation(
+      recordLocationBody,
+      zoneId,
+    );
   }
 
   @override
-  Future<Response> recordLocation(RecordLocationBodyModel recordLocationBody, String zoneId) async {
-    return await profileRepositoryInterface.recordLocation(recordLocationBody, zoneId);
+  Future<Response> recordLocation(
+    RecordLocationBodyModel recordLocationBody,
+    String zoneId,
+  ) async {
+    return await profileRepositoryInterface.recordLocation(
+      recordLocationBody,
+      zoneId,
+    );
   }
-
 
   @override
   Future<String> getZoneId(Position locationResult) async {
@@ -52,12 +71,34 @@ class ProfileService implements ProfileServiceInterface {
   @override
   Future<String> addressPlaceMark(Position locationResult) async {
     String address;
-    try{
-      List<geo_coding.Placemark> addresses = await geo_coding.placemarkFromCoordinates(locationResult.latitude, locationResult.longitude);
+    try {
+      await geo_coding.setLocaleIdentifier('ka_GE');
+      List<geo_coding.Placemark> addresses = await geo_coding
+          .placemarkFromCoordinates(
+            locationResult.latitude,
+            locationResult.longitude,
+          );
       geo_coding.Placemark placeMark = addresses.first;
-      address = '${placeMark.name}, ${placeMark.subAdministrativeArea}, ${placeMark.isoCountryCode}';
-    }catch(e) {
-      address = 'Unknown Location Found';
+      List<String?> parts = [
+        placeMark.street,
+        placeMark.subLocality,
+        placeMark.locality?.isNotEmpty == true
+            ? placeMark.locality
+            : placeMark.subAdministrativeArea,
+        placeMark.country,
+      ];
+      address = parts
+          .where((part) => part != null && part.trim().isNotEmpty)
+          .map((part) => part!.trim())
+          .toSet()
+          .join(', ')
+          .replaceAll(RegExp(r'^[A-Z0-9]{2,8}\+[A-Z0-9]{2,3}[,\s]*'), '')
+          .trim();
+      if (address.isEmpty) {
+        address = 'მდებარეობა ვერ მოიძებნა';
+      }
+    } catch (e) {
+      address = 'მდებარეობა ვერ მოიძებნა';
     }
     return address;
   }
@@ -67,28 +108,37 @@ class ProfileService implements ProfileServiceInterface {
     LocationPermission permission = await Geolocator.requestPermission();
     permission = await Geolocator.checkPermission();
 
-    while(Get.isDialogOpen == true) {
+    while (Get.isDialogOpen == true) {
       Get.back();
     }
 
-    if(permission == LocationPermission.denied) {
-      Get.dialog(LocationAccessDialog(onConfirm: () async {
-        Get.back();
-        await Geolocator.openAppSettings();
-        Future.delayed(const Duration(seconds: 3), () {
-          if(GetPlatform.isAndroid) checkPermission(callback);
-        });
-      },
-      ));
-    }else if(permission == LocationPermission.deniedForever || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
-      Get.dialog(LocationAccessDialog(onConfirm: () async {
-        await Geolocator.openAppSettings();
-        Future.delayed(const Duration(seconds: 3), () {
-          if(GetPlatform.isAndroid) checkPermission(callback);
-        });
-      },
-      ));
-    }else {
+    if (permission == LocationPermission.denied) {
+      Get.dialog(
+        LocationAccessDialog(
+          onConfirm: () async {
+            Get.back();
+            await Geolocator.openAppSettings();
+            Future.delayed(const Duration(seconds: 3), () {
+              if (GetPlatform.isAndroid) checkPermission(callback);
+            });
+          },
+        ),
+      );
+    } else if (permission == LocationPermission.deniedForever ||
+        (GetPlatform.isIOS
+            ? false
+            : permission == LocationPermission.whileInUse)) {
+      Get.dialog(
+        LocationAccessDialog(
+          onConfirm: () async {
+            await Geolocator.openAppSettings();
+            Future.delayed(const Duration(seconds: 3), () {
+              if (GetPlatform.isAndroid) checkPermission(callback);
+            });
+          },
+        ),
+      );
+    } else {
       callback();
     }
   }
@@ -97,5 +147,4 @@ class ProfileService implements ProfileServiceInterface {
   Future getProfileLevelInfo() {
     return profileRepositoryInterface.getProfileLevelInfo();
   }
-
 }
