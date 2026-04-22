@@ -85,22 +85,25 @@ class AuthController extends GetxController implements GetxService {
   Future<ResponseModel> login(String phone, String password, String type) async {
     _isLoading = true;
     update();
-    Response response = await authServiceInterface.login(phone, password, type);
     ResponseModel responseModel;
-    if (response.statusCode == 200) {
-
-      if(Get.find<SplashController>().configModel?.webSocketStatus ?? false){
-        PusherHelper.initializePusher();
+    try {
+      Response response = await authServiceInterface.login(phone, password, type);
+      if (response.statusCode == 200) {
+        if(Get.find<SplashController>().configModel?.webSocketStatus ?? false){
+          PusherHelper.initializePusher();
+        }
+        authServiceInterface.saveUserToken(response.body['token'], response.body['zone_topic'], response.body['topic']);
+        await authServiceInterface.updateToken();
+        responseModel = ResponseModel(true, 'successful');
+      } else {
+        responseModel = ResponseModel(false, response.statusText);
       }
-
-      authServiceInterface.saveUserToken(response.body['token'], response.body['zone_topic'], response.body['topic']);
-      await authServiceInterface.updateToken();
-      responseModel = ResponseModel(true, 'successful');
-    } else {
-      responseModel = ResponseModel(false, response.statusText);
+    } catch (_) {
+      responseModel = ResponseModel(false, 'connection_to_api_server_failed'.tr);
+    } finally {
+      _isLoading = false;
+      update();
     }
-    _isLoading = false;
-    update();
     return responseModel;
   }
 
