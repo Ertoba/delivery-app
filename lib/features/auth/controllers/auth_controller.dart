@@ -93,7 +93,9 @@ class AuthController extends GetxController implements GetxService {
           PusherHelper.initializePusher();
         }
         authServiceInterface.saveUserToken(response.body['token'], response.body['zone_topic'], response.body['topic']);
-        await authServiceInterface.updateToken();
+        try {
+          await authServiceInterface.updateToken();
+        } catch (_) {}
         responseModel = ResponseModel(true, 'successful');
       } else {
         responseModel = ResponseModel(false, response.statusText);
