@@ -12,7 +12,7 @@ class ColorResources {
         : Theme.of(Get.context!).disabledColor.withValues(alpha: 0.2);
   }
 
-  static const Color green = Color(0xffD35701);
+  static const Color green = Color(0xff039D55);
   static const Color red = Color(0xffFF5A54);
   static const Color blue = Color(0xff1D95FF);
   static const Color white = Color(0xffffffff);
