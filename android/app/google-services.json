@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:100879464630:android:90bb988d8ff48ee32cce17",
         "android_client_info": {
-          "package_name": "com.vendor.portal_delivery_app"
+          "package_name": "ge.mili.delivery"
         }
       },
       "oauth_client": [],
@@ -28,7 +28,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:100879464630:android:2a56ef0c36129fd92cce17",
         "android_client_info": {
-          "package_name": "com.vendor.portal_mart_store_app"
+          "package_name": "ge.mili.customer"
         }
       },
       "oauth_client": [],
