@@ -94,7 +94,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(height: 40),
 
                     CustomTextFieldWidget(
-                      hintText: 'xxx-xxxx-xxxx',
+                      hintText: 'XXX-XXXXXX',
                       labelText: 'phone_number'.tr,
                       controller: _phoneController,
                       focusNode: _phoneFocus,

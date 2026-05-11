@@ -175,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 2,
           leading: Padding(
             padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-            child: Image.asset(Images.logo, height: 30, width: 30),
+            child: Image.asset(Images.authLogo, height: 30, width: 30, fit: BoxFit.contain),
           ),
           titleSpacing: 0,
           title: Text(AppConstants.appName, maxLines: 1, overflow: TextOverflow.ellipsis, style: robotoMedium.copyWith(

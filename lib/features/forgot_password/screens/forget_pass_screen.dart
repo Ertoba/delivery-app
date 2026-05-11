@@ -44,7 +44,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
             ),
 
             CustomTextFieldWidget(
-              hintText: 'xxx-xxxx-xxxx',
+              hintText: 'XXX-XXXXXX',
               labelText: 'phone_number'.tr,
               controller: _numberController,
               inputType: TextInputType.phone,

@@ -9,6 +9,13 @@ class ServerMessageTranslator {
     'item already exists': 'ნივთი უკვე დამატებულია.',
     'cart item remove successfully': 'ნივთი კალათიდან წარმატებით წაიშალა.',
     'updated successfully': 'წარმატებით განახლდა.',
+    'status updated': 'სტატუსი განახლდა.',
+    'status updated successfully': 'სტატუსი წარმატებით განახლდა.',
+    'order status updated': 'შეკვეთის სტატუსი განახლდა.',
+    'order status updated successfully':
+        'შეკვეთის სტატუსი წარმატებით განახლდა.',
+    'order accepted successfully': 'შეკვეთა წარმატებით მიიღეთ.',
+    'order picked up successfully': 'შეკვეთა წარმატებით აიღეთ.',
     'payment info updated': 'გადახდის ინფორმაცია განახლდა.',
     'request sent successfully': 'მოთხოვნა წარმატებით გაიგზავნა.',
     'add successfully': 'წარმატებით დაემატა.',
