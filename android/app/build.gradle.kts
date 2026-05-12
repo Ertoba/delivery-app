@@ -13,6 +13,22 @@ val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
+fun hasKeystoreValue(key: String): Boolean {
+    return (keystoreProperties[key] as String?)?.isNotBlank() == true
+}
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+        && hasKeystoreValue("keyAlias")
+        && hasKeystoreValue("keyPassword")
+        && hasKeystoreValue("storeFile")
+        && hasKeystoreValue("storePassword")
+
+if (!hasReleaseKeystore) {
+    gradle.taskGraph.whenReady {
+        if (allTasks.any { it.name.contains("Release", ignoreCase = true) }) {
+            throw GradleException("Release signing requires android/key.properties with the upload keystore configuration.")
+        }
+    }
+}
 
 android {
     namespace = "ge.mili.delivery"
@@ -49,7 +65,11 @@ android {
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("debug") // or "release" if you have real keystore
+            signingConfig = if (hasReleaseKeystore) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

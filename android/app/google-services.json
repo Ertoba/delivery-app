@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "100879464630",
-    "project_id": "portal-9524e",
-    "storage_bucket": "portal-9524e.firebasestorage.app"
+    "project_number": "294177416704",
+    "project_id": "mili-a2a33",
+    "storage_bucket": "mili-a2a33.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:100879464630:android:90bb988d8ff48ee32cce17",
+        "mobilesdk_app_id": "1:294177416704:android:5a4be8ecc747a48e9e5ae5",
         "android_client_info": {
-          "package_name": "ge.mili.delivery"
+          "package_name": "ge.mili.customer"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDDuD7JPPP-9xGrI_J5aygfNvvSKjqUa6Y"
+          "current_key": "AIzaSyD6JxaFLqTr7SVBVixTG-3Zd4PdDCIXeMg"
         }
       ],
       "services": {
@@ -26,15 +26,34 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:100879464630:android:2a56ef0c36129fd92cce17",
+        "mobilesdk_app_id": "1:294177416704:android:fc0d3407403403e29e5ae5",
         "android_client_info": {
-          "package_name": "ge.mili.customer"
+          "package_name": "ge.mili.delivery"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDDuD7JPPP-9xGrI_J5aygfNvvSKjqUa6Y"
+          "current_key": "AIzaSyD6JxaFLqTr7SVBVixTG-3Zd4PdDCIXeMg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:294177416704:android:94db53c448b8f99e9e5ae5",
+        "android_client_info": {
+          "package_name": "ge.mili.vendor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6JxaFLqTr7SVBVixTG-3Zd4PdDCIXeMg"
         }
       ],
       "services": {
