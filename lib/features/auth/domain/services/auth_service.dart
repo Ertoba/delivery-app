@@ -8,6 +8,8 @@ import 'package:sixam_mart_delivery/features/auth/domain/repositories/auth_repos
 import 'package:sixam_mart_delivery/features/auth/domain/services/auth_service_interface.dart';
 
 class AuthService implements AuthServiceInterface {
+  static const int _maxRegistrationUploadBytes = 10 * 1024 * 1024;
+
   final AuthRepositoryInterface authRepositoryInterface;
   AuthService({required this.authRepositoryInterface});
 
@@ -114,13 +116,11 @@ class AuthService implements AuthServiceInterface {
   Future<XFile?> pickImageFromGallery() async{
     XFile? pickImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     if(pickImage != null) {
-      pickImage.length().then((value) {
-        if (value > 2000000) {
-          showCustomSnackBar('please_upload_lower_size_file'.tr);
-        } else {
-          return pickImage;
-        }
-      });
+      final int fileSize = await pickImage.length();
+      if (fileSize > _maxRegistrationUploadBytes) {
+        showCustomSnackBar('please_upload_lower_size_file'.tr);
+        return null;
+      }
     }
     return pickImage;
   }
