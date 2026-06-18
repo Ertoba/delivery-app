@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/withdraw_method_model.dart';
-import 'package:sixam_mart_delivery/features/disbursement/domain/models/disbursement_method_model.dart' as disburse;
-import 'package:sixam_mart_delivery/features/disbursement/domain/models/disbursement_report_model.dart' as report;
+import 'package:sixam_mart_delivery/features/disbursement/domain/models/disbursement_method_model.dart'
+    as disburse;
+import 'package:sixam_mart_delivery/features/disbursement/domain/models/disbursement_report_model.dart'
+    as report;
 import 'package:sixam_mart_delivery/common/widgets/custom_dropdown_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_delivery/features/disbursement/domain/services/disbursement_service_interface.dart';
@@ -38,20 +40,22 @@ class DisbursementController extends GetxController implements GetxService {
   List<WidthDrawMethodModel>? get widthDrawMethods => _widthDrawMethods;
 
   disburse.DisbursementMethodBody? _disbursementMethodBody;
-  disburse.DisbursementMethodBody? get disbursementMethodBody => _disbursementMethodBody;
+  disburse.DisbursementMethodBody? get disbursementMethodBody =>
+      _disbursementMethodBody;
 
   int? _index = -1;
-  int? get index =>_index;
+  int? get index => _index;
 
   report.DisbursementReportModel? _disbursementReportModel;
-  report.DisbursementReportModel? get disbursementReportModel => _disbursementReportModel;
+  report.DisbursementReportModel? get disbursementReportModel =>
+      _disbursementReportModel;
 
   disburse.Methods? _selectedWithdrawMethod;
   disburse.Methods? get selectedWithdrawMethod => _selectedWithdrawMethod;
 
   void setMethodId(int? id, {bool canUpdate = true}) {
     _selectedMethodIndex = id;
-    if(canUpdate){
+    if (canUpdate) {
       update();
     }
   }
@@ -62,29 +66,35 @@ class DisbursementController extends GetxController implements GetxService {
     _methodFields = [];
     _focusList = [];
 
-    if(_widthDrawMethods == null) {
+    if (_widthDrawMethods == null) {
       _widthDrawMethods = await getWithdrawMethodList();
     } else {
       _widthDrawMethods = widthDrawMethods;
     }
-    if(_widthDrawMethods != null && _widthDrawMethods!.isNotEmpty){
-      for(int i=0; i < _widthDrawMethods!.length; i++){
-        _methodList.add(DropdownItem<int>(value: i, child: SizedBox(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('${_widthDrawMethods![i].methodName}'),
+    if (_widthDrawMethods != null && _widthDrawMethods!.isNotEmpty) {
+      for (int i = 0; i < _widthDrawMethods!.length; i++) {
+        _methodList.add(
+          DropdownItem<int>(
+            value: i,
+            child: SizedBox(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('${_widthDrawMethods![i].methodName}'),
+              ),
+            ),
           ),
-        )));
+        );
       }
       _textControllerList = [];
       _methodFields = [];
-      for (var field in _widthDrawMethods![_selectedMethodIndex!].methodFields!) {
+      for (var field
+          in _widthDrawMethods![_selectedMethodIndex!].methodFields!) {
         _methodFields.add(field);
         _textControllerList.add(TextEditingController());
         _focusList.add(FocusNode());
       }
     }
-    if(isUpdate) {
+    if (isUpdate) {
       update();
     }
   }
@@ -93,7 +103,9 @@ class DisbursementController extends GetxController implements GetxService {
     _selectedWithdrawMethod = method;
 
     if (_widthDrawMethods != null && _widthDrawMethods!.isNotEmpty) {
-      int methodIndex = _widthDrawMethods!.indexWhere((element) => element.id == method.withdrawalMethodId);
+      int methodIndex = _widthDrawMethods!.indexWhere(
+        (element) => element.id == method.withdrawalMethodId,
+      );
 
       if (methodIndex != -1) {
         _selectedMethodIndex = methodIndex;
@@ -103,7 +115,8 @@ class DisbursementController extends GetxController implements GetxService {
         if (method.methodFields != null && method.methodFields!.isNotEmpty) {
           for (int i = 0; i < method.methodFields!.length; i++) {
             if (i < _textControllerList.length) {
-              _textControllerList[i].text = method.methodFields![i].userData ?? '';
+              _textControllerList[i].text =
+                  method.methodFields![i].userData ?? '';
             }
           }
         }
@@ -111,14 +124,20 @@ class DisbursementController extends GetxController implements GetxService {
     }
   }
 
-  Future<void> addWithdrawMethod(Map<String?, String> data, {bool isUpdate = false}) async {
+  Future<void> addWithdrawMethod(
+    Map<String?, String> data, {
+    bool isUpdate = false,
+  }) async {
     _isLoading = true;
     update();
     bool isSuccess = await disbursementServiceInterface.addWithdraw(data);
-    if(isSuccess) {
+    if (isSuccess) {
       Get.back();
       getDisbursementMethodList();
-      showCustomSnackBar(isUpdate ? 'update_successfully'.tr : 'add_successfully'.tr, isError: false);
+      showCustomSnackBar(
+        isUpdate ? 'update_successfully'.tr : 'add_successfully'.tr,
+        isError: false,
+      );
     }
     _isLoading = false;
     update();
@@ -126,9 +145,13 @@ class DisbursementController extends GetxController implements GetxService {
 
   Future<bool> getDisbursementMethodList() async {
     bool success = false;
-    disburse.DisbursementMethodBody? disbursementMethodBody = await disbursementServiceInterface.getDisbursementMethodList();
-    if(disbursementMethodBody != null) {
+    disburse.DisbursementMethodBody? disbursementMethodBody =
+        await disbursementServiceInterface.getDisbursementMethodList();
+    if (disbursementMethodBody != null) {
       success = true;
+      disbursementMethodBody.methods?.removeWhere(_isKeepzSplitReceiver);
+      disbursementMethodBody.totalSize =
+          disbursementMethodBody.methods?.length ?? 0;
       _disbursementMethodBody = disbursementMethodBody;
     }
     update();
@@ -141,7 +164,9 @@ class DisbursementController extends GetxController implements GetxService {
       _isLoading = true;
       update();
 
-      bool isSuccess = await disbursementServiceInterface.makeDefaultMethod(data);
+      bool isSuccess = await disbursementServiceInterface.makeDefaultMethod(
+        data,
+      );
 
       if (isSuccess) {
         await getDisbursementMethodList();
@@ -159,12 +184,11 @@ class DisbursementController extends GetxController implements GetxService {
     }
   }
 
-
   Future<void> deleteMethod(int id) async {
     _isDeleteLoading = true;
     update();
     bool isSuccess = await disbursementServiceInterface.deleteMethod(id);
-    if(isSuccess) {
+    if (isSuccess) {
       await getDisbursementMethodList();
       if (Get.isDialogOpen ?? false) {
         Get.back();
@@ -176,16 +200,18 @@ class DisbursementController extends GetxController implements GetxService {
   }
 
   Future<void> getDisbursementReport(int offset) async {
-    report.DisbursementReportModel? disbursementReportModel = await disbursementServiceInterface.getDisbursementReport(offset);
-    if(disbursementReportModel != null) {
+    report.DisbursementReportModel? disbursementReportModel =
+        await disbursementServiceInterface.getDisbursementReport(offset);
+    if (disbursementReportModel != null) {
       _disbursementReportModel = disbursementReportModel;
     }
     update();
   }
 
   Future<List<WidthDrawMethodModel>?> getWithdrawMethodList() async {
-    List<WidthDrawMethodModel>? widthDrawMethods = await disbursementServiceInterface.getWithdrawMethodList();
-    if(widthDrawMethods != null) {
+    List<WidthDrawMethodModel>? widthDrawMethods =
+        await disbursementServiceInterface.getWithdrawMethodList();
+    if (widthDrawMethods != null) {
       _widthDrawMethods = [];
       _widthDrawMethods!.addAll(widthDrawMethods);
     }
@@ -193,10 +219,26 @@ class DisbursementController extends GetxController implements GetxService {
     return _widthDrawMethods;
   }
 
-  void updateSelectedWithdrawMethod({disburse.Methods? newValue, bool shouldUpdate = true}){
+  bool _isKeepzSplitReceiver(disburse.Methods method) {
+    final String methodName = method.methodName?.toLowerCase().trim() ?? '';
+    final bool hasKeepzReceiverField =
+        method.methodFields?.any((field) {
+          final String inputName = field.userInput?.toLowerCase().trim() ?? '';
+          return inputName == 'keepz_receiver_identifier' ||
+              inputName == 'keepz_receiver_type';
+        }) ??
+        false;
+
+    return methodName == 'keepz split receiver' || hasKeepzReceiverField;
+  }
+
+  void updateSelectedWithdrawMethod({
+    disburse.Methods? newValue,
+    bool shouldUpdate = true,
+  }) {
     _selectedWithdrawMethod = newValue;
 
-    if(shouldUpdate){
+    if (shouldUpdate) {
       update();
     }
   }
@@ -204,8 +246,10 @@ class DisbursementController extends GetxController implements GetxService {
   Future<bool> createWithdrawRequest(Map<String?, dynamic> data) async {
     _isLoading = true;
     update();
-    bool isSuccess = await disbursementServiceInterface.createWithdrawRequest(data);
-    if(isSuccess) {
+    bool isSuccess = await disbursementServiceInterface.createWithdrawRequest(
+      data,
+    );
+    if (isSuccess) {
       Get.back();
       Get.find<ProfileController>().getProfile();
       getDisbursementMethodList();
@@ -216,5 +260,4 @@ class DisbursementController extends GetxController implements GetxService {
     update();
     return isSuccess;
   }
-  
 }
