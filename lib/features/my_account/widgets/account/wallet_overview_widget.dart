@@ -4,20 +4,14 @@ import 'package:sixam_mart_delivery/common/widgets/custom_asset_image_widget.dar
 import 'package:sixam_mart_delivery/common/widgets/custom_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
-import 'package:sixam_mart_delivery/features/my_account/helpers/payment_method_filter_helper.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/amount_card_widget.dart';
-import 'package:sixam_mart_delivery/features/my_account/widgets/empty_state_bottom_sheet.dart';
-import 'package:sixam_mart_delivery/features/my_account/widgets/payment_method_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/tab_section_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/transaction_section_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/wallet_attention_alert_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/withdrawal_bottomsheet.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
-import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
-import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
@@ -385,135 +379,46 @@ class WalletOverviewWidget extends StatelessWidget {
                                                           .paddingSizeSmall,
                                                     ),
 
-                                                    isPayable
-                                                        ? InkWell(
-                                                            onTap: () {
-                                                              bool
-                                                              isRideActive =
-                                                                  AppConstants
-                                                                      .appMode ==
-                                                                  AppMode.ride;
-                                                              final config =
-                                                                  Get.find<
-                                                                        SplashController
-                                                                      >()
-                                                                      .configModel;
-                                                              double
-                                                              minimumPayableAmount =
-                                                                  isRideActive
-                                                                  ? (config?.minAmountToPayRider ??
-                                                                        0)
-                                                                  : (config?.minAmountToPayDm ??
-                                                                        0);
-                                                              final paymentMethods =
-                                                                  PaymentMethodFilterHelper.nonKeepzMethods(
-                                                                    config
-                                                                        ?.activePaymentMethodList,
-                                                                  );
-
-                                                              if (paymentMethods
-                                                                      .isEmpty ||
-                                                                  !(config?.digitalPayment ??
-                                                                      false)) {
-                                                                showCustomBottomSheet(
-                                                                  child: EmptyStateBottomSheet(
-                                                                    noPaymentMethod:
-                                                                        paymentMethods
-                                                                            .isEmpty ||
-                                                                        !(config?.digitalPayment ??
-                                                                            false),
-                                                                  ),
-                                                                );
-                                                              } else if (minimumPayableAmount >
+                                                    if (!isPayable)
+                                                      InkWell(
+                                                        onTap: () {
+                                                          showCustomBottomSheet(
+                                                            child: WithdrawBottomSheet(
+                                                              withdrawAmount:
                                                                   profileController
-                                                                      .profileModel!
-                                                                      .payableBalance!) {
-                                                                showCustomBottomSheet(
-                                                                  child:
-                                                                      const EmptyStateBottomSheet(),
-                                                                );
-                                                              } else {
-                                                                showCustomBottomSheet(
-                                                                  child:
-                                                                      const PaymentMethodBottomSheetWidget(),
-                                                                );
-                                                              }
-                                                            },
-                                                            child: Container(
-                                                              width: 100,
-                                                              padding: const EdgeInsets.symmetric(
-                                                                vertical: Dimensions
-                                                                    .paddingSizeSmall,
-                                                                horizontal:
-                                                                    Dimensions
-                                                                        .paddingSizeDefault,
-                                                              ),
-                                                              decoration: BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      Dimensions
-                                                                          .radiusMedium,
-                                                                    ),
-                                                                color: Theme.of(
-                                                                  context,
-                                                                ).primaryColor,
-                                                              ),
-                                                              child: Text(
-                                                                'pay_now'.tr,
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                style: robotoMedium.copyWith(
-                                                                  fontSize:
-                                                                      Dimensions
-                                                                          .fontSizeSmall,
-                                                                  color: Theme.of(
-                                                                    context,
-                                                                  ).cardColor,
-                                                                ),
-                                                              ),
+                                                                      .profileModel
+                                                                      ?.withDrawableBalance ??
+                                                                  0,
                                                             ),
-                                                          )
-                                                        : InkWell(
-                                                            onTap: () {
-                                                              showCustomBottomSheet(
-                                                                child: WithdrawBottomSheet(
-                                                                  withdrawAmount:
-                                                                      profileController
-                                                                          .profileModel
-                                                                          ?.withDrawableBalance ??
-                                                                      0,
-                                                                ),
-                                                              );
-                                                            },
-                                                            child: Container(
-                                                              padding: const EdgeInsets.symmetric(
-                                                                vertical: Dimensions
-                                                                    .paddingSizeSmall,
-                                                                horizontal:
-                                                                    Dimensions
-                                                                        .paddingSizeSmall,
-                                                              ),
-                                                              decoration: BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      Dimensions
-                                                                          .radiusMedium,
-                                                                    ),
-                                                                color: Theme.of(
-                                                                  context,
-                                                                ).primaryColor,
-                                                              ),
-                                                              child: Icon(
-                                                                Icons
-                                                                    .arrow_forward_ios_rounded,
-                                                                color: Theme.of(
-                                                                  context,
-                                                                ).cardColor,
-                                                                size: 20,
-                                                              ),
-                                                            ),
+                                                          );
+                                                        },
+                                                        child: Container(
+                                                          padding: const EdgeInsets.symmetric(
+                                                            vertical: Dimensions
+                                                                .paddingSizeSmall,
+                                                            horizontal: Dimensions
+                                                                .paddingSizeSmall,
                                                           ),
+                                                          decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  Dimensions
+                                                                      .radiusMedium,
+                                                                ),
+                                                            color: Theme.of(
+                                                              context,
+                                                            ).primaryColor,
+                                                          ),
+                                                          child: Icon(
+                                                            Icons
+                                                                .arrow_forward_ios_rounded,
+                                                            color: Theme.of(
+                                                              context,
+                                                            ).cardColor,
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                      ),
                                                   ],
                                                 ),
                                               ),
