@@ -67,6 +67,7 @@ class CashInHandCardWidget extends StatelessWidget {
           backgroundColor: Theme.of(context).primaryColor,
           onPressed: () => Get.toNamed(RouteHelper.getMyAccountRoute()),
         ),
+
       ]),
     );
   }
