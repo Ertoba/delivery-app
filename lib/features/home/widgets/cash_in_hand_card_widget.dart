@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
+import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/color_resources.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
@@ -13,6 +15,8 @@ class CashInHandCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    bool isPayable = profileController.profileModel != null && profileController.profileModel?.showPayNowButton == true;
 
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -52,6 +56,16 @@ class CashInHandCardWidget extends StatelessWidget {
                 TextSpan(text: ' (${'limit_exceeded'.tr})', style: robotoRegular.copyWith(color: ColorResources.red, fontSize: Dimensions.fontSizeSmall - 2)),
             ],
           ),
+        ),
+        const SizedBox(height: Dimensions.paddingSizeLarge),
+
+        if(isPayable) CustomButtonWidget(
+          width: 90, height: 40,
+          isBold: false,
+          fontSize: Dimensions.fontSizeDefault,
+          buttonText: 'pay_now'.tr,
+          backgroundColor: Theme.of(context).primaryColor,
+          onPressed: () => Get.toNamed(RouteHelper.getMyAccountRoute()),
         ),
       ]),
     );

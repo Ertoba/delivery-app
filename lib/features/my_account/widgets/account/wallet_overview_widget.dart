@@ -45,7 +45,7 @@ class WalletOverviewWidget extends StatelessWidget {
                               physics: const AlwaysScrollableScrollPhysics(),
                               child: Column(
                                 children: [
-                                  isAdjust && !isPayable
+                                  isAdjust
                                       ? Container(
                                           width: context.width,
                                           padding: EdgeInsets.all(
