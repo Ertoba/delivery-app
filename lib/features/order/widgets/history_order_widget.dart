@@ -3,7 +3,6 @@ import 'package:sixam_mart_delivery/helper/date_converter_helper.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
-import 'package:sixam_mart_delivery/common/widgets/custom_image_widget.dart';
 import 'package:sixam_mart_delivery/features/order/screens/order_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -103,7 +102,7 @@ class HistoryOrderWidget extends StatelessWidget {
                     color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                   ),
-                  child: Text(orderModel.moduleType == 'parcel' ? 'parcel'.tr : orderModel.moduleType == 'food' ? 'food'.tr : orderModel.moduleType == 'grocery' ? 'grocery'.tr : orderModel.moduleType == 'pharmacy' ? 'pharmacy'.tr : orderModel.moduleType!,
+                  child: Text(orderModel.moduleType == 'parcel' ? 'parcel'.tr : orderModel.moduleType == 'food' ? 'food'.tr : orderModel.moduleType == 'grocery' ? 'grocery'.tr : orderModel.moduleType == 'pharmacy' ? 'pharmacy'.tr : orderModel.moduleType == 'ecommerce' ? 'ecommerce'.tr : orderModel.moduleType!,
                     style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor),
                   ),
                 ),

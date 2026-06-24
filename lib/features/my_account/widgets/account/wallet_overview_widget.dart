@@ -5,18 +5,13 @@ import 'package:sixam_mart_delivery/common/widgets/custom_bottom_sheet_widget.da
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/amount_card_widget.dart';
-import 'package:sixam_mart_delivery/features/my_account/widgets/empty_state_bottom_sheet.dart';
-import 'package:sixam_mart_delivery/features/my_account/widgets/payment_method_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/tab_section_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/transaction_section_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/wallet_attention_alert_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/withdrawal_bottomsheet.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
-import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
-import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 class WalletOverviewWidget extends StatelessWidget {
@@ -40,7 +35,7 @@ class WalletOverviewWidget extends StatelessWidget {
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(children: [
 
-                    isAdjust && !isPayable ? Container(
+                    isAdjust ? Container(
                       width: context.width,
                       padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
                       decoration: BoxDecoration(
@@ -146,7 +141,7 @@ class WalletOverviewWidget extends StatelessWidget {
                         Text(isPayable ? 'pay_able_balance'.tr : 'withdrawable_balance'.tr, style: robotoSemiBold),
                         const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                        Text(isPayable ? 'you_can_pay_the_amount_to_the_admin'.tr : 'you_can_send_withdraw_request_to_admin'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
+                        Text(isPayable ? 'you_can_hand_over_the_amount_to_the_admin'.tr : 'you_can_send_withdraw_request_to_admin'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
                         const SizedBox(height: Dimensions.paddingSizeSmall),
 
                         Container(
@@ -173,18 +168,19 @@ class WalletOverviewWidget extends StatelessWidget {
 
                             isPayable ? InkWell(
                               onTap: () {
-
-                                bool isRideActive = AppConstants.appMode == AppMode.ride;
-                                final config = Get.find<SplashController>().configModel;
-                                double minimumPayableAmount = isRideActive ? (config?.minAmountToPayRider ?? 0) : (config?.minAmountToPayDm ?? 0);
-
-                                if(Get.find<SplashController>().configModel!.activePaymentMethodList!.isEmpty || !Get.find<SplashController>().configModel!.digitalPayment!){
-                                  showCustomBottomSheet(child: EmptyStateBottomSheet(noPaymentMethod: Get.find<SplashController>().configModel!.activePaymentMethodList!.isEmpty || !Get.find<SplashController>().configModel!.digitalPayment!));
-                                }else if(minimumPayableAmount > profileController.profileModel!.payableBalance!){
-                                  showCustomBottomSheet(child: const EmptyStateBottomSheet());
-                                }else{
-                                  showCustomBottomSheet(child: const PaymentMethodBottomSheetWidget());
-                                }
+                                showDialog<void>(
+                                  context: context,
+                                  builder: (dialogContext) => AlertDialog(
+                                    title: Text('cash_handover'.tr, textAlign: TextAlign.center),
+                                    content: Text('cash_handover_instruction'.tr, textAlign: TextAlign.center),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(dialogContext).pop(),
+                                        child: Text('ok'.tr),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               },
                               child: Container(
                                 width: 100,
@@ -193,7 +189,7 @@ class WalletOverviewWidget extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(Dimensions.radiusMedium),
                                   color: Theme.of(context).primaryColor,
                                 ),
-                                child: Text('pay_now'.tr, textAlign: TextAlign.center, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).cardColor)),
+                                child: Text('hand_over_cash'.tr, textAlign: TextAlign.center, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).cardColor)),
                               ),
                             ) : InkWell(
                               onTap: () {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_app_bar_widget.dart';
-import 'package:sixam_mart_delivery/features/chat/screens/conversation_screen.dart';
+import 'package:sixam_mart_delivery/features/notification/domain/models/notification_body_model.dart';
+import 'package:sixam_mart_delivery/helper/route_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
@@ -44,7 +46,15 @@ class HelpAndSupportScreen extends StatelessWidget {
                 icon: const Icon(Icons.chat, color: Colors.white),
                 label: Text('chat_with_us'.tr.isNotEmpty ? 'chat_with_us'.tr : 'live_chat'.tr,
                     style: robotoBold.copyWith(color: Colors.white)),
-                onPressed: () => Get.to(() => const ConversationScreen()),
+                onPressed: () => Get.toNamed(RouteHelper.getChatRoute(
+                  notificationBody: NotificationBodyModel(
+                    notificationType: NotificationType.admin,
+                    adminId: 0,
+                    type: AppConstants.admin,
+                  ),
+                  fromNotification: false,
+                  fromSupport: true,
+                )),
               ),
             ),
 

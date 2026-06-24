@@ -1023,5 +1023,11 @@
   "already_paid_digitally": "უკვე გადახდილია ციფრულად",
   "you_can_not_go_offline_now_for_ride": "აქტიური მგზავრობა გაქვთ და ამჟამად ხაზგარეშე გადასვლა არ შეგიძლიათ.",
   "cancellation_note": "გაუქმების შენიშვნა",
-  "total_ride": "სულ მგზავრობა"
+  "total_ride": "სულ მგზავრობა",
+  "ecommerce": "ტექნიკა",
+  "password_updated_successfully": "პაროლი წარმატებით განახლდა",
+  "you_can_hand_over_the_amount_to_the_admin": "თანხა შეგიძლიათ გადასცეთ ადმინს",
+  "cash_handover": "თანხის გადაცემა",
+  "cash_handover_instruction": "გადასცით თანხა ადმინისტრატორს. ბალანსი განახლდება მას შემდეგ, რაც ადმინისტრატორი მიღებულ თანხას სისტემაში დაადასტურებს.",
+  "hand_over_cash": "გადაცემა"
 }

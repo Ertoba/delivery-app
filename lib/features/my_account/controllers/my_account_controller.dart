@@ -366,12 +366,26 @@ class MyAccountController extends GetxController implements GetxService {
         final directory = await getApplicationDocumentsDirectory();
         final filePath = '${directory.path}/earning_invoice_$dmId.pdf';
 
+        final List<int> pdfBytes = await response.bodyBytes!.fold<List<int>>(
+          <int>[],
+          (bytes, chunk) => bytes..addAll(chunk),
+        );
+        if (pdfBytes.isEmpty) {
+          throw const FormatException('Empty PDF response');
+        }
+
         // Save the PDF file
         final file = File(filePath);
-        await file.writeAsBytes(response.bodyString!.codeUnits);
+        await file.writeAsBytes(pdfBytes, flush: true);
 
         // Open the PDF file
-        OpenFile.open(filePath);
+        final OpenResult openResult = await OpenFile.open(
+          filePath,
+          type: 'application/pdf',
+        );
+        if (openResult.type != ResultType.done) {
+          throw FileSystemException(openResult.message, filePath);
+        }
       } catch (e) {
         showCustomSnackBar('file_opening_failed'.tr);
       }

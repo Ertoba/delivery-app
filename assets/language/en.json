@@ -975,5 +975,12 @@
   "order_date": "Order Date",
   "cancellation_note": "Cancellation Note",
   "you_can_not_go_offline_now_for_ride": "You have an active ride and cannot go offline at this time.",
-  "total_ride": "Total Ride"
+  "total_ride": "Total Ride",
+  "yesterday": "Yesterday",
+  "ecommerce": "Electronics",
+  "password_updated_successfully": "Password updated successfully",
+  "you_can_hand_over_the_amount_to_the_admin": "You can hand the amount over to the admin",
+  "cash_handover": "Cash handover",
+  "cash_handover_instruction": "Hand the cash to the administrator. The balance will update after the administrator confirms receipt in the system.",
+  "hand_over_cash": "Handover"
 }

@@ -1709,5 +1709,12 @@
   "your_takeaway_order_has_been_placed_successfully" : "Your takeaway order has been placed successfully. We are preparing it and will be ready for pickup soon.",
   "insert_delivery_location" : "Insert Delivery Location",
   "please_insert_delivery_location" : "Please add your  delivery location so we can check whether the store delivers to your area.",
-  "module_is_not_available" : "Module is not available"
+  "module_is_not_available" : "Module is not available",
+  "yesterday": "Yesterday",
+  "ecommerce": "Electronics",
+  "password_updated_successfully": "Password updated successfully",
+  "you_can_hand_over_the_amount_to_the_admin": "You can hand the amount over to the admin",
+  "cash_handover": "Cash handover",
+  "cash_handover_instruction": "Hand the cash to the administrator. The balance will update after the administrator confirms receipt in the system.",
+  "hand_over_cash": "Handover"
 }

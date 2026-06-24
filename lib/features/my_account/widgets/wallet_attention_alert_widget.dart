@@ -1,16 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
-import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
-import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
-import 'package:sixam_mart_delivery/features/my_account/widgets/payment_method_bottom_sheet_widget.dart';
 
 class WalletAttentionAlertWidget extends StatelessWidget {
   final bool isOverFlowBlockWarning;
@@ -47,35 +41,21 @@ class WalletAttentionAlertWidget extends StatelessWidget {
                 children: [
                   TextSpan(
                     recognizer: TapGestureRecognizer()..onTap = () {
-
-                      bool isRideActive = AppConstants.appMode == AppMode.ride;
-                      final config = Get.find<SplashController>().configModel;
-                      double minimumPayableAmount = isRideActive ? (config?.minAmountToPayRider ?? 0) : (config?.minAmountToPayDm ?? 0);
-
-
-                      if(profileController.profileModel!.showPayNowButton!) {
-                        showModalBottomSheet(
-                          isScrollControlled: true, useRootNavigator: true, context: context,
-                          backgroundColor: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(Dimensions.radiusExtraLarge), topRight: Radius.circular(Dimensions.radiusExtraLarge)),
-                          ),
-                          builder: (context) {
-                            return ConstrainedBox(
-                              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
-                              child: const PaymentMethodBottomSheetWidget(),
-                            );
-                          },
-                        );
-                      } else {
-                        if(Get.find<SplashController>().configModel!.activePaymentMethodList!.isEmpty || !Get.find<SplashController>().configModel!.digitalPayment!){
-                          showCustomSnackBar('currently_there_are_no_payment_options_available_please_contact_admin_regarding_any_payment_process_or_queries'.tr);
-                        }else if(minimumPayableAmount > profileController.profileModel!.payableBalance!){
-                          showCustomSnackBar('${'you_do_not_have_sufficient_balance_to_pay_the_minimum_payable_balance_is'.tr} ${PriceConverterHelper.convertPrice(minimumPayableAmount)}');
-                        }
-                      }
+                      showDialog<void>(
+                        context: context,
+                        builder: (dialogContext) => AlertDialog(
+                          title: Text('cash_handover'.tr, textAlign: TextAlign.center),
+                          content: Text('cash_handover_instruction'.tr, textAlign: TextAlign.center),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(dialogContext).pop(),
+                              child: Text('ok'.tr),
+                            ),
+                          ],
+                        ),
+                      );
                     },
-                    text: 'pay_the_due'.tr,
+                    text: 'hand_over_cash'.tr,
                     style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Colors.blue, decoration: TextDecoration.underline),
                   ),
                 ],
