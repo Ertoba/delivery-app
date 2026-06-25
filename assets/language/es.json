@@ -336,6 +336,7 @@
   "my_account": "Mi cuenta",
   "payable_amount": "Monto a pagar",
   "cash_adjustment": "Ajuste de efectivo",
+  "wallet_adjustment": "Ajuste de billetera",
   "cash_adjustment_description": "Para ajustar su saldo de efectivo en mano y monto retirable, haga clic en Aceptar para confirmar los ajustes.",
   "adjust_payments": "Ajustar pagos",
   "pay_now": "Paga ahora",

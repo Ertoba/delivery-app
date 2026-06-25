@@ -90,9 +90,9 @@ class EarningListWidget extends StatelessWidget {
         final item = transactions![index];
         return TransactionItemWidget(
           amount: item.amount,
-          method: selectedIndex == 0 ? '${'withdraw_via'.tr} ${item.bankName}' : '${selectedIndex == 1 ? 'paid_via'.tr : 'wallet'.tr} ${item.method}',
+          method: _localizedMethod(item),
           date: selectedIndex == 0 ? DateConverterHelper.utcToDateTime(item.requestedAt) : item.paymentTime.toString(),
-          status: item.status,
+          status: _localizedStatus(item.status),
           statusColor: _getStatusColor(context, item.status),
           fromWalletEarning: selectedIndex == 2,
         );
@@ -100,9 +100,36 @@ class EarningListWidget extends StatelessWidget {
     );
   }
 
+  String _localizedMethod(dynamic item) {
+    if (selectedIndex == 0) {
+      return '${'withdraw_via'.tr} ${item.bankName}';
+    }
+    if (selectedIndex == 1) {
+      return '${'paid_via'.tr} ${item.method}';
+    }
+    final String method = item.method?.toString().trim().toLowerCase() ?? '';
+    if (method == 'adjustment') {
+      return 'wallet_adjustment'.tr;
+    }
+    if (method.isEmpty) {
+      return 'wallet'.tr;
+    }
+    return '${'wallet'.tr} ${method.replaceAll('_', ' ').toTitleCase()}';
+  }
+
+  String _localizedStatus(String? status) {
+    final String rawStatus = status?.trim() ?? '';
+    final String key = rawStatus.toLowerCase();
+    if (key.isEmpty) {
+      return '';
+    }
+    final String translated = key.tr;
+    return translated == key ? rawStatus.toTitleCase() : translated;
+  }
+
   Color _getStatusColor(BuildContext context, String? status) {
-    switch (status) {
-      case 'approved' || 'Approved':
+    switch (status?.trim().toLowerCase()) {
+      case 'approved':
         return Theme.of(context).primaryColor;
       case 'denied':
         return Theme.of(context).colorScheme.error;
@@ -149,7 +176,7 @@ class TransactionItemWidget extends StatelessWidget {
                       ),
                       margin: const EdgeInsets.only(left: Dimensions.paddingSizeExtraSmall),
                       child: Text(
-                        status.tr,
+                        status,
                         style: robotoRegular.copyWith(
                           fontSize: Dimensions.fontSizeSmall,
                           color: statusColor,

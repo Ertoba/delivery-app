@@ -339,6 +339,7 @@
   "my_account": "My Account",
   "payable_amount": "Payable Amount",
   "cash_adjustment": "Cash Adjustment",
+  "wallet_adjustment": "Wallet Adjustment",
   "cash_adjustment_description": "To adjust your Cash in Hand balance and Withdrawable Amount please click 'OK' to confirm the adjustments",
   "adjust_payments": "Adjust Payments",
   "pay_now": "Pay Now",

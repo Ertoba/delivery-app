@@ -336,6 +336,7 @@
   "my_account": "حسابي",
   "payable_amount": "المبلغ المستحق",
   "cash_adjustment": "التسوية النقدية",
+  "wallet_adjustment": "تعديل المحفظة",
   "cash_adjustment_description": "لضبط رصيد النقد في الصندوق والمبلغ القابل للسحب، يرجى النقر فوق \"موافق\" لتأكيد التعديلات",
   "adjust_payments": "ضبط المدفوعات",
   "pay_now": "ادفع الآن",

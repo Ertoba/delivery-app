@@ -1716,5 +1716,6 @@
   "you_can_hand_over_the_amount_to_the_admin": "You can hand the amount over to the admin",
   "cash_handover": "Cash handover",
   "cash_handover_instruction": "Hand the cash to the administrator. The balance will update after the administrator confirms receipt in the system.",
-  "hand_over_cash": "Handover"
+  "hand_over_cash": "Handover",
+  "wallet_adjustment": "Корректировка кошелька"
 }

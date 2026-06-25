@@ -336,6 +336,7 @@
   "my_account": "আমার অ্যাকাউন্ট",
   "payable_amount": "পরিশোধযোগ্য পরিমাণ",
   "cash_adjustment": "ক্যাশ অ্যাডজাস্টমেন্ট",
+  "wallet_adjustment": "ওয়ালেট সমন্বয়",
   "cash_adjustment_description": "আপনার নগদ ব্যালেন্স এবং উইথড্র যোগ্য পরিমাণ ঠিক করতে ok ক্লিক করুন",
   "adjust_payments": "এডযাস্ট পেমেন্ট",
   "pay_now": "পরিশোধ করুন",
