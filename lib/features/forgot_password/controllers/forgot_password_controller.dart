@@ -31,7 +31,7 @@ class ForgotPasswordController extends GetxController implements GetxService {
     _isLoading = false;
     if (responseModel.isSuccess) {
       Get.back();
-      showCustomSnackBar('password_updated_successfully'.tr, isError: false);
+      showCustomSnackBar(responseModel.message, isError: false);
     } else {
       showCustomSnackBar(responseModel.message, isError: true);
     }

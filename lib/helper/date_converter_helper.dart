@@ -3,20 +3,17 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class DateConverterHelper {
-  static String get _localeName => Get.locale?.languageCode ?? 'en';
-
   static String formatDate(DateTime dateTime) {
     return DateFormat('yyyy-MM-dd hh:mm:ss').format(dateTime);
   }
 
   static String estimatedDate(DateTime dateTime) {
-    return DateFormat('dd MMM yyyy', _localeName).format(dateTime);
+    return DateFormat('dd MMM yyyy').format(dateTime);
   }
 
   static String dateTimeStringToDateTime(String dateTime) {
     return DateFormat(
       'dd MMM yyyy  ${_timeFormatter()}',
-      _localeName,
     ).format(DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime));
   }
 
@@ -24,7 +21,6 @@ class DateConverterHelper {
     try {
       return DateFormat(
         'dd MMM yyyy',
-        _localeName,
       ).format(DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime));
     } catch (_) {
       return DateFormat(
@@ -50,10 +46,7 @@ class DateConverterHelper {
   }
 
   static String isoStringToLocalDateOnly(String dateTime) {
-    return DateFormat(
-      'dd MMM yyyy',
-      _localeName,
-    ).format(isoStringToLocalDate(dateTime));
+    return DateFormat('dd MMM yyyy').format(isoStringToLocalDate(dateTime));
   }
 
   static String isoStringToLocalAMPM(String dateTime) {
@@ -121,7 +114,6 @@ class DateConverterHelper {
     var newTime = '${time.substring(0, 10)} ${time.substring(11, 23)}';
     return DateFormat(
       'dd MMM, yyyy',
-      _localeName,
     ).format(DateFormat('yyyy-MM-dd HH:mm:ss').parse(newTime));
   }
 
@@ -134,19 +126,19 @@ class DateConverterHelper {
       'yyyy-MM-dd HH:mm:ss',
     ).parse(createdAt);
     final DateTime now = DateTime.now();
-    final DateFormat formatter = DateFormat('dd MMM yyyy', _localeName);
+    final DateFormat formatter = DateFormat('dd MMM yyyy');
 
     if (createdDate.year == now.year &&
         createdDate.month == now.month &&
         createdDate.day == now.day) {
-      return 'today'.tr;
+      return 'Today';
     }
 
     final DateTime yesterday = now.subtract(const Duration(days: 1));
     if (createdDate.year == yesterday.year &&
         createdDate.month == yesterday.month &&
         createdDate.day == yesterday.day) {
-      return 'yesterday'.tr;
+      return 'Yesterday';
     }
 
     return formatter.format(createdDate);
@@ -171,7 +163,6 @@ class DateConverterHelper {
   static String utcToDateTime(String dateTime) {
     return DateFormat(
       'dd MMM, yyyy h:mm a',
-      _localeName,
     ).format(DateTime.parse(dateTime).toLocal());
   }
 
@@ -184,10 +175,7 @@ class DateConverterHelper {
   static String formatUtcTime(String utcString) {
     DateTime dateTime = DateTime.parse(utcString).toLocal();
 
-    final formatter = DateFormat(
-      'dd MMM yyyy ${_timeFormatter()}',
-      _localeName,
-    );
+    final formatter = DateFormat('dd MMM yyyy ${_timeFormatter()}');
     return formatter.format(dateTime);
   }
 
@@ -271,7 +259,6 @@ class DateConverterHelper {
   static String isoStringToDateTimeString(String dateTime) {
     return DateFormat(
       'dd MMM yyyy  ${_timeFormatter()}',
-      _localeName,
     ).format(isoStringToLocalDate(dateTime));
   }
 
@@ -316,13 +303,12 @@ class DateConverterHelper {
   }
 
   static String localToIsoString(DateTime dateTime) {
-    return DateFormat('d MMMM, yyyy ', _localeName).format(dateTime.toLocal());
+    return DateFormat('d MMMM, yyyy ').format(dateTime.toLocal());
   }
 
   static String dateTimeStringToMonthAndYear(String dateTime) {
     return DateFormat(
       'MMM, yyyy',
-      _localeName,
     ).format(DateFormat('yyyy-MM-ddTHH:mm:ss').parse(dateTime));
   }
 }

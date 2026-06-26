@@ -52,15 +52,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double rememberMeFontSize =
-        (Theme.of(context).textTheme.bodyLarge?.fontSize ??
-            Dimensions.fontSizeDefault) *
-        0.70;
-    final double forgotPasswordFontSize =
-        (Theme.of(context).textTheme.labelLarge?.fontSize ??
-            Dimensions.fontSizeDefault) *
-        0.70;
-
     bool isRideActive = AppConstants.appMode == AppMode.ride;
     final config = Get.find<SplashController>().configModel;
     bool isSelfRegistrationActive = isRideActive
@@ -155,12 +146,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               onChanged: (bool? isChecked) =>
                                   authController.toggleRememberMe(),
                             ),
-                            title: Text(
-                              'remember_me'.tr,
-                              style: robotoRegular.copyWith(
-                                fontSize: rememberMeFontSize,
-                              ),
-                            ),
+                            title: Text('remember_me'.tr),
                             contentPadding: EdgeInsets.zero,
                             dense: true,
                             horizontalTitleGap: 0,
@@ -169,12 +155,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         TextButton(
                           onPressed: () =>
                               Get.toNamed(RouteHelper.getForgotPassRoute()),
-                          child: Text(
-                            '${'forgot_password'.tr}?',
-                            style: robotoRegular.copyWith(
-                              fontSize: forgotPasswordFontSize,
-                            ),
-                          ),
+                          child: Text('${'forgot_password'.tr}?'),
                         ),
                       ],
                     ),

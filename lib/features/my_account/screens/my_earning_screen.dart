@@ -107,14 +107,8 @@ class _MyEarningScreenState extends State<MyEarningScreen> {
               children: [
                 InkWell(
                   onTap: () {
-                    final RenderBox? renderBox =
-                        context.findRenderObject() as RenderBox?;
                     myAccountController.downloadEarningInvoice(
                       dmId: Get.find<ProfileController>().profileModel!.id!,
-                      sharePositionOrigin: renderBox != null
-                          ? renderBox.localToGlobal(Offset.zero) &
-                                renderBox.size
-                          : const Rect.fromLTWH(0, 0, 1, 1),
                       earningType: _selectedTabIndex == 0
                           ? null
                           : _selectedTabIndex == 1

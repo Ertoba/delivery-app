@@ -12,77 +12,34 @@ class ChatService implements ChatServiceInterface {
   ChatService({required this.chatRepositoryInterface});
 
   @override
-  Future<ConversationsModel?> getConversationList(
-    int offset,
-    String type,
-  ) async {
+  Future<ConversationsModel?> getConversationList(int offset, String type) async {
     return await chatRepositoryInterface.getConversationList(offset, type);
   }
 
   @override
-  Future<ConversationsModel?> searchConversationList(
-    String name,
-    String type,
-  ) async {
+  Future<ConversationsModel?> searchConversationList(String name, String type) async {
     return await chatRepositoryInterface.searchConversationList(name, type);
   }
 
   @override
-  Future<MessageModel?> getMessages(
-    int offset,
-    int? userId,
-    String userType,
-    int? conversationID,
-  ) async {
-    return await chatRepositoryInterface.getMessages(
-      offset,
-      userId,
-      userType,
-      conversationID,
-    );
+  Future<MessageModel?> getMessages(int offset, int? userId, String userType, int? conversationID) async {
+    return await chatRepositoryInterface.getMessages(offset, userId, userType, conversationID);
   }
 
   @override
-  Future<MessageModel?> sendMessage(
-    String message,
-    List<MultipartBody> file,
-    int? conversationId,
-    int? userId,
-    String userType,
-  ) async {
-    return await chatRepositoryInterface.sendMessage(
-      message,
-      file,
-      conversationId,
-      userId,
-      userType,
-    );
+  Future<MessageModel?> sendMessage(String message, List<MultipartBody> file, int? conversationId, int? userId, String userType) async {
+    return await chatRepositoryInterface.sendMessage(message, file, conversationId, userId, userType);
   }
 
   @override
-  Future<MessageModel?> processGetMessage(
-    int offset,
-    NotificationBodyModel notificationBody,
-    int? conversationID,
-  ) async {
+  Future<MessageModel?> processGetMessage(int offset, NotificationBodyModel notificationBody, int? conversationID) async {
     MessageModel? messageModel;
-    if (notificationBody.customerId != null ||
-        notificationBody.type == AppConstants.user) {
-      messageModel = await getMessages(
-        offset,
-        notificationBody.customerId,
-        AppConstants.user,
-        conversationID,
-      );
-    } else if (notificationBody.vendorId != null ||
-        notificationBody.type == AppConstants.vendor) {
-      messageModel = await getMessages(
-        offset,
-        notificationBody.vendorId,
-        AppConstants.vendor,
-        conversationID,
-      );
-    } else if (notificationBody.adminId != null) {
+    if(notificationBody.customerId != null || notificationBody.type == AppConstants.user) {
+      messageModel = await getMessages(offset, notificationBody.customerId, AppConstants.user, conversationID);
+    }else if(notificationBody.vendorId != null || notificationBody.type == AppConstants.vendor) {
+      messageModel = await getMessages(offset, notificationBody.vendorId, AppConstants.vendor, conversationID);
+    }
+    else if (notificationBody.adminId != null) {
       messageModel = await getMessages(offset, null, AppConstants.admin, null);
     }
     return messageModel;
@@ -98,43 +55,15 @@ class ChatService implements ChatServiceInterface {
   }
 
   @override
-  Future<MessageModel?> processSendMessage(
-    NotificationBodyModel? notificationBody,
-    List<MultipartBody> chatImage,
-    String message,
-    int? conversationId,
-  ) async {
+  Future<MessageModel?> processSendMessage(NotificationBodyModel? notificationBody, List<MultipartBody> chatImage, String message, int? conversationId) async {
     MessageModel? messageModel;
-    if (notificationBody != null &&
-        (notificationBody.customerId != null ||
-            notificationBody.type == AppConstants.user)) {
-      messageModel = await sendMessage(
-        message,
-        chatImage,
-        conversationId,
-        notificationBody.customerId,
-        AppConstants.customer,
-      );
-    } else if (notificationBody != null &&
-        (notificationBody.vendorId != null ||
-            notificationBody.type == AppConstants.vendor)) {
-      messageModel = await sendMessage(
-        message,
-        chatImage,
-        conversationId,
-        notificationBody.vendorId,
-        AppConstants.vendor,
-      );
-    } else if (notificationBody != null &&
-        (notificationBody.adminId != null ||
-            notificationBody.type == AppConstants.admin)) {
-      messageModel = await sendMessage(
-        message,
-        chatImage,
-        null,
-        notificationBody.adminId ?? 0,
-        AppConstants.admin,
-      );
+    if(notificationBody != null && (notificationBody.customerId != null || notificationBody.type == AppConstants.user)) {
+      messageModel = await sendMessage(message, chatImage, conversationId, notificationBody.customerId, AppConstants.customer);
+    }else if(notificationBody != null && (notificationBody.vendorId != null || notificationBody.type == AppConstants.vendor)){
+      messageModel = await sendMessage(message, chatImage, conversationId, notificationBody.vendorId, AppConstants.vendor);
+    }
+    else if(notificationBody != null && (notificationBody.adminId != null || notificationBody.type == AppConstants.admin)){
+      messageModel = await sendMessage(message, chatImage, null, notificationBody.vendorId, AppConstants.admin);
     }
     return messageModel;
   }
@@ -156,9 +85,10 @@ class ChatService implements ChatServiceInterface {
   @override
   List<MultipartBody> processMultipartVideo(XFile? video) {
     List<MultipartBody> multipartVideo = [];
-    if (video != null) {
+    if(video != null) {
       multipartVideo.add(MultipartBody('image[]', video));
     }
     return multipartVideo;
   }
+
 }

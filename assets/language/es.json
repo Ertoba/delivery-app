@@ -336,7 +336,6 @@
   "my_account": "Mi cuenta",
   "payable_amount": "Monto a pagar",
   "cash_adjustment": "Ajuste de efectivo",
-  "wallet_adjustment": "Ajuste de billetera",
   "cash_adjustment_description": "Para ajustar su saldo de efectivo en mano y monto retirable, haga clic en Aceptar para confirmar los ajustes.",
   "adjust_payments": "Ajustar pagos",
   "pay_now": "Paga ahora",
@@ -642,12 +641,5 @@
   "you_can_pay_the_amount_to_the_admin": "Puedes pagar el monto al administrador",
   "from_customer_to_store_distance": "Distancia del cliente a la tienda",
   "your_distance_from_store": "Tu distancia de la tienda",
-  "order_date": "Fecha del pedido",
-  "yesterday": "Yesterday",
-  "ecommerce": "Electronics",
-  "password_updated_successfully": "Password updated successfully",
-  "you_can_hand_over_the_amount_to_the_admin": "You can hand the amount over to the admin",
-  "cash_handover": "Cash handover",
-  "cash_handover_instruction": "Hand the cash to the administrator. The balance will update after the administrator confirms receipt in the system.",
-  "hand_over_cash": "Handover"
+  "order_date": "Fecha del pedido"
 }

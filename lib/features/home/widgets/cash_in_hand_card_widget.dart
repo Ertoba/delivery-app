@@ -63,11 +63,10 @@ class CashInHandCardWidget extends StatelessWidget {
           width: 90, height: 40,
           isBold: false,
           fontSize: Dimensions.fontSizeDefault,
-          buttonText: 'hand_over_cash'.tr,
+          buttonText: 'pay_now'.tr,
           backgroundColor: Theme.of(context).primaryColor,
           onPressed: () => Get.toNamed(RouteHelper.getMyAccountRoute()),
         ),
-
       ]),
     );
   }

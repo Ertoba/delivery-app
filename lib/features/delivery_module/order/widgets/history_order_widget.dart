@@ -102,7 +102,7 @@ class HistoryOrderWidget extends StatelessWidget {
                     color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                   ),
-                  child: Text(orderModel.moduleType == 'parcel' ? 'parcel'.tr : orderModel.moduleType == 'food' ? 'food'.tr : orderModel.moduleType == 'grocery' ? 'grocery'.tr : orderModel.moduleType == 'pharmacy' ? 'pharmacy'.tr : orderModel.moduleType == 'ecommerce' ? 'ecommerce'.tr : orderModel.moduleType!,
+                  child: Text(orderModel.moduleType == 'parcel' ? 'parcel'.tr : orderModel.moduleType == 'food' ? 'food'.tr : orderModel.moduleType == 'grocery' ? 'grocery'.tr : orderModel.moduleType == 'pharmacy' ? 'pharmacy'.tr : orderModel.moduleType!,
                     style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor),
                   ),
                 ),

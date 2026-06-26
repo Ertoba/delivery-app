@@ -336,7 +336,6 @@
   "my_account": "আমার অ্যাকাউন্ট",
   "payable_amount": "পরিশোধযোগ্য পরিমাণ",
   "cash_adjustment": "ক্যাশ অ্যাডজাস্টমেন্ট",
-  "wallet_adjustment": "ওয়ালেট সমন্বয়",
   "cash_adjustment_description": "আপনার নগদ ব্যালেন্স এবং উইথড্র যোগ্য পরিমাণ ঠিক করতে ok ক্লিক করুন",
   "adjust_payments": "এডযাস্ট পেমেন্ট",
   "pay_now": "পরিশোধ করুন",
@@ -643,13 +642,6 @@
   "for" : "জন্য",
   "from_customer_to_store_distance": "গ্রাহক থেকে দোকানের দূরত্ব",
   "your_distance_from_store": "দোকান থেকে আপনার দূরত্ব",
-  "order_date": "অর্ডারের তারিখ",
-  "yesterday": "Yesterday",
-  "ecommerce": "Electronics",
-  "password_updated_successfully": "Password updated successfully",
-  "you_can_hand_over_the_amount_to_the_admin": "You can hand the amount over to the admin",
-  "cash_handover": "Cash handover",
-  "cash_handover_instruction": "Hand the cash to the administrator. The balance will update after the administrator confirms receipt in the system.",
-  "hand_over_cash": "Handover"
+  "order_date": "অর্ডারের তারিখ"
 
 }

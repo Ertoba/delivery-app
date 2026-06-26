@@ -129,18 +129,11 @@ class ApiClient extends GetxService {
 
   Response handleResponse(http.Response response, String uri, bool handleError) {
     dynamic body;
-    final String contentType = response.headers['content-type'] ?? '';
-    final bool isBinaryResponse = contentType.contains('application/pdf')
-        || uri.contains('earning-report-invoice');
-    if (!isBinaryResponse) {
-      try {
-        body = jsonDecode(response.body);
-      }catch(_) {}
-    }
+    try {
+      body = jsonDecode(response.body);
+    }catch(_) {}
     Response response0 = Response(
-      body: isBinaryResponse ? null : body ?? response.body,
-      bodyString: isBinaryResponse ? null : response.body.toString(),
-      bodyBytes: Stream<List<int>>.value(response.bodyBytes),
+      body: body ?? response.body, bodyString: response.body.toString(),
       headers: response.headers, statusCode: response.statusCode, statusText: response.reasonPhrase,
     );
     if(response0.statusCode != 200 && response0.body != null && response0.body is !String) {
@@ -153,8 +146,7 @@ class ApiClient extends GetxService {
     }else if(response0.statusCode != 200 && response0.body == null) {
       response0 = const Response(statusCode: 0, statusText: noInternetMessage);
     }
-    debugPrint('====> API Response: [${response0.statusCode}] $uri\n'
-        '${isBinaryResponse ? '<binary ${response.bodyBytes.length} bytes>' : response0.body}');
+    debugPrint('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
     // debugPrint('====> API Response: [${response0.statusCode}] $uri}');
     if(handleError) {
       if(response0.statusCode == 200) {

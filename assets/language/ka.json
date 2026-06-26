@@ -339,7 +339,6 @@
   "my_account": "ჩემი ანგარიში",
   "payable_amount": "გადასახდელი თანხა",
   "cash_adjustment": "ნაღდი ფულის კორექტირება",
-  "wallet_adjustment": "საფულის კორექტირება",
   "cash_adjustment_description": "ხელში არსებული ბალანსის და გასატანი თანხის კორექტირებისთვის დააჭირეთ 'კარგი'",
   "adjust_payments": "გადახდების კორექტირება",
   "pay_now": "ახლა გადახდა",
@@ -469,7 +468,7 @@
   "add_withdraw_info": "გატანის ინფორმაციის დამატება",
   "delete_this_payment_method": "წაიშლება ეს გადახდის მეთოდი?",
   "once_delete_you_cannot_recover_this_information": "წაშლის შემდეგ\nინფორმაციის აღდგენა შეუძლებელი იქნება.",
-  "pay_able_balance": "გასატანი ბალანსი",
+  "pay_able_balance": "ადმინისტრატორისთვის გადასახდელი ბალანსი",
   "you_can_send_withdraw_request_to_admin": "შეგიძლიათ გატანის მოთხოვნა გაუგზავნოთ ადმინს",
   "withdrawable_balance": "გასატანი ბალანსი",
   "withdraw_history": "გატანის ისტორია",
@@ -1024,11 +1023,5 @@
   "already_paid_digitally": "უკვე გადახდილია ციფრულად",
   "you_can_not_go_offline_now_for_ride": "აქტიური მგზავრობა გაქვთ და ამჟამად ხაზგარეშე გადასვლა არ შეგიძლიათ.",
   "cancellation_note": "გაუქმების შენიშვნა",
-  "total_ride": "სულ მგზავრობა",
-  "ecommerce": "ტექნიკა",
-  "password_updated_successfully": "პაროლი წარმატებით განახლდა",
-  "you_can_hand_over_the_amount_to_the_admin": "თანხა შეგიძლიათ გადასცეთ ადმინს",
-  "cash_handover": "თანხის გადაცემა",
-  "cash_handover_instruction": "გადასცით თანხა ადმინისტრატორს. ბალანსი განახლდება მას შემდეგ, რაც ადმინისტრატორი მიღებულ თანხას სისტემაში დაადასტურებს.",
-  "hand_over_cash": "გადაცემა"
+  "total_ride": "სულ მგზავრობა"
 }
