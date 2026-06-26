@@ -311,7 +311,7 @@ class WalletOverviewWidget extends StatelessWidget {
 
                                               Text(
                                                 isPayable
-                                                    ? 'you_can_pay_the_amount_to_the_admin'
+                                                    ? 'you_can_hand_over_the_amount_to_the_admin'
                                                           .tr
                                                     : 'you_can_send_withdraw_request_to_admin'
                                                           .tr,

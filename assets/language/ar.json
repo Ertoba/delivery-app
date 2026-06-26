@@ -964,5 +964,15 @@
   "ride_request": "طلب ركوب",
   "rider_registration": "تسجيل الراكب",
   "no_ride_found": "لم يتم العثور على رحلة",
-  "for" : "ل"
+  "for" : "ل",
+  "yesterday": "Yesterday",
+  "ready_for_delivery": "Ready for delivery",
+  "file_opening_failed": "File opening failed",
+  "ecommerce": "Electronics",
+  "password_updated_successfully": "Password updated successfully",
+  "you_can_hand_over_the_amount_to_the_admin": "You can hand the amount over to the admin",
+  "cash_handover": "Cash handover",
+  "cash_handover_instruction": "Hand the cash to the administrator. The balance will update after the administrator confirms receipt in the system.",
+  "hand_over_cash": "Handover",
+  "wallet_adjustment": "Wallet Adjustment"
 }
