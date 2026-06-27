@@ -188,7 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Row(children: [
 
-                  Image.asset(Images.online, height: 25, width: 25, color: Theme.of(context).disabledColor),
+                  Icon(Icons.power_settings_new_outlined, size: 25, color: Theme.of(context).disabledColor),
                   const SizedBox(width: Dimensions.paddingSizeSmall),
 
                   Expanded(child: Column(
@@ -312,7 +312,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               GetBuilder<AuthController>(builder: (authController) {
                 return ProfileButtonWidget(
-                  iconImage: Images.settingIcon,
+                  icon: Icons.notifications_active_outlined,
                   title: 'system_notification'.tr,
                   isButtonActive: authController.notification, onTap: () {
                   showCustomBottomSheet(child: const NotificationStatusChangeBottomSheet());
@@ -337,7 +337,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: Row(children: [
 
-                    Image.asset(Images.notificationBall, height: 25, width: 25, color: Theme.of(context).disabledColor),
+                    Icon(Icons.notifications_outlined, size: 25, color: Theme.of(context).disabledColor),
                     const SizedBox(width: Dimensions.paddingSizeSmall),
 
                     Expanded(child: Text('background_notification'.tr, style: robotoRegular)),
@@ -360,67 +360,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               if(profileController.profileModel?.vehicle != null && isRideActive) Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(iconImage: Images.car, title: 'vehicle_details'.tr, onTap: () {
+                child: ProfileButtonWidget(icon: Icons.directions_car_outlined, title: 'vehicle_details'.tr, onTap: () {
                   Get.to(()=>  VehicleDetailsScreen());
                 }),
               ),
 
-              ProfileButtonWidget(iconImage: Images.security, title: 'change_password'.tr, onTap: () {
+              ProfileButtonWidget(icon: Icons.lock_outline, title: 'change_password'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getResetPasswordRoute('', '', 'password-change'));
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              ProfileButtonWidget(iconImage: Images.message, title: 'conversation'.tr, onTap: () {
+              ProfileButtonWidget(icon: Icons.chat_bubble_outline, title: 'conversation'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getConversationListRoute());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              ProfileButtonWidget(iconImage: Images.translation, title: 'language'.tr, onTap: () {
+              ProfileButtonWidget(icon: Icons.language_outlined, title: 'language'.tr, onTap: () {
                 _manageLanguageFunctionality();
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              ProfileButtonWidget(iconImage: Images.editUser, title: 'edit_profile'.tr, onTap: () {
+              ProfileButtonWidget(icon: Icons.manage_accounts_outlined, title: 'edit_profile'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getUpdateProfileRoute());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
               if(isRideActive) Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(iconImage: Images.noReview, title: 'my_reviews'.tr, onTap: () {
+                child: ProfileButtonWidget(icon: Icons.rate_review_outlined, title: 'my_reviews'.tr, onTap: () {
                   Get.to(()=> const ReviewScreen());
                 }),
               ),
 
               if(isRideActive) Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(iconImage: Images.leaderBoardIcon, title: 'leader_board'.tr, onTap: () {
+                child: ProfileButtonWidget(icon: Icons.emoji_events_outlined, title: 'leader_board'.tr, onTap: () {
                   Get.to(()=> const LeaderboardScreen());
                 }),
               ),
 
-              ProfileButtonWidget(iconImage: Images.support, title: 'help_and_support'.tr, onTap: () {
+              ProfileButtonWidget(icon: Icons.support_agent_outlined, title: 'help_and_support'.tr, onTap: () {
                 Get.to(()=> const HelpAndSupportScreen());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
               (profileController.profileModel != null && profileController.profileModel!.earnings == 1) ? Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(iconImage: Images.earning, title: 'my_earning'.tr, onTap: () {
+                child: ProfileButtonWidget(icon: Icons.payments_outlined, title: 'my_earning'.tr, onTap: () {
                   Get.toNamed(RouteHelper.getMyEarningRoute());
                 }),
               ) : const SizedBox(),
 
               (profileController.profileModel != null && profileController.profileModel!.earnings == 1) ? Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(iconImage: Images.emptyWallet, title: 'my_account'.tr, onTap: () {
+                child: ProfileButtonWidget(icon: Icons.account_balance_wallet_outlined, title: 'my_account'.tr, onTap: () {
                   Get.toNamed(RouteHelper.getMyAccountRoute());
                 }),
               ) : const SizedBox(),
 
               Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(icon: Icons.money, title: 'withdraw_method'.tr, onTap: () {
+                child: ProfileButtonWidget(icon: Icons.account_balance_outlined, title: 'withdraw_method'.tr, onTap: () {
                   Get.toNamed(RouteHelper.getWithdrawMethodRoute());
                 }),
               ),
@@ -428,37 +428,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if(Get.find<SplashController>().configModel!.disbursementType == 'automated' && profileController.profileModel!.type != 'store_wise' && profileController.profileModel!.earnings != 0)
                 Padding(
                   padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                  child: ProfileButtonWidget(icon: Icons.payments, title: 'disbursement'.tr, onTap: () {
+                  child: ProfileButtonWidget(icon: Icons.receipt_long_outlined, title: 'disbursement'.tr, onTap: () {
                     Get.toNamed(RouteHelper.getDisbursementRoute());
                   }),
                 ),
 
               if(showReferAndEarn)Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(iconImage: Images.earning, title: 'refer_and_earn'.tr, onTap: () {
+                child: ProfileButtonWidget(icon: Icons.person_add_alt_1_outlined, title: 'refer_and_earn'.tr, onTap: () {
                   Get.to(()=> const ReferAndEarnScreen());
                 }),
               ),
 
               if(isRideActive) Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(iconImage: Images.shieldTick, title: 'safety'.tr, onTap: () {
+                child: ProfileButtonWidget(icon: Icons.security_outlined, title: 'safety'.tr, onTap: () {
                   Get.to(()=> const SafetyPolicyScreen());
                 }),
               ),
 
-              ProfileButtonWidget(iconImage: Images.document, title: 'terms_condition'.tr, onTap: () {
+              ProfileButtonWidget(icon: Icons.description_outlined, title: 'terms_condition'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getTermsRoute());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              ProfileButtonWidget(iconImage: Images.document, title: 'privacy_policy'.tr, onTap: () {
+              ProfileButtonWidget(icon: Icons.policy_outlined, title: 'privacy_policy'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getPrivacyRoute());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
               ProfileButtonWidget(
-                iconImage: Images.trash, title: 'delete_account'.tr,
+                icon: Icons.delete_outline, title: 'delete_account'.tr,
                 onTap: () {
                   Get.dialog(ConfirmationDialogWidget(icon: Images.warning, title: 'are_you_sure_to_delete_account'.tr,
                     description: 'it_will_remove_your_all_information'.tr, isLogOut: true,
