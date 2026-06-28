@@ -40,6 +40,12 @@ class ChatController extends GetxController implements GetxService {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _isMessageLoading = false;
+  bool get isMessageLoading => _isMessageLoading;
+
+  bool _hasMessageLoadError = false;
+  bool get hasMessageLoadError => _hasMessageLoadError;
+
   List<XFile>? _chatImage = [];
   List<XFile>? get chatImage => _chatImage;
 
@@ -141,75 +147,87 @@ class ChatController extends GetxController implements GetxService {
   }) async {
     if (firstLoad) {
       _messageModel = null;
+      _isMessageLoading = true;
+      _hasMessageLoadError = false;
+      update();
     }
 
-    MessageModel? messageModel = await chatServiceInterface.processGetMessage(
-      offset,
-      notificationBody,
-      conversationID,
-    );
+    try {
+      MessageModel? messageModel = await chatServiceInterface.processGetMessage(
+        offset,
+        notificationBody,
+        conversationID,
+      );
 
-    if (messageModel != null) {
-      if (offset == 1) {
-        if (Get.find<ProfileController>().profileModel == null ||
-            Get.find<ProfileController>().profileModel?.userinfo == null) {
-          await Get.find<ProfileController>().getProfile();
-        }
-        _messageModel = messageModel;
-        final profile = Get.find<ProfileController>().profileModel!;
-        final User sender = User(
-          id: profile.id,
-          imageFullUrl: profile.imageFullUrl,
-          fName: profile.fName,
-          lName: profile.lName,
-          phone: profile.phone,
-        );
-        if (notificationBody.adminId != null ||
-            notificationBody.type == 'admin') {
-          User receiver = User(
-            id: 0,
-            fName: Get.find<SplashController>().configModel!.businessName,
-            lName: '',
-            imageFullUrl: Get.find<SplashController>().configModel!.logo,
-            phone: Get.find<SplashController>().configModel!.phone,
+      if (messageModel != null) {
+        if (offset == 1) {
+          if (Get.find<ProfileController>().profileModel == null ||
+              Get.find<ProfileController>().profileModel?.userinfo == null) {
+            await Get.find<ProfileController>().getProfile();
+          }
+          _messageModel = messageModel;
+          final profile = Get.find<ProfileController>().profileModel!;
+          final User sender = User(
+            id: profile.id,
+            imageFullUrl: profile.imageFullUrl,
+            fName: profile.fName,
+            lName: profile.lName,
+            phone: profile.phone,
           );
-          _messageModel!.conversation ??= Conversation(
-            sender: sender,
-            receiver: receiver,
-            receiverId: 0,
-            receiverType: 'admin',
-          );
-          _messageModel!.conversation!.receiver = receiver;
-        } else if (_messageModel!.conversation == null && user != null) {
-          _messageModel!.conversation = Conversation(
-            sender: sender,
-            receiver: user,
-          );
-        } else if (_messageModel!.conversation != null &&
-            _messageModel!.conversation!.receiverType == 'delivery_man') {
-          User? receiver = _messageModel!.conversation!.receiver;
-          _messageModel!.conversation!.receiver =
-              _messageModel!.conversation!.sender;
-          _messageModel!.conversation!.sender = receiver;
-        } else if (_messageModel!.conversation != null &&
-            _messageModel!.conversation!.receiverType == 'admin') {
-          User? receiver = User(
-            id: 0,
-            fName: Get.find<SplashController>().configModel!.businessName,
-            lName: '',
-            imageFullUrl: Get.find<SplashController>().configModel!.logo,
-            phone: Get.find<SplashController>().configModel!.phone,
-          );
-          _messageModel!.conversation!.receiver = receiver;
+          if (notificationBody.adminId != null ||
+              notificationBody.type == 'admin') {
+            User receiver = User(
+              id: 0,
+              fName: Get.find<SplashController>().configModel!.businessName,
+              lName: '',
+              imageFullUrl: Get.find<SplashController>().configModel!.logo,
+              phone: Get.find<SplashController>().configModel!.phone,
+            );
+            _messageModel!.conversation ??= Conversation(
+              sender: sender,
+              receiver: receiver,
+              receiverId: 0,
+              receiverType: 'admin',
+            );
+            _messageModel!.conversation!.receiver = receiver;
+          } else if (_messageModel!.conversation == null && user != null) {
+            _messageModel!.conversation = Conversation(
+              sender: sender,
+              receiver: user,
+            );
+          } else if (_messageModel!.conversation != null &&
+              _messageModel!.conversation!.receiverType == 'delivery_man') {
+            User? receiver = _messageModel!.conversation!.receiver;
+            _messageModel!.conversation!.receiver =
+                _messageModel!.conversation!.sender;
+            _messageModel!.conversation!.sender = receiver;
+          } else if (_messageModel!.conversation != null &&
+              _messageModel!.conversation!.receiverType == 'admin') {
+            User? receiver = User(
+              id: 0,
+              fName: Get.find<SplashController>().configModel!.businessName,
+              lName: '',
+              imageFullUrl: Get.find<SplashController>().configModel!.logo,
+              phone: Get.find<SplashController>().configModel!.phone,
+            );
+            _messageModel!.conversation!.receiver = receiver;
+          }
+          _hasMessageLoadError = _messageModel!.conversation == null;
+        } else if (_messageModel != null) {
+          _messageModel!.totalSize = messageModel.totalSize;
+          _messageModel!.offset = messageModel.offset;
+          _messageModel!.messages!.addAll(messageModel.messages ?? []);
         }
       } else {
-        _messageModel!.totalSize = messageModel.totalSize;
-        _messageModel!.offset = messageModel.offset;
-        _messageModel!.messages!.addAll(messageModel.messages!);
+        _hasMessageLoadError = true;
       }
+    } catch (_) {
+      _hasMessageLoadError = true;
+    } finally {
+      _isMessageLoading = false;
+      _isLoading = false;
+      update();
     }
-    _isLoading = false;
-    update();
   }
 
   Future<bool> sendMessage({
@@ -239,52 +257,55 @@ class ChatController extends GetxController implements GetxService {
     }
     MessageModel? messageModel;
 
-    if (!fromFaq) {
-      messageModel = await chatServiceInterface.processSendMessage(
-        notificationBody,
-        allFiles,
-        message,
-        conversationId,
-      );
-    } else {
-      messageModel = await chatServiceInterface.sendFaqMessage(
-        questionId: message,
-      );
-    }
-
-    if (messageModel != null) {
-      _imageFiles = [];
-      _chatImage = [];
-      _objFile = [];
-      _objWebFile = [];
-      _pickedVideoFile = null;
-      _pickedWebVideoFile = null;
-      _videoSize = 0;
-      _fileSizeList = [];
-      _isSendButtonActive = false;
-      _isLoading = false;
-      _messageModel = messageModel;
-
-      if (_messageModel!.conversation != null &&
-          _messageModel!.conversation!.receiverType == 'delivery_man') {
-        User? receiver = _messageModel!.conversation!.receiver;
-        _messageModel!.conversation!.receiver =
-            _messageModel!.conversation!.sender;
-        _messageModel!.conversation!.sender = receiver;
-      } else if (_messageModel!.conversation != null &&
-          _messageModel!.conversation!.receiverType == 'admin') {
-        User? receiver = User(
-          id: 0,
-          fName: Get.find<SplashController>().configModel!.businessName,
-          lName: '',
-          imageFullUrl: Get.find<SplashController>().configModel!.logo,
-          phone: Get.find<SplashController>().configModel!.phone,
+    try {
+      if (!fromFaq) {
+        messageModel = await chatServiceInterface.processSendMessage(
+          notificationBody,
+          allFiles,
+          message,
+          conversationId,
         );
-        _messageModel!.conversation!.receiver = receiver;
+      } else {
+        messageModel = await chatServiceInterface.sendFaqMessage(
+          questionId: message,
+        );
       }
-      isSuccess = true;
+
+      if (messageModel != null) {
+        _imageFiles = [];
+        _chatImage = [];
+        _objFile = [];
+        _objWebFile = [];
+        _pickedVideoFile = null;
+        _pickedWebVideoFile = null;
+        _videoSize = 0;
+        _fileSizeList = [];
+        _isSendButtonActive = false;
+        _messageModel = messageModel;
+
+        if (_messageModel!.conversation != null &&
+            _messageModel!.conversation!.receiverType == 'delivery_man') {
+          User? receiver = _messageModel!.conversation!.receiver;
+          _messageModel!.conversation!.receiver =
+              _messageModel!.conversation!.sender;
+          _messageModel!.conversation!.sender = receiver;
+        } else if (_messageModel!.conversation != null &&
+            _messageModel!.conversation!.receiverType == 'admin') {
+          User? receiver = User(
+            id: 0,
+            fName: Get.find<SplashController>().configModel!.businessName,
+            lName: '',
+            imageFullUrl: Get.find<SplashController>().configModel!.logo,
+            phone: Get.find<SplashController>().configModel!.phone,
+          );
+          _messageModel!.conversation!.receiver = receiver;
+        }
+        isSuccess = true;
+      }
+    } finally {
+      _isLoading = false;
+      update();
     }
-    update();
     return isSuccess;
   }
 
