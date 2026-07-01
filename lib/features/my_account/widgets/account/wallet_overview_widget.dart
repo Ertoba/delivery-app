@@ -4,16 +4,12 @@ import 'package:sixam_mart_delivery/common/widgets/custom_asset_image_widget.dar
 import 'package:sixam_mart_delivery/common/widgets/custom_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
-import 'package:sixam_mart_delivery/features/my_account/helpers/payment_method_filter_helper.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/amount_card_widget.dart';
-import 'package:sixam_mart_delivery/features/my_account/widgets/empty_state_bottom_sheet.dart';
-import 'package:sixam_mart_delivery/features/my_account/widgets/payment_method_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/tab_section_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/transaction_section_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/wallet_attention_alert_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/withdrawal_bottomsheet.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
@@ -386,27 +382,6 @@ class WalletOverviewWidget extends StatelessWidget {
                                                     if (isPayable)
                                                       InkWell(
                                                         onTap: () {
-                                                          final config =
-                                                              Get.find<
-                                                                    SplashController
-                                                                  >()
-                                                                  .configModel;
-                                                          final paymentMethods =
-                                                              PaymentMethodFilterHelper.nonKeepzMethods(
-                                                                config
-                                                                    ?.activePaymentMethodList,
-                                                              );
-                                                          final bool
-                                                          noPaymentMethod =
-                                                              paymentMethods
-                                                                  .isEmpty ||
-                                                              !(config?.digitalPayment ??
-                                                                  false);
-                                                          final double
-                                                          minimumPayableAmount =
-                                                              config
-                                                                  ?.minAmountToPayDm ??
-                                                              0;
                                                           final double
                                                           payableBalance =
                                                               profileController
@@ -414,25 +389,29 @@ class WalletOverviewWidget extends StatelessWidget {
                                                                   ?.payableBalance ??
                                                               0;
 
-                                                          if (noPaymentMethod) {
-                                                            showCustomBottomSheet(
-                                                              child: const EmptyStateBottomSheet(
-                                                                noPaymentMethod:
-                                                                    true,
+                                                          Get.dialog(
+                                                            AlertDialog(
+                                                              title: Text(
+                                                                'cash_handover'
+                                                                    .tr,
                                                               ),
-                                                            );
-                                                          } else if (minimumPayableAmount >
-                                                              payableBalance) {
-                                                            showCustomBottomSheet(
-                                                              child:
-                                                                  const EmptyStateBottomSheet(),
-                                                            );
-                                                          } else {
-                                                            showCustomBottomSheet(
-                                                              child:
-                                                                  const PaymentMethodBottomSheetWidget(),
-                                                            );
-                                                          }
+                                                              content: Text(
+                                                                '${'cash_handover_instruction'.tr}\n\n${'pay_able_balance'.tr}: ${PriceConverterHelper.convertPrice(payableBalance)}',
+                                                                textDirection:
+                                                                    TextDirection
+                                                                        .ltr,
+                                                              ),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () =>
+                                                                      Get.back(),
+                                                                  child: Text(
+                                                                    'ok'.tr,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
                                                         },
                                                         child: Container(
                                                           width: 100,
@@ -453,7 +432,7 @@ class WalletOverviewWidget extends StatelessWidget {
                                                             ).primaryColor,
                                                           ),
                                                           child: Text(
-                                                            'pay_now'.tr,
+                                                            'hand_over_cash'.tr,
                                                             textAlign: TextAlign
                                                                 .center,
                                                             style: robotoMedium
