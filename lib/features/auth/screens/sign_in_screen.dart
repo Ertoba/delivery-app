@@ -550,7 +550,7 @@ class _RegistrationEntry extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: robotoBold.copyWith(
-                      fontSize: Dimensions.fontSizeDefault * 0.5,
+                      fontSize: Dimensions.fontSizeDefault * 0.675,
                     ),
                   ),
                   const SizedBox(height: Dimensions.paddingSizeExtraSmall),
@@ -562,7 +562,7 @@ class _RegistrationEntry extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: robotoRegular.copyWith(
                       color: Theme.of(context).hintColor,
-                      fontSize: Dimensions.fontSizeSmall * 0.5,
+                      fontSize: Dimensions.fontSizeSmall * 0.675,
                       height: 1.35,
                     ),
                   ),
@@ -578,7 +578,7 @@ class _RegistrationEntry extends StatelessWidget {
                     'delivery_registration_cta_action'.tr,
                     style: robotoBold.copyWith(
                       color: primaryColor,
-                      fontSize: Dimensions.fontSizeDefault * 0.5,
+                      fontSize: Dimensions.fontSizeDefault * 0.675,
                     ),
                   ),
                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
