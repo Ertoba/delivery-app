@@ -9,7 +9,6 @@ import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
-import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_text_field_widget.dart';
 import 'package:flutter/material.dart';
@@ -52,15 +51,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double rememberMeFontSize =
-        (Theme.of(context).textTheme.bodyLarge?.fontSize ??
-            Dimensions.fontSizeDefault) *
-        0.70;
-    final double forgotPasswordFontSize =
-        (Theme.of(context).textTheme.labelLarge?.fontSize ??
-            Dimensions.fontSizeDefault) *
-        0.70;
-
     bool isRideActive = AppConstants.appMode == AppMode.ride;
     final config = Get.find<SplashController>().configModel;
     bool isSelfRegistrationActive = isRideActive
@@ -68,186 +58,131 @@ class _SignInScreenState extends State<SignInScreen> {
         : (config?.toggleDmRegistration ?? false);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
-            child: GetBuilder<AuthController>(
-              builder: (authController) {
-                return Column(
-                  children: [
-                    Image.asset(
-                      Images.authLogo,
-                      width: 160,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: 50),
-
-                    Text(
-                      'login'.tr,
-                      style: robotoBold.copyWith(
-                        fontSize: Dimensions.fontSizeLarge,
-                      ),
-                    ),
-                    const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-                    Text(
-                      'welcome_back'.tr,
-                      style: robotoRegular.copyWith(
-                        fontSize: Dimensions.fontSizeDefault,
-                        color: Theme.of(
-                          context,
-                        ).textTheme.bodyLarge!.color!.withValues(alpha: 0.7),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-
-                    CustomTextFieldWidget(
-                      hintText: 'XXX-XXXXXX',
-                      labelText: 'phone_number'.tr,
-                      controller: _phoneController,
-                      focusNode: _phoneFocus,
-                      nextFocus: _passwordFocus,
-                      inputType: TextInputType.phone,
-                      isPhone: true,
-                      isRequired: true,
-                      onCountryChanged: (CountryCode countryCode) {
-                        _countryDialCode = countryCode.dialCode;
-                        _countryCode = countryCode.code;
-                      },
-                      countryDialCode:
-                          _countryCode ??
-                          CountryCode.fromCountryCode(
-                            Get.find<SplashController>().configModel!.country!,
-                          ).code,
-                    ),
-                    const SizedBox(height: Dimensions.paddingSizeExtraLarge),
-
-                    CustomTextFieldWidget(
-                      hintText: '********',
-                      labelText: 'password'.tr,
-                      controller: _passwordController,
-                      focusNode: _passwordFocus,
-                      inputAction: TextInputAction.done,
-                      inputType: TextInputType.visiblePassword,
-                      isPassword: true,
-                      isRequired: true,
-                      onSubmit: (text) => GetPlatform.isWeb
-                          ? _login(
-                              authController,
-                              _phoneController,
-                              _passwordController,
-                              _countryDialCode!,
-                              _countryCode!,
-                              context,
-                            )
-                          : null,
-                    ),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ListTile(
-                            onTap: () => authController.toggleRememberMe(),
-                            leading: Checkbox(
-                              activeColor: Theme.of(context).primaryColor,
-                              value: authController.isActiveRememberMe,
-                              onChanged: (bool? isChecked) =>
-                                  authController.toggleRememberMe(),
+        child: GetBuilder<AuthController>(
+          builder: (authController) {
+            return Stack(
+              children: [
+                const _CourierLoginBackground(),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Padding(
+                      padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                            Image.asset(
+                              Images.authLogo,
+                              width: 150,
+                              height: 88,
+                              fit: BoxFit.contain,
                             ),
-                            title: Text(
-                              'remember_me'.tr,
+                            const SizedBox(height: Dimensions.paddingSizeLarge),
+                            Text(
+                              'sign_in'.tr,
+                              textAlign: TextAlign.center,
+                              style: robotoBold.copyWith(
+                                fontSize: Dimensions.fontSizeOverLarge,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodyLarge!.color,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: Dimensions.paddingSizeExtraSmall,
+                            ),
+                            Text(
+                              isRideActive
+                                  ? 'rider_login_subtitle'.tr
+                                  : 'delivery_login_subtitle'.tr,
+                              textAlign: TextAlign.center,
                               style: robotoRegular.copyWith(
-                                fontSize: rememberMeFontSize,
+                                fontSize: Dimensions.fontSizeDefault,
+                                height: 1.25,
+                                color: Theme.of(context).hintColor,
                               ),
                             ),
-                            contentPadding: EdgeInsets.zero,
-                            dense: true,
-                            horizontalTitleGap: 0,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () =>
-                              Get.toNamed(RouteHelper.getForgotPassRoute()),
-                          child: Text(
-                            '${'forgot_password'.tr}?',
-                            style: robotoRegular.copyWith(
-                              fontSize: forgotPasswordFontSize,
+                            const SizedBox(
+                              height: Dimensions.paddingSizeExtraLarge,
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: Dimensions.paddingSizeDefault),
-
-                    CustomButtonWidget(
-                      buttonText: 'log_in'.tr,
-                      isLoading: authController.isLoading,
-                      onPressed: () => _login(
-                        authController,
-                        _phoneController,
-                        _passwordController,
-                        _countryDialCode!,
-                        _countryCode!,
-                        context,
+                            CustomTextFieldWidget(
+                              hintText: 'XXX-XXXXXX',
+                              labelText: 'phone_number'.tr,
+                              controller: _phoneController,
+                              focusNode: _phoneFocus,
+                              nextFocus: _passwordFocus,
+                              inputType: TextInputType.phone,
+                              isPhone: true,
+                              isRequired: true,
+                              onCountryChanged: (CountryCode countryCode) {
+                                _countryDialCode = countryCode.dialCode;
+                                _countryCode = countryCode.code;
+                              },
+                              countryDialCode:
+                                  _countryCode ??
+                                  CountryCode.fromCountryCode(
+                                    Get.find<SplashController>()
+                                        .configModel!
+                                        .country!,
+                                  ).code,
+                            ),
+                            const SizedBox(height: Dimensions.paddingSizeLarge),
+                            CustomTextFieldWidget(
+                              hintText: '********',
+                              labelText: 'password'.tr,
+                              controller: _passwordController,
+                              focusNode: _passwordFocus,
+                              inputAction: TextInputAction.done,
+                              inputType: TextInputType.visiblePassword,
+                              isPassword: true,
+                              isRequired: true,
+                              onSubmit: (text) => GetPlatform.isWeb
+                                  ? _login(
+                                      authController,
+                                      _phoneController,
+                                      _passwordController,
+                                      _countryDialCode!,
+                                      _countryCode!,
+                                      context,
+                                    )
+                                  : null,
+                            ),
+                            const SizedBox(height: Dimensions.paddingSizeSmall),
+                            _LoginOptionsRow(authController: authController),
+                            const SizedBox(height: Dimensions.paddingSizeLarge),
+                            _PrimaryLoginButton(
+                              isLoading: authController.isLoading,
+                              onPressed: () => _login(
+                                authController,
+                                _phoneController,
+                                _passwordController,
+                                _countryDialCode!,
+                                _countryCode!,
+                                context,
+                              ),
+                            ),
+                            if (isSelfRegistrationActive) ...[
+                              const SizedBox(
+                                height: Dimensions.paddingSizeExtraLarge,
+                              ),
+                              const _OrDivider(),
+                              const SizedBox(
+                                height: Dimensions.paddingSizeDefault,
+                              ),
+                              _RegistrationEntry(isRideActive: isRideActive),
+                            ],
+                            const SizedBox(height: Dimensions.paddingSizeLarge),
+                            _TrustFooter(isRideActive: isRideActive),
+                        ],
                       ),
-                    ),
-                    SizedBox(
-                      height: isSelfRegistrationActive
-                          ? Dimensions.paddingSizeSmall
-                          : 0,
-                    ),
-
-                    isSelfRegistrationActive
-                        ? Text(
-                            'or'.tr,
-                            style: robotoRegular.copyWith(
-                              color: Theme.of(context).disabledColor,
-                            ),
-                          )
-                        : const SizedBox(),
-
-                    isSelfRegistrationActive
-                        ? TextButton(
-                            style: TextButton.styleFrom(
-                              minimumSize: const Size(1, 40),
-                            ),
-                            onPressed: () {
-                              Get.toNamed(
-                                RouteHelper.getDeliverymanRegistrationRoute(),
-                              );
-                            },
-                            child: RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: '${'join_as_a'.tr} ',
-                                    style: robotoRegular.copyWith(
-                                      color: Theme.of(context).disabledColor,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: isRideActive
-                                        ? "rider".tr
-                                        : 'delivery_man'.tr,
-                                    style: robotoBold.copyWith(
-                                      color: Theme.of(context).primaryColor,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: Theme.of(
-                                        context,
-                                      ).primaryColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : const SizedBox(),
-                  ],
-                );
-              },
-            ),
-          ),
+                    );
+                  },
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -303,5 +238,327 @@ class _SignInScreenState extends State<SignInScreen> {
         }
       });
     }
+  }
+}
+
+class _CourierLoginBackground extends StatelessWidget {
+  const _CourierLoginBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    final Color primaryColor = Theme.of(context).primaryColor;
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: Stack(
+          children: [
+            Positioned(
+              top: -130,
+              left: -110,
+              child: Container(
+                width: 290,
+                height: 290,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: primaryColor.withValues(alpha: 0.06),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 150,
+              right: 58,
+              child: Icon(
+                Icons.cloud_rounded,
+                size: 52,
+                color: primaryColor.withValues(alpha: 0.06),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoginOptionsRow extends StatelessWidget {
+  final AuthController authController;
+
+  const _LoginOptionsRow({required this.authController});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: InkWell(
+            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+            onTap: authController.toggleRememberMe,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                children: [
+                  Checkbox(
+                    activeColor: Theme.of(context).primaryColor,
+                    value: authController.isActiveRememberMe,
+                    onChanged: (bool? isChecked) =>
+                        authController.toggleRememberMe(),
+                  ),
+                  Expanded(
+                    child: Text(
+                      'remember_me'.tr,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: robotoMedium.copyWith(
+                        fontSize: Dimensions.fontSizeDefault,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () => Get.toNamed(RouteHelper.getForgotPassRoute()),
+          child: Text(
+            '${'forgot_password'.tr}?',
+            textAlign: TextAlign.end,
+            style: robotoBold.copyWith(
+              color: Theme.of(context).primaryColor,
+              fontSize: Dimensions.fontSizeDefault,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PrimaryLoginButton extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  const _PrimaryLoginButton({
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Color primaryColor = Theme.of(context).primaryColor;
+    return TextButton(
+      onPressed: isLoading ? null : onPressed,
+      style: TextButton.styleFrom(
+        backgroundColor: isLoading
+            ? Theme.of(context).disabledColor
+            : primaryColor,
+        minimumSize: const Size.fromHeight(50),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Dimensions.paddingSizeLarge,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+        ),
+      ),
+      child: isLoading
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 15,
+                  height: 15,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+                const SizedBox(width: Dimensions.paddingSizeSmall),
+                Text(
+                  'loading'.tr,
+                  style: robotoBold.copyWith(
+                    color: Colors.white,
+                    fontSize: Dimensions.fontSizeLarge,
+                  ),
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                const SizedBox(width: 30),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.lock_outline_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: Dimensions.paddingSizeSmall),
+                      Flexible(
+                        child: Text(
+                          'log_in'.tr,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: robotoBold.copyWith(
+                            color: Colors.white,
+                            fontSize: Dimensions.fontSizeLarge,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+class _OrDivider extends StatelessWidget {
+  const _OrDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(child: Divider(color: Theme.of(context).dividerColor)),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Dimensions.paddingSizeDefault,
+          ),
+          child: Text(
+            'or'.tr,
+            style: robotoMedium.copyWith(
+              color: Theme.of(context).hintColor,
+              fontSize: Dimensions.fontSizeDefault,
+            ),
+          ),
+        ),
+        Expanded(child: Divider(color: Theme.of(context).dividerColor)),
+      ],
+    );
+  }
+}
+
+class _RegistrationEntry extends StatelessWidget {
+  final bool isRideActive;
+
+  const _RegistrationEntry({required this.isRideActive});
+
+  @override
+  Widget build(BuildContext context) {
+    final Color primaryColor = Theme.of(context).primaryColor;
+    return InkWell(
+      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+      onTap: () => Get.toNamed(RouteHelper.getDeliverymanRegistrationRoute()),
+      child: Container(
+        padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+        decoration: BoxDecoration(
+          color: primaryColor.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.18)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: primaryColor.withValues(alpha: 0.12),
+              ),
+              child: Icon(
+                isRideActive
+                    ? Icons.two_wheeler_rounded
+                    : Icons.delivery_dining_rounded,
+                color: primaryColor,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: Dimensions.paddingSizeDefault),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'delivery_registration_cta_title'.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: robotoBold.copyWith(
+                      fontSize: Dimensions.fontSizeDefault,
+                    ),
+                  ),
+                  const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                  Text(
+                    isRideActive
+                        ? 'rider_registration_cta_subtitle'.tr
+                        : 'delivery_registration_cta_subtitle'.tr,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: robotoRegular.copyWith(
+                      color: Theme.of(context).hintColor,
+                      fontSize: Dimensions.fontSizeSmall,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: Dimensions.paddingSizeSmall),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                children: [
+                  Text(
+                    'delivery_registration_cta_action'.tr,
+                    style: robotoBold.copyWith(
+                      color: primaryColor,
+                      fontSize: Dimensions.fontSizeDefault,
+                    ),
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                  Icon(Icons.chevron_right_rounded, color: primaryColor),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TrustFooter extends StatelessWidget {
+  final bool isRideActive;
+
+  const _TrustFooter({required this.isRideActive});
+
+  @override
+  Widget build(BuildContext context) {
+    final Color primaryColor = Theme.of(context).primaryColor;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.verified_user_outlined, size: 18, color: primaryColor),
+        const SizedBox(width: Dimensions.paddingSizeSmall),
+        Flexible(
+          child: Text(
+            isRideActive
+                ? 'rider_data_security_note'.tr
+                : 'delivery_data_security_note'.tr,
+            textAlign: TextAlign.center,
+            style: robotoMedium.copyWith(
+              color: Theme.of(context).hintColor,
+              fontSize: Dimensions.fontSizeDefault,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
