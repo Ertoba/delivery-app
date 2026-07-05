@@ -68,113 +68,110 @@ class _SignInScreenState extends State<SignInScreen> {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     return Padding(
-                      padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+                      padding: const EdgeInsets.all(
+                        Dimensions.paddingSizeLarge,
+                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                            Image.asset(
-                              Images.authLogo,
-                              width: 150,
-                              height: 88,
-                              fit: BoxFit.contain,
+                          _ThemedAuthLogo(isRideActive: isRideActive),
+                          const SizedBox(height: Dimensions.paddingSizeLarge),
+                          Text(
+                            'sign_in'.tr,
+                            textAlign: TextAlign.center,
+                            style: robotoBold.copyWith(
+                              fontSize: Dimensions.fontSizeOverLarge,
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyLarge!.color,
                             ),
-                            const SizedBox(height: Dimensions.paddingSizeLarge),
-                            Text(
-                              'sign_in'.tr,
-                              textAlign: TextAlign.center,
-                              style: robotoBold.copyWith(
-                                fontSize: Dimensions.fontSizeOverLarge,
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodyLarge!.color,
-                              ),
+                          ),
+                          const SizedBox(
+                            height: Dimensions.paddingSizeExtraSmall,
+                          ),
+                          Text(
+                            isRideActive
+                                ? 'rider_login_subtitle'.tr
+                                : 'delivery_login_subtitle'.tr,
+                            textAlign: TextAlign.center,
+                            style: robotoRegular.copyWith(
+                              fontSize: Dimensions.fontSizeDefault,
+                              height: 1.25,
+                              color: Theme.of(context).hintColor,
                             ),
-                            const SizedBox(
-                              height: Dimensions.paddingSizeExtraSmall,
+                          ),
+                          const SizedBox(
+                            height: Dimensions.paddingSizeExtraLarge,
+                          ),
+                          CustomTextFieldWidget(
+                            hintText: 'XXX-XXXXXX',
+                            labelText: 'phone_number'.tr,
+                            controller: _phoneController,
+                            focusNode: _phoneFocus,
+                            nextFocus: _passwordFocus,
+                            inputType: TextInputType.phone,
+                            isPhone: true,
+                            isRequired: true,
+                            onCountryChanged: (CountryCode countryCode) {
+                              _countryDialCode = countryCode.dialCode;
+                              _countryCode = countryCode.code;
+                            },
+                            countryDialCode:
+                                _countryCode ??
+                                CountryCode.fromCountryCode(
+                                  Get.find<SplashController>()
+                                      .configModel!
+                                      .country!,
+                                ).code,
+                          ),
+                          const SizedBox(height: Dimensions.paddingSizeLarge),
+                          CustomTextFieldWidget(
+                            hintText: '********',
+                            labelText: 'password'.tr,
+                            controller: _passwordController,
+                            focusNode: _passwordFocus,
+                            inputAction: TextInputAction.done,
+                            inputType: TextInputType.visiblePassword,
+                            isPassword: true,
+                            isRequired: true,
+                            onSubmit: (text) => GetPlatform.isWeb
+                                ? _login(
+                                    authController,
+                                    _phoneController,
+                                    _passwordController,
+                                    _countryDialCode!,
+                                    _countryCode!,
+                                    context,
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(height: Dimensions.paddingSizeSmall),
+                          _LoginOptionsRow(authController: authController),
+                          const SizedBox(height: Dimensions.paddingSizeLarge),
+                          _PrimaryLoginButton(
+                            isLoading: authController.isLoading,
+                            onPressed: () => _login(
+                              authController,
+                              _phoneController,
+                              _passwordController,
+                              _countryDialCode!,
+                              _countryCode!,
+                              context,
                             ),
-                            Text(
-                              isRideActive
-                                  ? 'rider_login_subtitle'.tr
-                                  : 'delivery_login_subtitle'.tr,
-                              textAlign: TextAlign.center,
-                              style: robotoRegular.copyWith(
-                                fontSize: Dimensions.fontSizeDefault,
-                                height: 1.25,
-                                color: Theme.of(context).hintColor,
-                              ),
-                            ),
+                          ),
+                          if (isSelfRegistrationActive) ...[
                             const SizedBox(
                               height: Dimensions.paddingSizeExtraLarge,
                             ),
-                            CustomTextFieldWidget(
-                              hintText: 'XXX-XXXXXX',
-                              labelText: 'phone_number'.tr,
-                              controller: _phoneController,
-                              focusNode: _phoneFocus,
-                              nextFocus: _passwordFocus,
-                              inputType: TextInputType.phone,
-                              isPhone: true,
-                              isRequired: true,
-                              onCountryChanged: (CountryCode countryCode) {
-                                _countryDialCode = countryCode.dialCode;
-                                _countryCode = countryCode.code;
-                              },
-                              countryDialCode:
-                                  _countryCode ??
-                                  CountryCode.fromCountryCode(
-                                    Get.find<SplashController>()
-                                        .configModel!
-                                        .country!,
-                                  ).code,
+                            const _OrDivider(),
+                            const SizedBox(
+                              height: Dimensions.paddingSizeDefault,
                             ),
-                            const SizedBox(height: Dimensions.paddingSizeLarge),
-                            CustomTextFieldWidget(
-                              hintText: '********',
-                              labelText: 'password'.tr,
-                              controller: _passwordController,
-                              focusNode: _passwordFocus,
-                              inputAction: TextInputAction.done,
-                              inputType: TextInputType.visiblePassword,
-                              isPassword: true,
-                              isRequired: true,
-                              onSubmit: (text) => GetPlatform.isWeb
-                                  ? _login(
-                                      authController,
-                                      _phoneController,
-                                      _passwordController,
-                                      _countryDialCode!,
-                                      _countryCode!,
-                                      context,
-                                    )
-                                  : null,
-                            ),
-                            const SizedBox(height: Dimensions.paddingSizeSmall),
-                            _LoginOptionsRow(authController: authController),
-                            const SizedBox(height: Dimensions.paddingSizeLarge),
-                            _PrimaryLoginButton(
-                              isLoading: authController.isLoading,
-                              onPressed: () => _login(
-                                authController,
-                                _phoneController,
-                                _passwordController,
-                                _countryDialCode!,
-                                _countryCode!,
-                                context,
-                              ),
-                            ),
-                            if (isSelfRegistrationActive) ...[
-                              const SizedBox(
-                                height: Dimensions.paddingSizeExtraLarge,
-                              ),
-                              const _OrDivider(),
-                              const SizedBox(
-                                height: Dimensions.paddingSizeDefault,
-                              ),
-                              _RegistrationEntry(isRideActive: isRideActive),
-                            ],
-                            const SizedBox(height: Dimensions.paddingSizeLarge),
-                            _TrustFooter(isRideActive: isRideActive),
+                            _RegistrationEntry(isRideActive: isRideActive),
+                          ],
+                          const SizedBox(height: Dimensions.paddingSizeLarge),
+                          _TrustFooter(isRideActive: isRideActive),
                         ],
                       ),
                     );
@@ -279,6 +276,72 @@ class _CourierLoginBackground extends StatelessWidget {
   }
 }
 
+class _ThemedAuthLogo extends StatelessWidget {
+  final bool isRideActive;
+
+  const _ThemedAuthLogo({required this.isRideActive});
+
+  @override
+  Widget build(BuildContext context) {
+    final Color primaryColor = Theme.of(context).primaryColor;
+
+    return SizedBox(
+      height: 104,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            top: 2,
+            child: Container(
+              width: 136,
+              height: 92,
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 86,
+            bottom: 10,
+            child: Icon(
+              Icons.route_outlined,
+              size: 34,
+              color: primaryColor.withValues(alpha: 0.10),
+            ),
+          ),
+          Positioned(
+            right: 86,
+            top: 12,
+            child: Icon(
+              isRideActive
+                  ? Icons.two_wheeler_rounded
+                  : Icons.delivery_dining_rounded,
+              size: 42,
+              color: primaryColor.withValues(alpha: 0.12),
+            ),
+          ),
+          Container(
+            width: 160,
+            height: 84,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor.withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+            ),
+            child: Image.asset(
+              Images.authLogo,
+              width: 146,
+              height: 78,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LoginOptionsRow extends StatelessWidget {
   final AuthController authController;
 
@@ -337,10 +400,7 @@ class _PrimaryLoginButton extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPressed;
 
-  const _PrimaryLoginButton({
-    required this.isLoading,
-    required this.onPressed,
-  });
+  const _PrimaryLoginButton({required this.isLoading, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -490,7 +550,7 @@ class _RegistrationEntry extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: robotoBold.copyWith(
-                      fontSize: Dimensions.fontSizeDefault,
+                      fontSize: Dimensions.fontSizeDefault * 0.5,
                     ),
                   ),
                   const SizedBox(height: Dimensions.paddingSizeExtraSmall),
@@ -502,7 +562,7 @@ class _RegistrationEntry extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: robotoRegular.copyWith(
                       color: Theme.of(context).hintColor,
-                      fontSize: Dimensions.fontSizeSmall,
+                      fontSize: Dimensions.fontSizeSmall * 0.5,
                       height: 1.35,
                     ),
                   ),
@@ -518,7 +578,7 @@ class _RegistrationEntry extends StatelessWidget {
                     'delivery_registration_cta_action'.tr,
                     style: robotoBold.copyWith(
                       color: primaryColor,
-                      fontSize: Dimensions.fontSizeDefault,
+                      fontSize: Dimensions.fontSizeDefault * 0.5,
                     ),
                   ),
                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
@@ -541,24 +601,35 @@ class _TrustFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = Theme.of(context).primaryColor;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.verified_user_outlined, size: 18, color: primaryColor),
-        const SizedBox(width: Dimensions.paddingSizeSmall),
-        Flexible(
-          child: Text(
-            isRideActive
-                ? 'rider_data_security_note'.tr
-                : 'delivery_data_security_note'.tr,
-            textAlign: TextAlign.center,
-            style: robotoMedium.copyWith(
-              color: Theme.of(context).hintColor,
-              fontSize: Dimensions.fontSizeDefault,
-            ),
-          ),
+    return Align(
+      alignment: Alignment.center,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width - 80,
         ),
-      ],
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.verified_user_outlined, size: 18, color: primaryColor),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                isRideActive
+                    ? 'rider_data_security_note'.tr
+                    : 'delivery_data_security_note'.tr,
+                textAlign: TextAlign.start,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: robotoMedium.copyWith(
+                  color: Theme.of(context).hintColor,
+                  fontSize: Dimensions.fontSizeDefault,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
