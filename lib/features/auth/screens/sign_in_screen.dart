@@ -321,20 +321,11 @@ class _ThemedAuthLogo extends StatelessWidget {
               color: primaryColor.withValues(alpha: 0.12),
             ),
           ),
-          Container(
-            width: 160,
-            height: 84,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor.withValues(alpha: 0.92),
-              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-            ),
-            child: Image.asset(
-              Images.authLogo,
-              width: 146,
-              height: 78,
-              fit: BoxFit.contain,
-            ),
+          Image.asset(
+            Images.authLogo,
+            width: 161,
+            height: 86,
+            fit: BoxFit.contain,
           ),
         ],
       ),
@@ -550,7 +541,7 @@ class _RegistrationEntry extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: robotoBold.copyWith(
-                      fontSize: Dimensions.fontSizeDefault * 0.675,
+                      fontSize: Dimensions.fontSizeDefault * 0.7425,
                     ),
                   ),
                   const SizedBox(height: Dimensions.paddingSizeExtraSmall),
@@ -562,7 +553,7 @@ class _RegistrationEntry extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: robotoRegular.copyWith(
                       color: Theme.of(context).hintColor,
-                      fontSize: Dimensions.fontSizeSmall * 0.675,
+                      fontSize: Dimensions.fontSizeSmall * 0.7425,
                       height: 1.35,
                     ),
                   ),
@@ -578,7 +569,7 @@ class _RegistrationEntry extends StatelessWidget {
                     'delivery_registration_cta_action'.tr,
                     style: robotoBold.copyWith(
                       color: primaryColor,
-                      fontSize: Dimensions.fontSizeDefault * 0.675,
+                      fontSize: Dimensions.fontSizeDefault * 0.7425,
                     ),
                   ),
                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
