@@ -4,11 +4,13 @@ import 'package:sixam_mart_delivery/features/forgot_password/controllers/forgot_
 import 'package:sixam_mart_delivery/helper/custom_validator_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_app_bar_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_text_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 class ForgetPassScreen extends StatefulWidget {
@@ -167,78 +169,11 @@ class _ForgotPasswordIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-
     return SizedBox(
       height: 230,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 248,
-            height: 188,
-            decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: 0.07),
-              borderRadius: BorderRadius.circular(96),
-            ),
-          ),
-          Positioned(
-            left: 90,
-            child: Container(
-              width: 96,
-              height: 168,
-              decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: primaryColor, width: 3),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.person_rounded, color: primaryColor, size: 46),
-                  const SizedBox(height: Dimensions.paddingSizeSmall),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Dimensions.paddingSizeSmall,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Text(
-                      '••••',
-                      style: robotoBold.copyWith(
-                        color: primaryColor,
-                        fontSize: Dimensions.fontSizeLarge,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: Dimensions.paddingSizeSmall),
-                  Icon(Icons.lock_rounded, color: primaryColor, size: 30),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            right: 70,
-            top: 34,
-            child: Container(
-              width: 66,
-              height: 48,
-              decoration: BoxDecoration(
-                color: primaryColor,
-                borderRadius: BorderRadius.circular(26),
-              ),
-              child: const Icon(Icons.key_rounded, color: Colors.white),
-            ),
-          ),
-          Positioned(
-            right: 86,
-            bottom: 34,
-            child: Icon(Icons.person, color: primaryColor, size: 78),
-          ),
-        ],
+      child: SvgPicture.asset(
+        Images.courierForgotPasswordIllustration,
+        fit: BoxFit.contain,
       ),
     );
   }
@@ -306,25 +241,12 @@ class _RecoverButton extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             )
-          : Stack(
-              alignment: Alignment.center,
-              children: [
-                Text(
-                  'next'.tr,
-                  style: robotoBold.copyWith(
-                    color: Colors.white,
-                    fontSize: Dimensions.fontSizeLarge,
-                  ),
-                ),
-                const Positioned(
-                  right: 18,
-                  child: Icon(
-                    Icons.arrow_forward_rounded,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-              ],
+          : Text(
+              'next'.tr,
+              style: robotoBold.copyWith(
+                color: Colors.white,
+                fontSize: Dimensions.fontSizeLarge,
+              ),
             ),
     );
   }

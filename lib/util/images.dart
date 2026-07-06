@@ -172,6 +172,8 @@ class Images {
   static const String offline = 'assets/image/ofline.png';
   static const String phoneOrderDetails =
       'assets/image/phone_order_details.png';
+  static const String courierForgotPasswordIllustration =
+      'assets/image/mili_courier_forgot_password.svg';
   static const String riderCall = 'assets/image/rider_call.png';
   static const String riderChat = 'assets/image/chat.png';
   static const String frame = 'assets/image/frame2.png';
