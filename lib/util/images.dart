@@ -173,7 +173,7 @@ class Images {
   static const String phoneOrderDetails =
       'assets/image/phone_order_details.png';
   static const String courierForgotPasswordIllustration =
-      'assets/image/mili_courier_forgot_password.svg';
+      'assets/image/access_control_password_recovery.jpg';
   static const String riderCall = 'assets/image/rider_call.png';
   static const String riderChat = 'assets/image/chat.png';
   static const String frame = 'assets/image/frame2.png';
