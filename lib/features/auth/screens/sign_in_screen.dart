@@ -171,7 +171,6 @@ class _SignInScreenState extends State<SignInScreen> {
                             _RegistrationEntry(isRideActive: isRideActive),
                           ],
                           const SizedBox(height: Dimensions.paddingSizeLarge),
-                          _TrustFooter(isRideActive: isRideActive),
                         ],
                       ),
                     );
@@ -283,35 +282,10 @@ class _ThemedAuthLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-
     return SizedBox(
       height: 104,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            left: 86,
-            bottom: 10,
-            child: Icon(
-              Icons.route_outlined,
-              size: 34,
-              color: primaryColor.withValues(alpha: 0.10),
-            ),
-          ),
-          Positioned(
-            right: 86,
-            top: 12,
-            child: Icon(
-              isRideActive
-                  ? Icons.two_wheeler_rounded
-                  : Icons.delivery_dining_rounded,
-              size: 42,
-              color: primaryColor.withValues(alpha: 0.12),
-            ),
-          ),
-          Image.asset(Images.brandMark, height: 94, fit: BoxFit.contain),
-        ],
+      child: Center(
+        child: Image.asset(Images.brandMark, height: 94, fit: BoxFit.contain),
       ),
     );
   }
@@ -417,36 +391,25 @@ class _PrimaryLoginButton extends StatelessWidget {
               ],
             )
           : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(width: 30),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.lock_outline_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(width: Dimensions.paddingSizeSmall),
-                      Flexible(
-                        child: Text(
-                          'log_in'.tr,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: robotoBold.copyWith(
-                            color: Colors.white,
-                            fontSize: Dimensions.fontSizeLarge,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 const Icon(
-                  Icons.arrow_forward_rounded,
+                  Icons.lock_outline_rounded,
                   color: Colors.white,
-                  size: 24,
+                  size: 20,
+                ),
+                const SizedBox(width: Dimensions.paddingSizeSmall),
+                Flexible(
+                  child: Text(
+                    'log_in'.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: robotoBold.copyWith(
+                      color: Colors.white,
+                      fontSize: Dimensions.fontSizeLarge,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -559,47 +522,6 @@ class _RegistrationEntry extends StatelessWidget {
                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                   Icon(Icons.chevron_right_rounded, color: primaryColor),
                 ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TrustFooter extends StatelessWidget {
-  final bool isRideActive;
-
-  const _TrustFooter({required this.isRideActive});
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-    return Align(
-      alignment: Alignment.center,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width - 80,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(Icons.verified_user_outlined, size: 18, color: primaryColor),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                isRideActive
-                    ? 'rider_data_security_note'.tr
-                    : 'delivery_data_security_note'.tr,
-                textAlign: TextAlign.start,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: robotoMedium.copyWith(
-                  color: Theme.of(context).hintColor,
-                  fontSize: Dimensions.fontSizeDefault,
-                ),
               ),
             ),
           ],
