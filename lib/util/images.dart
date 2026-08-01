@@ -2,6 +2,7 @@ class Images {
   static const String logo = 'assets/image/logo.png';
   static const String splashScreen = 'assets/image/splash.png';
   static const String authLogo = 'assets/image/auth_logo.png';
+  static const String brandMark = 'assets/image/brand_mark.png';
   static const String georgian = 'assets/image/georgian.png';
   static const String russian = 'assets/image/russian.png';
   static const String call = 'assets/image/call.png';

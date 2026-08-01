@@ -291,17 +291,6 @@ class _ThemedAuthLogo extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Positioned(
-            top: 2,
-            child: Container(
-              width: 136,
-              height: 92,
-              decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
-              ),
-            ),
-          ),
-          Positioned(
             left: 86,
             bottom: 10,
             child: Icon(
@@ -321,12 +310,7 @@ class _ThemedAuthLogo extends StatelessWidget {
               color: primaryColor.withValues(alpha: 0.12),
             ),
           ),
-          Image.asset(
-            Images.authLogo,
-            width: 161,
-            height: 86,
-            fit: BoxFit.contain,
-          ),
+          Image.asset(Images.brandMark, height: 94, fit: BoxFit.contain),
         ],
       ),
     );

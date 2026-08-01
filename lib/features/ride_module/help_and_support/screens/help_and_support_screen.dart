@@ -7,6 +7,7 @@ import 'package:sixam_mart_delivery/features/splash/controllers/splash_controlle
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -121,26 +122,7 @@ class _SupportHero extends StatelessWidget {
                   borderRadius: BorderRadius.circular(90),
                 ),
               ),
-              Container(
-                width: 104,
-                height: 104,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: primaryColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColor.withValues(alpha: 0.16),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.support_agent_rounded,
-                  color: Colors.white,
-                  size: 54,
-                ),
-              ),
+              Image.asset(Images.brandMark, height: 132, fit: BoxFit.contain),
               Positioned(
                 left: 80,
                 top: 48,
