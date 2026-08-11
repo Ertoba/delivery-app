@@ -65,6 +65,8 @@ android {
 
     buildTypes {
         getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = if (hasReleaseKeystore) {
                 signingConfigs.getByName("release")
             } else {
@@ -96,6 +98,7 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    implementation("androidx.core:core:1.17.0")
     implementation("androidx.datastore:datastore-preferences:1.2.1")
     implementation("com.google.firebase:firebase-messaging:23.4.1")
 }
