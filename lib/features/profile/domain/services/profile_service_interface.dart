@@ -13,6 +13,7 @@ abstract class ProfileServiceInterface {
   Future<Response> recordLocation(RecordLocationBodyModel recordLocationBody, String zoneId);
   Future<ResponseModel> deleteDriver();
   void checkPermission(Function callback);
+  Future<bool> hasLocationConsentAndPermission();
   Future<String> addressPlaceMark(Position locationResult);
   Future<String> getZoneId(Position locationResult);
   Future<dynamic> getProfileLevelInfo();

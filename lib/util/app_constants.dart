@@ -206,6 +206,7 @@ class AppConstants {
       'sixam_mart_delivery_user_country_dial_code';
   static const String userCountryCode = 'sixam_mart_delivery_user_country_code';
   static const String notification = 'sixam_mart_delivery_notification';
+  static const String locationDisclosureConsent = 'mili_courier_location_disclosure_consent_v1';
   static const String notificationCount =
       'sixam_mart_delivery_notification_count';
   static const String ignoreList = 'sixam_mart_delivery_ignore_list';

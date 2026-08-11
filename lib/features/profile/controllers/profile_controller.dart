@@ -144,6 +144,16 @@ class ProfileController extends GetxController implements GetxService {
     return responseModel.isSuccess;
   }
 
+  void checkLocationPermission(Function callback) {
+    profileServiceInterface.checkPermission(callback);
+  }
+
+  Future<void> resumeLocationTrackingIfPermitted() async {
+    if (_profileModel?.active == 1 && await profileServiceInterface.hasLocationConsentAndPermission()) {
+      startLocationRecord();
+    }
+  }
+
   Future deleteDriver() async {
     _isLoading = true;
     update();

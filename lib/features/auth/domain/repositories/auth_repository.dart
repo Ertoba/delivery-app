@@ -112,6 +112,7 @@ class AuthRepository implements AuthRepositoryInterface {
       apiClient.postData(AppConstants.tokenUri, {"_method": "put", "token": getUserToken()}, handleError: false);
     }
     await sharedPreferences.remove(AppConstants.token);
+    await sharedPreferences.remove(AppConstants.locationDisclosureConsent);
     await sharedPreferences.setStringList(AppConstants.ignoreList, []);
     await sharedPreferences.remove(AppConstants.userAddress);
     apiClient.updateHeader(null, null);

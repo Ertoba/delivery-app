@@ -195,7 +195,7 @@ Future<Map<String, Map<String, String>>> init() async {
   NotificationServiceInterface notificationServiceInterface = NotificationService(notificationRepositoryInterface: Get.find());
   Get.lazyPut(() => notificationServiceInterface);
 
-  ProfileServiceInterface profileServiceInterface = ProfileService(profileRepositoryInterface: Get.find());
+  ProfileServiceInterface profileServiceInterface = ProfileService(profileRepositoryInterface: Get.find(), sharedPreferences: Get.find());
   Get.lazyPut(() => profileServiceInterface);
 
   AddressServiceInterface addressServiceInterface = AddressService(addressRepositoryInterface: Get.find());
@@ -238,7 +238,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => LanguageService(languageRepositoryInterface: Get.find()));
   Get.lazyPut(() => SplashService(splashRepositoryInterface: Get.find()));
   Get.lazyPut(() => NotificationService(notificationRepositoryInterface: Get.find()));
-  Get.lazyPut(() => ProfileService(profileRepositoryInterface: Get.find()));
+  Get.lazyPut(() => ProfileService(profileRepositoryInterface: Get.find(), sharedPreferences: Get.find()));
   Get.lazyPut(() => AddressService(addressRepositoryInterface: Get.find()));
   Get.lazyPut(() => AuthService(authRepositoryInterface: Get.find()));
   Get.lazyPut(() => OrderService(orderRepositoryInterface: Get.find()));

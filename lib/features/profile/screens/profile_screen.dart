@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_confirmation_bottom_sheet.dart';
 import 'package:sixam_mart_delivery/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart_delivery/features/home/widgets/location_access_dialog.dart';
 import 'package:sixam_mart_delivery/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart_delivery/features/language/widgets/language_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/controllers/order_controller.dart';
@@ -286,12 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     );
                                   }else {
-                                    LocationPermission permission = await Geolocator.checkPermission();
-                                    if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
-                                      _checkPermission(() => profileController.updateActiveStatus());
-                                    }else {
-                                      profileController.updateActiveStatus();
-                                    }
+                                    profileController.checkLocationPermission(() => profileController.updateActiveStatus());
                                   }
                                 }
                               },
@@ -600,35 +593,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       },
     ).then((value) => Get.find<LocalizationController>().setLanguage(Get.find<LocalizationController>().getCacheLocaleFromSharedPref()));
-  }
-
-  void _checkPermission(Function callback) async {
-    LocationPermission permission = await Geolocator.requestPermission();
-    permission = await Geolocator.checkPermission();
-
-    while(Get.isDialogOpen == true) {
-      Get.back();
-    }
-
-    if(permission == LocationPermission.denied) {
-      Get.dialog(LocationAccessDialog(onConfirm: () async {
-        Get.back();
-        final perm = await Geolocator.requestPermission();
-        if(perm == LocationPermission.deniedForever) await Geolocator.openAppSettings();
-        if(GetPlatform.isAndroid) _checkPermission(callback);
-      }));
-    }else if(permission == LocationPermission.deniedForever || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
-      Get.dialog(LocationAccessDialog(onConfirm: () async {
-        Get.back();
-        await Geolocator.openAppSettings();
-        Future.delayed(const Duration(seconds: 3), () {
-          if(GetPlatform.isAndroid) _checkPermission(callback);
-        });
-      },
-      ));
-    }else {
-      callback();
-    }
   }
 
 }

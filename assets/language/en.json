@@ -1,4 +1,13 @@
 {
+  "location_disclosure_title": "How MILI Courier uses your location",
+  "location_disclosure_body": "MILI Courier collects, transmits, and stores your precise location on MILI servers to assign and track deliveries, show your live delivery progress to customers, participating stores, and MILI administrators, and calculate routes and arrival times, even when the app is closed or not in use.",
+  "location_disclosure_usage_limit": "Location is used only for delivery operations. It is not used for advertising or sold.",
+  "background_location_settings_title": "Allow background location",
+  "background_location_settings_instruction": "To continue delivery tracking in the background on Android, open app settings and choose Allow all the time for Location.",
+  "location_app_settings_instruction": "Open app settings and allow Location. On Android, choose Allow all the time so delivery tracking can continue when the app is closed or not in use.",
+  "location_consent_decline": "Not now",
+  "location_consent_agree": "I agree",
+  "continue_to_location_settings": "Continue to settings",
   "suffix_name": "Delivery",
   "sign_in": "Sign In",
   "email": "E-mail",

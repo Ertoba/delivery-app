@@ -90,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
       case AppLifecycleState.resumed:
         checkPermission();
+        Get.find<ProfileController>().resumeLocationTrackingIfPermitted();
         break;
       case AppLifecycleState.inactive:
         break;
