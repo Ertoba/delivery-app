@@ -4,6 +4,7 @@ import 'package:sixam_mart_delivery/features/auth/domain/models/delivery_man_bod
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/models/vehicle_model.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart_delivery/helper/api_error_helper.dart';
 import 'package:sixam_mart_delivery/helper/pusher_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:get/get.dart';
@@ -98,10 +99,16 @@ class AuthController extends GetxController implements GetxService {
         } catch (_) {}
         responseModel = ResponseModel(true, 'successful');
       } else {
-        responseModel = ResponseModel(false, response.statusText);
+        responseModel = ResponseModel(
+          false,
+          ApiErrorHelper.userMessage(
+            response.statusText,
+            statusCode: response.statusCode,
+          ),
+        );
       }
     } catch (_) {
-      responseModel = ResponseModel(false, 'connection_to_api_server_failed'.tr);
+      responseModel = ResponseModel(false, ApiErrorHelper.networkErrorMessage);
     } finally {
       _isLoading = false;
       update();
