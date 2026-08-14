@@ -62,7 +62,10 @@ class ApiErrorHelper {
       return requestFailedMessage;
     }
 
-    final String normalized = message.toLowerCase();
+    // Some backend translation keys can arrive with underscores rather than
+    // spaces. Normalize them before classification without changing the text
+    // that is ultimately shown for non-technical validation/account errors.
+    final String normalized = message.toLowerCase().replaceAll('_', ' ');
 
     const List<String> credentialMarkers = <String>[
       'credential do not match',
@@ -82,7 +85,6 @@ class ApiErrorHelper {
     const List<String> networkMarkers = <String>[
       'connection to api server failed',
       'handshakeexception',
-      'certificate_verify_failed',
       'certificate verify failed',
       'bad certificate',
       'socketexception',
