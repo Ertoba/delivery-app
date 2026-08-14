@@ -43,6 +43,15 @@ class ApiErrorHelper {
         bn: 'অনুরোধটি সম্পন্ন করা যায়নি। আবার চেষ্টা করুন।',
       );
 
+  static String get credentialErrorMessage => _localized(
+        en: 'The phone number or password is incorrect.',
+        ka: 'ტელეფონის ნომერი ან პაროლი არასწორია.',
+        ru: 'Неверный номер телефона или пароль.',
+        es: 'El número de teléfono o la contraseña son incorrectos.',
+        ar: 'رقم الهاتف أو كلمة المرور غير صحيحة.',
+        bn: 'ফোন নম্বর বা পাসওয়ার্ড সঠিক নয়।',
+      );
+
   static String userMessage(String? rawMessage, {int? statusCode}) {
     if (statusCode == 0 || statusCode == 1) {
       return networkErrorMessage;
@@ -54,6 +63,21 @@ class ApiErrorHelper {
     }
 
     final String normalized = message.toLowerCase();
+
+    const List<String> credentialMarkers = <String>[
+      'credential do not match',
+      'credentials do not match',
+      'incorrect credential',
+      'incorrect credentials',
+      'invalid credential',
+      'invalid credentials',
+      'phone or password is incorrect',
+      'wrong password',
+    ];
+
+    if (statusCode == 401 && credentialMarkers.any(normalized.contains)) {
+      return credentialErrorMessage;
+    }
 
     const List<String> networkMarkers = <String>[
       'connection to api server failed',
@@ -100,7 +124,7 @@ class ApiErrorHelper {
       return requestFailedMessage;
     }
 
-    // Keep useful backend validation/authentication messages (normally 4xx).
+    // Preserve useful backend validation/account-state messages (normally 4xx).
     return message;
   }
 }
