@@ -52,7 +52,43 @@ class ApiErrorHelper {
         bn: 'ফোন নম্বর বা পাসওয়ার্ড সঠিক নয়।',
       );
 
-  static String userMessage(String? rawMessage, {int? statusCode}) {
+  static String get accountNotApprovedMessage => _localized(
+    en: 'Your account has not been approved yet.',
+    ka: 'თქვენი ანგარიში ჯერ არ არის დამტკიცებული.',
+    ru: 'Ваш аккаунт ещё не одобрен.',
+    es: 'Tu cuenta aún no ha sido aprobada.',
+    ar: 'لم تتم الموافقة على حسابك بعد.',
+    bn: 'আপনার অ্যাকাউন্ট এখনো অনুমোদিত হয়নি।',
+  );
+
+  static String get accountSuspendedMessage => _localized(
+    en: 'Your account has been suspended.',
+    ka: 'თქვენი ანგარიში შეჩერებულია.',
+    ru: 'Ваш аккаунт заблокирован.',
+    es: 'Tu cuenta ha sido suspendida.',
+    ar: 'تم تعليق حسابك.',
+    bn: 'আপনার অ্যাকাউন্ট স্থগিত করা হয়েছে।',
+  );
+
+  static String? firstErrorCode(dynamic responseBody) {
+    if (responseBody is! Map) {
+      return null;
+    }
+
+    final dynamic errors = responseBody['errors'];
+    if (errors is! List || errors.isEmpty || errors.first is! Map) {
+      return null;
+    }
+
+    final dynamic code = (errors.first as Map)['code'];
+    return code?.toString().trim();
+  }
+
+  static String userMessage(
+    String? rawMessage, {
+    int? statusCode,
+    String? errorCode,
+  }) {
     if (statusCode == 0 || statusCode == 1) {
       return networkErrorMessage;
     }
@@ -66,6 +102,7 @@ class ApiErrorHelper {
     // spaces. Normalize them before classification without changing the text
     // that is ultimately shown for non-technical validation/account errors.
     final String normalized = message.toLowerCase().replaceAll('_', ' ');
+    final String normalizedErrorCode = (errorCode ?? '').trim().toLowerCase();
 
     const List<String> credentialMarkers = <String>[
       'credential do not match',
@@ -78,8 +115,36 @@ class ApiErrorHelper {
       'wrong password',
     ];
 
-    if (statusCode == 401 && credentialMarkers.any(normalized.contains)) {
+    if (statusCode == 401 &&
+        (normalizedErrorCode == 'auth-001' ||
+            credentialMarkers.any(normalized.contains))) {
       return credentialErrorMessage;
+    }
+
+    const List<String> notApprovedMarkers = <String>[
+      'not approved',
+      'ჯერ არ არის დამტკიცებული',
+      'ჯერ არ არის დადასტურებული',
+      'ещё не одобрен',
+      'еще не одобрен',
+      'ещё не подтвержден',
+      'еще не подтвержден',
+    ];
+
+    if (statusCode == 401 && notApprovedMarkers.any(normalized.contains)) {
+      return accountNotApprovedMessage;
+    }
+
+    const List<String> suspendedMarkers = <String>[
+      'suspended',
+      'შეჩერებულია',
+      'შეჩერებული',
+      'заблокирован',
+      'приостановлен',
+    ];
+
+    if (statusCode == 401 && suspendedMarkers.any(normalized.contains)) {
+      return accountSuspendedMessage;
     }
 
     const List<String> networkMarkers = <String>[

@@ -104,6 +104,7 @@ class AuthController extends GetxController implements GetxService {
           ApiErrorHelper.userMessage(
             response.statusText,
             statusCode: response.statusCode,
+            errorCode: ApiErrorHelper.firstErrorCode(response.body),
           ),
         );
       }
