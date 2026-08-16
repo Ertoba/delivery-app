@@ -111,39 +111,21 @@ class _SupportHero extends StatelessWidget {
       children: [
         SizedBox(
           height: 220,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 240,
-                height: 170,
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.07),
-                  borderRadius: BorderRadius.circular(90),
-                ),
+          child: Center(
+            child: Container(
+              width: 240,
+              height: 170,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(90),
               ),
-              Image.asset(Images.brandMark, height: 132, fit: BoxFit.contain),
-              Positioned(
-                left: 80,
-                top: 48,
-                child: _HeroBubble(icon: Icons.chat_bubble_rounded),
+              child: Image.asset(
+                Images.brandMark,
+                height: 132,
+                fit: BoxFit.contain,
               ),
-              Positioned(
-                right: 76,
-                top: 58,
-                child: _HeroBubble(icon: Icons.priority_high_rounded),
-              ),
-              Positioned(
-                left: 84,
-                bottom: 44,
-                child: _HeroBubble(icon: Icons.settings_rounded),
-              ),
-              Positioned(
-                right: 84,
-                bottom: 40,
-                child: _HeroBubble(icon: Icons.build_rounded),
-              ),
-            ],
+            ),
           ),
         ),
         const SizedBox(height: Dimensions.paddingSizeDefault),
@@ -175,27 +157,6 @@ class _SupportHero extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _HeroBubble extends StatelessWidget {
-  final IconData icon;
-
-  const _HeroBubble({required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = Theme.of(context).primaryColor;
-
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: primaryColor.withValues(alpha: 0.12),
-      ),
-      child: Icon(icon, color: primaryColor, size: 24),
     );
   }
 }
