@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart_delivery/common/widgets/custom_ink_well_widget.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/controllers/order_controller.dart';
 import 'package:sixam_mart_delivery/features/ride_module/ride_order/controllers/ride_controller.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
@@ -19,10 +18,13 @@ class BottomNavItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(child: CustomInkWellWidget(
+    return Expanded(child: InkWell(
       onTap: onTap,
-      radius: Dimensions.radiusExtraLarge,
-      child: Column(children: [
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Stack(clipBehavior: Clip.none, children: [
           Image.asset(iconData, color: isSelected ? Theme.of(context).primaryColor : Colors.grey, height: 20),
 

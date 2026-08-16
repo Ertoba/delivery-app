@@ -147,12 +147,15 @@ class DashboardScreenState extends State<DashboardScreen> {
       },
       child: Scaffold(
         bottomNavigationBar: GetPlatform.isDesktop ? const SizedBox() : Container(
-          height: 70 + MediaQuery.of(context).padding.bottom,
+          height: 64 + MediaQuery.of(context).padding.bottom,
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             boxShadow: [BoxShadow(color: Colors.grey[Get.isDarkMode ? 800 : 200]!, spreadRadius: 1, blurRadius: 5)],
           ),
-          padding: EdgeInsets.only(top: 14),
+          padding: EdgeInsets.only(
+            top: Dimensions.paddingSizeExtraSmall,
+            bottom: MediaQuery.of(context).padding.bottom,
+          ),
           child: Row(children: [
             BottomNavItemWidget(iconData: Images.home, label: 'home'.tr, isSelected: _pageIndex == 0, onTap: () => _setPage(0)),
             BottomNavItemWidget(iconData: Images.request, label: 'request'.tr, isSelected: _pageIndex == 1, pageIndex: 1, onTap: () {
