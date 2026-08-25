@@ -660,5 +660,9 @@
   "cash_handover": "Cash handover",
   "cash_handover_instruction": "Hand the cash to the administrator. The balance will update after the administrator confirms receipt in the system.",
   "hand_over_cash": "Handover",
-  "wallet_adjustment": "Wallet Adjustment"
+  "wallet_adjustment": "Wallet Adjustment",
+  "support_chat": "Chat de soporte",
+  "support_chat_description": "Escribe directamente al equipo de soporte",
+  "support_conversation_empty_title": "Inicia una conversación con soporte de MILI",
+  "support_conversation_empty_description": "Escribe tu pregunta abajo. El mensaje se enviará al equipo de soporte del administrador."
 }

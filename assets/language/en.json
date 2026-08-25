@@ -1034,5 +1034,9 @@
   "AI_Chat_Assistant_read_only_hint": "Answers customer questions without changing carts, orders, accounts, or payments. Never share passwords, card details, or one-time codes.",
   "ai_chat_disabled": "AI chat is currently disabled.",
   "ai_chat_daily_limit_reached": "You have reached the daily AI chat limit.",
-  "ai_chat_temporarily_unavailable": "AI chat is temporarily unavailable. Please try again later."
+  "ai_chat_temporarily_unavailable": "AI chat is temporarily unavailable. Please try again later.",
+  "support_chat": "Support chat",
+  "support_chat_description": "Message the support team directly",
+  "support_conversation_empty_title": "Start a conversation with MILI support",
+  "support_conversation_empty_description": "Write your question below. Your message will be delivered to the admin support team."
 }

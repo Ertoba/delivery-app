@@ -661,6 +661,10 @@
   "cash_handover": "Cash handover",
   "cash_handover_instruction": "Hand the cash to the administrator. The balance will update after the administrator confirms receipt in the system.",
   "hand_over_cash": "Handover",
-  "wallet_adjustment": "Wallet Adjustment"
+  "wallet_adjustment": "Wallet Adjustment",
+  "support_chat": "সহায়তা চ্যাট",
+  "support_chat_description": "সহায়তা দলকে সরাসরি বার্তা পাঠান",
+  "support_conversation_empty_title": "MILI সহায়তার সঙ্গে কথোপকথন শুরু করুন",
+  "support_conversation_empty_description": "নিচে আপনার প্রশ্ন লিখুন। বার্তাটি অ্যাডমিন সহায়তা দলের কাছে পৌঁছে যাবে।"
 
 }

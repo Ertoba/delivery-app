@@ -71,6 +71,14 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
+  void dispose() {
+    _inputMessageController.dispose();
+    _inputMessageFocus.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GetBuilder<ChatController>(
       builder: (chatController) {
@@ -100,7 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
             }
           },
           child: Scaffold(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             appBar: AppBar(
               leading: GestureDetector(
                 onTap: () {
@@ -168,7 +176,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
             body: _isLoggedIn
                 ? ColoredBox(
-                    color: Theme.of(context).scaffoldBackgroundColor,
+                    color: Theme.of(context).colorScheme.surface,
                     child: SafeArea(
                       child: Center(
                         child: SizedBox(
@@ -692,6 +700,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                                     );
                                                   },
                                                 )
+                                              : (widget.fromSupport ?? false)
+                                              ? _buildSupportEmptyView(context)
                                               : const SizedBox()
                                         : chatController.isMessageLoading
                                         ? const Center(
@@ -1220,8 +1230,17 @@ class _ChatScreenState extends State<ChatScreen> {
                                                               textCapitalization:
                                                                   TextCapitalization
                                                                       .sentences,
-                                                              style:
-                                                                  robotoRegular,
+                                                              style: robotoRegular
+                                                                  .copyWith(
+                                                                    color: Theme.of(context)
+                                                                        .textTheme
+                                                                        .bodyLarge
+                                                                        ?.color,
+                                                                  ),
+                                                              cursorColor:
+                                                                  Theme.of(
+                                                                    context,
+                                                                  ).primaryColor,
                                                               keyboardType:
                                                                   TextInputType
                                                                       .multiline,
@@ -1633,6 +1652,47 @@ class _ChatScreenState extends State<ChatScreen> {
               },
         icon: const Icon(Icons.refresh),
         label: Text('try_again'.tr),
+      ),
+    );
+  }
+
+  Widget _buildSupportEmptyView(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.support_agent_rounded,
+                size: 34,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            const SizedBox(height: Dimensions.paddingSizeDefault),
+            Text(
+              'support_conversation_empty_title'.tr,
+              textAlign: TextAlign.center,
+              style: robotoBold.copyWith(
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+                fontSize: Dimensions.fontSizeLarge,
+              ),
+            ),
+            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+            Text(
+              'support_conversation_empty_description'.tr,
+              textAlign: TextAlign.center,
+              style: robotoRegular.copyWith(color: Theme.of(context).hintColor),
+            ),
+          ],
+        ),
       ),
     );
   }

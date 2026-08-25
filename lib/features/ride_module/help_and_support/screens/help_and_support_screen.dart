@@ -71,9 +71,9 @@ class HelpAndSupportScreen extends StatelessWidget {
                   const SizedBox(height: Dimensions.paddingSizeSmall),
                   _SupportActionCard(
                     icon: Icons.support_agent_rounded,
-                    title: 'საპორტის ჩატი',
+                    title: 'support_chat'.tr,
                     color: Theme.of(context).primaryColor,
-                    info: 'მოგვწერეთ პირდაპირ მხარდაჭერის გუნდს',
+                    info: 'support_chat_description'.tr,
                     onTap: _openSupportChat,
                   ),
                 ],
