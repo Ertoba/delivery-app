@@ -54,6 +54,8 @@
   "pending": "قيد الانتظار",
   "accepted": "مقبول",
   "processing": "يعالج",
+  "location_timeout_try_again": "استغرق تحديد الموقع وقتًا طويلاً. تحقق من GPS وحاول مرة أخرى.",
+  "unable_to_accept_order_try_again": "تعذر قبول الطلب. حاول مرة أخرى.",
   "confirmed": "مؤكد",
   "handover": "التسليم",
   "picked_up": "التقطت",

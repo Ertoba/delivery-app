@@ -303,17 +303,38 @@ class OrderController extends GetxController implements GetxService {
   Future<bool> acceptOrder(int? orderID, int index, OrderModel orderModel) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await orderServiceInterface.acceptOrder(orderID);
-    Get.back();
-    if(responseModel.isSuccess) {
-      _latestOrderList!.removeAt(index);
-      _currentOrderList!.add(orderModel);
-    }else {
-      showCustomSnackBar(responseModel.message, isError: true);
+    try {
+      final ResponseModel responseModel = await orderServiceInterface.acceptOrder(orderID);
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      if(responseModel.isSuccess) {
+        final List<OrderModel>? latestOrders = _latestOrderList;
+        if (latestOrders != null) {
+          final int resolvedIndex = index >= 0 && index < latestOrders.length && latestOrders[index].id == orderID
+              ? index : latestOrders.indexWhere((order) => order.id == orderID);
+          if (resolvedIndex >= 0) {
+            latestOrders.removeAt(resolvedIndex);
+          }
+        }
+        _currentOrderList ??= <OrderModel>[];
+        if (!_currentOrderList!.any((order) => order.id == orderID)) {
+          _currentOrderList!.add(orderModel);
+        }
+      }else {
+        showCustomSnackBar(responseModel.message, isError: true);
+      }
+      return responseModel.isSuccess;
+    } catch (_) {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      showCustomSnackBar('unable_to_accept_order_try_again'.tr, isError: true);
+      return false;
+    } finally {
+      _isLoading = false;
+      update();
     }
-    _isLoading = false;
-    update();
-    return responseModel.isSuccess;
   }
 
   void getIgnoreList() {

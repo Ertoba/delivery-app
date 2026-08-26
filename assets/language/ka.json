@@ -63,6 +63,8 @@
   "pending": "მოლოდინში",
   "accepted": "მიღებულია",
   "processing": "მუშავდება",
+  "location_timeout_try_again": "ლოკაციის მიღებას დიდი დრო დასჭირდა. შეამოწმეთ GPS და სცადეთ ხელახლა.",
+  "unable_to_accept_order_try_again": "შეკვეთის მიღება ვერ შესრულდა. სცადეთ ხელახლა.",
   "confirmed": "დადასტურებულია",
   "handover": "გადასაცემად მზადაა",
   "picked_up": "აღებულია",

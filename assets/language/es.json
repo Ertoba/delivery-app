@@ -54,6 +54,8 @@
   "pending": "Pendiente",
   "accepted": "Aceptado",
   "processing": "Tratamiento",
+  "location_timeout_try_again": "La ubicación está tardando demasiado. Comprueba el GPS e inténtalo de nuevo.",
+  "unable_to_accept_order_try_again": "No se pudo aceptar el pedido. Inténtalo de nuevo.",
   "confirmed": "Confirmado",
   "handover": "Entregar",
   "picked_up": "Recogido",

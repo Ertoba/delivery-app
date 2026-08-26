@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -110,8 +111,24 @@ class OrderRepository implements OrderRepositoryInterface {
 
   @override
   Future<ResponseModel> acceptOrder(int? orderID) async {
+    Position? locationResult;
+    try {
+      locationResult = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 12),
+        ),
+      );
+    } on TimeoutException {
+      locationResult = await _recentLastKnownPosition();
+    } catch (_) {
+      locationResult = await _recentLastKnownPosition();
+    }
+    if (locationResult == null) {
+      return ResponseModel(false, 'location_timeout_try_again'.tr);
+    }
+
     ResponseModel responseModel;
-    final Position locationResult = await Geolocator.getCurrentPosition();
     Response response = await apiClient.postData(
         AppConstants.acceptOrderUri,
         {
@@ -128,6 +145,19 @@ class OrderRepository implements OrderRepositoryInterface {
       responseModel = ResponseModel(false, response.statusText);
     }
     return responseModel;
+  }
+
+  Future<Position?> _recentLastKnownPosition() async {
+    try {
+      final Position? position = await Geolocator.getLastKnownPosition();
+      if (position == null) {
+        return null;
+      }
+      final Duration age = DateTime.now().difference(position.timestamp).abs();
+      return age <= const Duration(minutes: 10) ? position : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   @override

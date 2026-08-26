@@ -63,6 +63,8 @@
   "pending": "Pending",
   "accepted": "Accepted",
   "processing": "Processing",
+  "location_timeout_try_again": "Location is taking too long. Check GPS and try again.",
+  "unable_to_accept_order_try_again": "Unable to accept this order. Please try again.",
   "confirmed": "Confirmed",
   "handover": "Handover",
   "picked_up": "Picked Up",

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,7 +31,7 @@ class SliderButton extends StatefulWidget {
   final Alignment alignLabel;
   final BoxShadow boxShadow;
   final Widget icon;
-  final Function action;
+  final FutureOr<dynamic> Function() action;
 
   ///Make it false if you want to deactivate the shimmer effect.
   final bool shimmer;
@@ -82,6 +84,9 @@ class SliderButton extends StatefulWidget {
 class SliderButtonState extends State<SliderButton> {
   bool? flag;
   Widget? _child;
+  bool _isSubmitting = false;
+
+  bool get _isDisabled => widget.disable || _isSubmitting;
 
   @override
   void initState() {
@@ -92,7 +97,9 @@ class SliderButtonState extends State<SliderButton> {
 
   @override
   Widget build(BuildContext context) {
-    return flag == true
+    return _isSubmitting
+        ? _control()
+        : flag == true
         ? _control()
         : widget.dismissible == true
         ? Container()
@@ -103,7 +110,7 @@ class SliderButtonState extends State<SliderButton> {
     height: widget.height,
     width: widget.width,
     decoration: BoxDecoration(
-      color: widget.disable
+      color: _isDisabled
           ? Colors.grey.shade700
           : Get.isDarkMode
           ? Colors.white12
@@ -117,15 +124,42 @@ class SliderButtonState extends State<SliderButton> {
         Container(
           alignment: widget.alignLabel,
           padding: EdgeInsets.symmetric(horizontal: widget.buttonSize + 12),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: widget.shimmer && !widget.disable
-                ? Shimmer(color: widget.highlightedColor, child: widget.label!)
-                : widget.label,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: _isSubmitting
+                ? Row(
+                    key: const ValueKey('slider_processing'),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: widget.highlightedColor,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'processing'.tr,
+                        style: TextStyle(color: widget.highlightedColor),
+                      ),
+                    ],
+                  )
+                : FittedBox(
+                    key: const ValueKey('slider_idle'),
+                    fit: BoxFit.scaleDown,
+                    child: widget.shimmer && !widget.disable
+                        ? Shimmer(
+                            color: widget.highlightedColor,
+                            child: widget.label!,
+                          )
+                        : widget.label,
+                  ),
           ),
         ),
 
-        widget.disable
+        _isDisabled
             ? Tooltip(
                 verticalOffset: 50,
                 message: 'Button is disabled',
@@ -148,7 +182,18 @@ class SliderButtonState extends State<SliderButton> {
                           color: Colors.grey,
                           borderRadius: BorderRadius.circular(widget.radius),
                         ),
-                        child: Center(child: widget.icon),
+                        child: Center(
+                          child: _isSubmitting
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : widget.icon,
+                        ),
                       ),
                 ),
               )
@@ -162,6 +207,7 @@ class SliderButtonState extends State<SliderButton> {
                 ///gives direction of swipping in argument.
                 onDismissed: (dir) async {
                   setState(() {
+                    _isSubmitting = true;
                     if (widget.dismissible) {
                       flag = false;
                     } else {
@@ -169,14 +215,21 @@ class SliderButtonState extends State<SliderButton> {
                     }
                   });
 
-                  widget.action();
-                  if (widget.vibrationFlag && (await Vibration.hasVibrator())) {
-                    try {
+                  try {
+                    await Future.sync(widget.action);
+                    if (widget.vibrationFlag &&
+                        (await Vibration.hasVibrator())) {
                       Vibration.vibrate(duration: 200);
-                    } catch (e) {
-                      if (kDebugMode) {
-                        print(e);
-                      }
+                    }
+                  } catch (error) {
+                    if (kDebugMode) {
+                      debugPrint('Slider action failed: $error');
+                    }
+                  } finally {
+                    if (mounted) {
+                      setState(() {
+                        _isSubmitting = false;
+                      });
                     }
                   }
                 },

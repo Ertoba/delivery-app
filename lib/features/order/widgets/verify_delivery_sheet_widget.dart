@@ -175,17 +175,30 @@ class _VerifyDeliverySheetWidgetState extends State<VerifyDeliverySheetWidget> {
             ) : const Center(child: CircularProgressIndicator()),
 
             widget.verify! ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(
+              Expanded(child: Text(
                 'did_not_receive_user_notification'.tr,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall),
-              ),
+              )),
+              const SizedBox(width: Dimensions.paddingSizeSmall),
 
               Get.find<NotificationController>().hideNotificationButton ? const SizedBox() : InkWell(
                 onTap: _seconds < 1 ? () {
                   Get.find<NotificationController>().sendDeliveredNotification(widget.currentOrderModel.id);
                   _startTimer();
                 } : null,
-                child: Text('${'resend_it'.tr}${_seconds > 0 ? ' (${_seconds}s)' : ''}', style: TextStyle(color: Theme.of(context).primaryColor),),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 150),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '${'resend_it'.tr}${_seconds > 0 ? ' (${_seconds}s)' : ''}',
+                      maxLines: 1,
+                      style: robotoMedium.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
+                    ),
+                  ),
+                ),
               )
             ]) : const SizedBox(),
             const SizedBox(height: Dimensions.paddingSizeLarge),

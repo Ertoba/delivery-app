@@ -108,7 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
             }
           },
           child: Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: Theme.of(context).cardColor,
             appBar: AppBar(
               leading: GestureDetector(
                 onTap: () {
@@ -176,7 +176,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
             body: _isLoggedIn
                 ? ColoredBox(
-                    color: Theme.of(context).colorScheme.surface,
+                    color: Theme.of(context).cardColor,
                     child: SafeArea(
                       child: Center(
                         child: SizedBox(
