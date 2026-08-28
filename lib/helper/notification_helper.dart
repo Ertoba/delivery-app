@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
@@ -180,6 +181,20 @@ class NotificationHelper {
           );
           Get.find<OrderController>().getLatestOrders();
           Get.find<NotificationController>().getNotificationList();
+          final int? affectedOrderId = int.tryParse(
+            message.data['order_id']?.toString() ?? '',
+          );
+          final OrderController orderController = Get.find<OrderController>();
+          if (type == 'order_status' &&
+              affectedOrderId != null &&
+              Get.currentRoute.startsWith(RouteHelper.orderDetails) &&
+              orderController.orderModel?.id == affectedOrderId) {
+            unawaited(orderController.getOrderWithId(
+              affectedOrderId,
+              showLoading: false,
+              popOnError: false,
+            ));
+          }
         }
       }
 

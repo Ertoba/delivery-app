@@ -57,6 +57,8 @@ class OrderController extends GetxController implements GetxService {
   
   OrderModel? _orderModel;
   OrderModel? get orderModel => _orderModel;
+  final Set<int> _refreshingOrderIds = <int>{};
+  int? _currentOrderRequestId;
   
   String? _cancelReason = '';
   String? get cancelReason => _cancelReason;
@@ -147,18 +149,37 @@ class OrderController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getOrderWithId(int? orderId) async {
-    _orderModel = null;
-    Response response = await orderServiceInterface.getOrderWithId(orderId);
-    if(response.statusCode == 200) {
-      _orderModel = OrderModel.fromJson(response.body);
-
-      debugPrint(_orderModel.toString());
-    }else {
-      Navigator.pop(Get.context!);
-      await Get.find<OrderController>().getRunningOrders(offset);
+  Future<bool> getOrderWithId(int? orderId, {bool showLoading = true, bool popOnError = true}) async {
+    if (orderId == null) {
+      return false;
     }
-    update();
+    _currentOrderRequestId = orderId;
+    if (_refreshingOrderIds.contains(orderId)) {
+      return false;
+    }
+    _refreshingOrderIds.add(orderId);
+    if (showLoading) {
+      _orderModel = null;
+      update();
+    }
+
+    try {
+      final Response response = await orderServiceInterface.getOrderWithId(orderId);
+      if(response.statusCode == 200) {
+        if (_currentOrderRequestId == orderId) {
+          _orderModel = OrderModel.fromJson(response.body);
+          update();
+        }
+        return true;
+      }
+      if (popOnError && _currentOrderRequestId == orderId && Get.context != null) {
+        Navigator.pop(Get.context!);
+        await getRunningOrders(offset);
+      }
+      return false;
+    } finally {
+      _refreshingOrderIds.remove(orderId);
+    }
   }
 
   Future<void> getCompletedOrders(int offset, {bool willUpdate = true, String? status}) async {

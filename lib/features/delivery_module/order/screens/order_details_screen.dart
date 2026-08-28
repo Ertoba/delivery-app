@@ -42,20 +42,34 @@ class OrderDetailsScreen extends StatefulWidget {
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBindingObserver {
   Timer? _timer;
 
+  Future<void> _refreshOrder() async {
+    await Get.find<OrderController>().getOrderWithId(
+      widget.orderId,
+      showLoading: false,
+      popOnError: false,
+    );
+  }
+
   void _startApiCalling(){
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      Get.find<OrderController>().getOrderWithId(widget.orderId!);
+      unawaited(_refreshOrder());
     });
   }
 
   Future<void> _loadData() async {
     Get.find<OrderController>().pickPrescriptionImage(isRemove: true, isCamera: false);
-    await Get.find<OrderController>().getOrderWithId(widget.orderId);
-    Get.find<OrderController>().getOrderDetails(widget.orderId, Get.find<OrderController>().orderModel!.orderType == 'parcel');
+    final bool loaded = await Get.find<OrderController>().getOrderWithId(widget.orderId);
+    if (!mounted || !loaded || Get.find<OrderController>().orderModel == null) {
+      return;
+    }
+    await Get.find<OrderController>().getOrderDetails(widget.orderId, Get.find<OrderController>().orderModel!.orderType == 'parcel');
     await Get.find<OrderController>().getLatestOrders();
     if(Get.find<OrderController>().showDeliveryImageField){
       Get.find<OrderController>().changeDeliveryImageStatus(isUpdate: false);
+    }
+    if (mounted) {
+      _startApiCalling();
     }
   }
 
@@ -64,8 +78,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
-    _loadData();
-    _startApiCalling();
+    unawaited(_loadData());
   }
 
   @override
@@ -73,6 +86,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
     super.didChangeAppLifecycleState(state);
     if(state == AppLifecycleState.paused) {
       _timer?.cancel();
+    } else if (state == AppLifecycleState.resumed) {
+      unawaited(_refreshOrder());
+      _startApiCalling();
     }
   }
 
