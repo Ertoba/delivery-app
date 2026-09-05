@@ -1040,5 +1040,18 @@
   "support_chat": "Support chat",
   "support_chat_description": "Message the support team directly",
   "support_conversation_empty_title": "Start a conversation with MILI support",
-  "support_conversation_empty_description": "Write your question below. Your message will be delivered to the admin support team."
+  "support_conversation_empty_description": "Write your question below. Your message will be delivered to the admin support team.",
+  "auth_ui_title": "Welcome back",
+  "auth_ui_otp_subtitle": "Enter your phone number. We’ll send you a sign-in code.",
+  "auth_ui_manual_subtitle": "Sign in with your email or phone number and password.",
+  "auth_ui_vendor_subtitle": "Your store, orders and team in one place.",
+  "auth_ui_courier_subtitle": "Sign in to manage your deliveries.",
+  "auth_ui_show_password": "Show password",
+  "auth_ui_hide_password": "Hide password",
+  "auth_ui_account_type": "Account type",
+  "auth_ui_use_password": "Sign in with a password",
+  "auth_ui_use_code": "Sign in with a code",
+  "auth_ui_send_code": "Continue",
+  "auth_ui_phone_hint": "Phone number",
+  "auth_ui_role": "Courier"
 }

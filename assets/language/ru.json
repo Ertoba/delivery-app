@@ -2379,5 +2379,18 @@
   "support_chat": "Чат поддержки",
   "support_chat_description": "Напишите напрямую команде поддержки",
   "support_conversation_empty_title": "Начните разговор с поддержкой MILI",
-  "support_conversation_empty_description": "Напишите вопрос ниже. Сообщение будет отправлено команде поддержки администратора."
+  "support_conversation_empty_description": "Напишите вопрос ниже. Сообщение будет отправлено команде поддержки администратора.",
+  "auth_ui_title": "С возвращением",
+  "auth_ui_otp_subtitle": "Введите номер телефона — мы отправим код для входа.",
+  "auth_ui_manual_subtitle": "Войдите с помощью почты или телефона и пароля.",
+  "auth_ui_vendor_subtitle": "Ваш магазин, заказы и команда в одном месте.",
+  "auth_ui_courier_subtitle": "Войдите в аккаунт для управления доставками.",
+  "auth_ui_show_password": "Показать пароль",
+  "auth_ui_hide_password": "Скрыть пароль",
+  "auth_ui_account_type": "Тип аккаунта",
+  "auth_ui_use_password": "Войти с паролем",
+  "auth_ui_use_code": "Войти с кодом",
+  "auth_ui_send_code": "Продолжить",
+  "auth_ui_phone_hint": "Номер телефона",
+  "auth_ui_role": "Курьер"
 }

@@ -1066,5 +1066,18 @@
   "support_chat": "საპორტის ჩატი",
   "support_chat_description": "მოგვწერეთ პირდაპირ მხარდაჭერის გუნდს",
   "support_conversation_empty_title": "დაიწყეთ საუბარი MILI-ს მხარდაჭერასთან",
-  "support_conversation_empty_description": "დაწერეთ შეკითხვა ქვემოთ. შეტყობინება პირდაპირ ადმინისტრატორის მხარდაჭერის გუნდს გადაეცემა."
+  "support_conversation_empty_description": "დაწერეთ შეკითხვა ქვემოთ. შეტყობინება პირდაპირ ადმინისტრატორის მხარდაჭერის გუნდს გადაეცემა.",
+  "auth_ui_title": "კეთილი იყოს შენი დაბრუნება",
+  "auth_ui_otp_subtitle": "შეიყვანე ტელეფონის ნომერი — გამოგიგზავნით შესვლის კოდს.",
+  "auth_ui_manual_subtitle": "შედი ელფოსტით ან ტელეფონის ნომრით და პაროლით.",
+  "auth_ui_vendor_subtitle": "შენი მაღაზია, შეკვეთები და გუნდი ერთ სივრცეში.",
+  "auth_ui_courier_subtitle": "შედი ანგარიშში და მართე შენი მიტანები.",
+  "auth_ui_show_password": "პაროლის ჩვენება",
+  "auth_ui_hide_password": "პაროლის დამალვა",
+  "auth_ui_account_type": "ანგარიშის ტიპი",
+  "auth_ui_use_password": "პაროლით შესვლა",
+  "auth_ui_use_code": "ერთჯერადი კოდით შესვლა",
+  "auth_ui_send_code": "გაგრძელება",
+  "auth_ui_phone_hint": "ტელეფონის ნომერი",
+  "auth_ui_role": "კურიერი"
 }

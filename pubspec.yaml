@@ -1,7 +1,7 @@
 name: sixam_mart_delivery
 description: A new Flutter application.
 publish_to: 'none' #
-version: 3.8.18+37
+version: 3.8.19+38
 
 environment:
   sdk: ^3.10.0
@@ -90,6 +90,12 @@ flutter:
     - assets/notification.mp3
 
   fonts:
+    - family: MiliAuthGeorgian
+      fonts:
+        - asset: assets/font/mili-auth-georgian-regular.ttf
+          weight: 400
+        - asset: assets/font/mili-auth-georgian-bold.ttf
+          weight: 700
     - family: Roboto
       fonts:
         - asset: assets/font/Roboto-Regular.ttf
