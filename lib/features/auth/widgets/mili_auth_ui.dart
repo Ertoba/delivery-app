@@ -1,3 +1,4 @@
+import 'package:sixam_mart_delivery/util/typography.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,13 +39,14 @@ class MiliAuthLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final base = Theme.of(context);
-    final family = Get.locale?.languageCode == 'ka'
-        ? 'MiliAuthGeorgian'
-        : base.textTheme.bodyMedium?.fontFamily;
+    const family = MiliTypography.bodyFamily;
     return Theme(
       data: base.copyWith(textTheme: base.textTheme.apply(fontFamily: family)),
       child: DefaultTextStyle.merge(
-        style: TextStyle(fontFamily: family),
+        style: TextStyle(
+          fontFamily: family,
+          fontFamilyFallback: MiliTypography.fallback,
+        ),
         child: LayoutBuilder(
           builder: (context, constraints) {
             final compact = authCompact(context) || constraints.maxHeight < 500;

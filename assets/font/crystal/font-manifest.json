@@ -1,0 +1,75 @@
+{
+  "archive": "BPG_SSP_Crystal.zip",
+  "archive_sha256": "17625a809627336d12c54cb153607a39733464c17a68271f1d0fb4069b370846",
+  "faces": [
+    {
+      "file": "BPGSSPCrystal-Regular.ttf",
+      "source": "2019 BPG_SSP_Crystal.ttf",
+      "sha256": "41dd0458dfdff844270123575a0efed0c19d41c50366525c26d90540624e93a8"
+    },
+    {
+      "file": "BPGSSPCrystal-Bold.ttf",
+      "source": "2019  BPG_SSP_Crystal_Bold.ttf",
+      "sha256": "b64561a8a521df118355848a8a7b09c62050cc8140f60a578a4eb64e9b87445e"
+    },
+    {
+      "file": "BPGSSPCrystal-Italic.ttf",
+      "source": "BPG_SSP_Crystal_Italic.ttf",
+      "sha256": "6d77cfbe4f2e60292001d2e2f8301394b2b8cacd50a8b62a41216632278e47d3"
+    },
+    {
+      "file": "BPGSSPCrystal-BoldItalic.ttf",
+      "source": "BPG_SSP_Crystal_BoldItalic.ttf",
+      "sha256": "e94ca879a48dc2e961b725a00881d237c15b4612aff67e1976955a6875164737"
+    },
+    {
+      "file": "BPGSSPCrystalCaps-Regular.ttf",
+      "source": "BPG_SSP_Crystal_Caps.ttf",
+      "sha256": "23d31e9844695bbedba8605e7e9629a67e5a3fb45df12ac41da76ff2d977ec3c"
+    },
+    {
+      "file": "BPGSSPCrystalCaps-Bold.ttf",
+      "source": "BPG_SSP_Crystal_Bold_Caps.ttf",
+      "sha256": "6792e8d02bc8b623f93858017294c46d042f2c217e6e7b5cfa2a9c0a6a6133be"
+    },
+    {
+      "file": "BPGSSPCrystalCaps-Italic.ttf",
+      "source": "BPG_SSP_Crystal_Italic_Caps.ttf",
+      "sha256": "ac2702508e863227fccb0a321b51f46101b839f5cec562b74fff71853a8bb2a9"
+    },
+    {
+      "file": "BPGSSPCrystalCaps-BoldItalic.ttf",
+      "source": "BPG_SSP_Crystal_BoldItalic_Caps.ttf",
+      "sha256": "0531c9e612906552d502b84d219bbae416b036cdeb079907760516ace36df958"
+    },
+    {
+      "file": "MiliCyrillic-Regular.ttf",
+      "source": "Roboto-Regular.ttf",
+      "source_sha256": "56a45233d29f11b4dfb86d248e921939d115778f87325e7ae8cc108383d6664d",
+      "sha256": "67455cf2042081847fa23b26e141890e111ff2a1349864f4083a4bc1bc2aab69",
+      "unicode_range": "U+0400-052F,U+2DE0-2DFF,U+A640-A69F"
+    },
+    {
+      "file": "MiliCyrillic-Bold.ttf",
+      "source": "Roboto-Bold.ttf",
+      "source_sha256": "61f89f8db49261c2f6106e8dccc35df7b2f7ed909020db40a3fc905e95f99334",
+      "sha256": "3420eac283a718ae9c7da87dad2f02549510c44fc82da8d0fbf60358b261e01d",
+      "unicode_range": "U+0400-052F,U+2DE0-2DFF,U+A640-A69F"
+    },
+    {
+      "file": "MiliCyrillic-Italic.ttf",
+      "source": "Roboto-Italic.ttf",
+      "source_sha256": "fa0b17bb4aaac4a1b2ee149dd4ca3b55e97d3077aa6ba9bb02541b316e7c46ce",
+      "sha256": "40c9ff92b970e6b3ecc7455f826f417a100b9068f1043f5291f0295faeed0701",
+      "unicode_range": "U+0400-052F,U+2DE0-2DFF,U+A640-A69F"
+    },
+    {
+      "file": "MiliCyrillic-BoldItalic.ttf",
+      "source": "Roboto-BoldItalic.ttf",
+      "source_sha256": "40083ed54338397cf49d2c49f59eddcd963a30fdb301813d4bd3abbb37a13d12",
+      "sha256": "6d4b69481bf84fdce502d7b9e16ea7ad483db5a551b29e5cb95e79b7cb3674a9",
+      "unicode_range": "U+0400-052F,U+2DE0-2DFF,U+A640-A69F"
+    }
+  ],
+  "cyrillic_source": "https://github.com/googlefonts/roboto-2/tree/38062f4b4a0be4346d07a928408da21602545e9e"
+}

@@ -1,3 +1,4 @@
+import 'package:sixam_mart_delivery/util/typography.dart';
 import 'package:sixam_mart_delivery/features/language/domain/models/language_model.dart';
 import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
@@ -7,7 +8,7 @@ class AppConstants {
   static const double appVersion = 3.8;
 
   ///Flutter sdk 3.41.6
-  static const String fontFamily = 'Roboto';
+  static const String fontFamily = MiliTypography.bodyFamily;
   static const AppMode appMode = AppMode.delivery;
   static const String baseUrl = 'https://mili.ge';
 
@@ -206,7 +207,8 @@ class AppConstants {
       'sixam_mart_delivery_user_country_dial_code';
   static const String userCountryCode = 'sixam_mart_delivery_user_country_code';
   static const String notification = 'sixam_mart_delivery_notification';
-  static const String locationDisclosureConsent = 'mili_courier_location_disclosure_consent_v1';
+  static const String locationDisclosureConsent =
+      'mili_courier_location_disclosure_consent_v1';
   static const String notificationCount =
       'sixam_mart_delivery_notification_count';
   static const String ignoreList = 'sixam_mart_delivery_ignore_list';

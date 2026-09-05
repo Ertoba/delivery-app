@@ -1,7 +1,10 @@
+import 'package:sixam_mart_delivery/util/typography.dart';
 import 'package:flutter/material.dart';
 
 ThemeData dark = ThemeData(
-  fontFamily: 'Roboto',
+  fontFamily: MiliTypography.bodyFamily,
+  fontFamilyFallback: MiliTypography.fallback,
+  textTheme: MiliTypography.textTheme,
   primaryColor: const Color(0xFF039D55),
   secondaryHeaderColor: const Color(0xFF10B981),
   disabledColor: const Color(0xFF6f7275),

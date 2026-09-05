@@ -90,19 +90,39 @@ flutter:
     - assets/notification.mp3
 
   fonts:
-    - family: MiliAuthGeorgian
+    - family: BPG SSP Crystal
       fonts:
-        - asset: assets/font/mili-auth-georgian-regular.ttf
+        - asset: assets/font/crystal/BPGSSPCrystal-Regular.ttf
           weight: 400
-        - asset: assets/font/mili-auth-georgian-bold.ttf
+        - asset: assets/font/crystal/BPGSSPCrystal-Bold.ttf
           weight: 700
-    - family: Roboto
+        - asset: assets/font/crystal/BPGSSPCrystal-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/font/crystal/BPGSSPCrystal-BoldItalic.ttf
+          weight: 700
+          style: italic
+    - family: BPG SSP Crystal Caps
       fonts:
-        - asset: assets/font/Roboto-Regular.ttf
+        - asset: assets/font/crystal/BPGSSPCrystalCaps-Regular.ttf
           weight: 400
-        - asset: assets/font/Roboto-Medium.ttf
-          weight: 500
-        - asset: assets/font/Roboto-Bold.ttf
+        - asset: assets/font/crystal/BPGSSPCrystalCaps-Bold.ttf
           weight: 700
-        - asset: assets/font/Roboto-Black.ttf
-          weight: 900
+        - asset: assets/font/crystal/BPGSSPCrystalCaps-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/font/crystal/BPGSSPCrystalCaps-BoldItalic.ttf
+          weight: 700
+          style: italic
+    - family: MILI Cyrillic
+      fonts:
+        - asset: assets/font/crystal/MiliCyrillic-Regular.ttf
+          weight: 400
+        - asset: assets/font/crystal/MiliCyrillic-Bold.ttf
+          weight: 700
+        - asset: assets/font/crystal/MiliCyrillic-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/font/crystal/MiliCyrillic-BoldItalic.ttf
+          weight: 700
+          style: italic
