@@ -1,30 +1,42 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:sixam_mart_delivery/main.dart';
+import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp(languages: null));
+  testWidgets('primary courier action remains usable with long Georgian text on a narrow screen', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    var pressed = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: CustomButtonWidget(
+                buttonText: 'შეკვეთის მიღება და მიწოდების უსაფრთხოდ გაგრძელება',
+                onPressed: () => pressed = true,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    expect(tester.takeException(), isNull);
+    expect(find.byType(TextButton), findsOneWidget);
+    expect(find.text('შეკვეთის მიღება და მიწოდების უსაფრთხოდ გაგრძელება'), findsOneWidget);
+
+    final buttonRect = tester.getRect(find.byType(TextButton));
+    expect(buttonRect.width, lessThanOrEqualTo(288));
+    expect(buttonRect.height, greaterThanOrEqualTo(50));
+
+    await tester.tap(find.byType(TextButton));
     await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(pressed, isTrue);
+    expect(tester.takeException(), isNull);
   });
 }
