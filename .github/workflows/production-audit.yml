@@ -1,0 +1,98 @@
+name: Production QA Audit
+
+on:
+  push:
+    branches: ["audit/production-qa-2026-09-06"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Environment
+        run: |
+          flutter --version
+          dart --version
+      - name: Dependencies
+        run: flutter pub get
+      - name: Static inventory
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, json
+          files=list(Path('lib').rglob('*.dart'))
+          text={str(p):p.read_text(encoding='utf-8',errors='ignore') for p in files}
+          def fm(rx):
+              r=re.compile(rx,re.I); return [p for p in text if r.search(p)]
+          inv={
+            'source_files':len(files),
+            'screens_pages':len(fm(r'/(screens?|pages?)/|_(screen|page)\.dart$')),
+            'widgets_components':len(fm(r'/(widgets?|components?)/|_widget\.dart$')),
+            'forms':sum(len(re.findall(r'\b(TextFormField|TextField|Form\s*\()',s)) for s in text.values()),
+            'buttons':sum(len(re.findall(r'\b(ElevatedButton|TextButton|OutlinedButton|IconButton|InkWell|GestureDetector)\b',s)) for s in text.values()),
+            'dialogs_sheets':sum(len(re.findall(r'\b(Dialog|showDialog|showModalBottomSheet|Get\.dialog|Get\.bottomSheet)\b',s)) for s in text.values()),
+            'loaders':sum(len(re.findall(r'\b(CircularProgressIndicator|LinearProgressIndicator|Shimmer|Lottie)\b',s)) for s in text.values()),
+            'animations':sum(len(re.findall(r'\b(Animated\w+|AnimationController|Tween|Hero|FadeTransition|SlideTransition|ScaleTransition)\b',s)) for s in text.values()),
+            'safe_area':sum(s.count('SafeArea(') for s in text.values()),
+            'scaffold':sum(s.count('Scaffold(') for s in text.values()),
+            'text_overflow':sum(s.count('TextOverflow.') for s in text.values()),
+            'expanded_flexible':sum(len(re.findall(r'\b(Expanded|Flexible)\s*\(',s)) for s in text.values()),
+            'uppercase_calls':sum(s.count('.toUpperCase()') for s in text.values()),
+            'print_calls':sum(len(re.findall(r'(?<!debug)\bprint\s*\(',s)) for s in text.values()),
+            'hardcoded_font_sizes':sum(len(re.findall(r'fontSize\s*:\s*(?:const\s+)?\d+(?:\.\d+)?',s)) for s in text.values()),
+            'fixed_width_height_literals':sum(len(re.findall(r'\b(?:width|height)\s*:\s*(?:const\s+)?\d{2,}(?:\.\d+)?',s)) for s in text.values()),
+          }
+          risks=[]
+          for p,s in text.items():
+              sig=[]; score=0
+              for tag,rx,w in [('print',r'(?<!debug)\bprint\s*\(',2),('uppercase',r'\.toUpperCase\(\)',1),('hardcoded_font',r'fontSize\s*:\s*(?:const\s+)?(?:2[0-9]|[3-9][0-9])',2),('fixed_dimension',r'\b(?:width|height)\s*:\s*(?:const\s+)?(?:[2-9]\d\d|\d{4,})',2),('stack_positioned',r'\bStack\s*\(|\bPositioned\s*\(',1)]:
+                  n=len(re.findall(rx,s))
+                  if n: score+=min(n,5)*w; sig.append(f'{tag}:{n}')
+              if score>=4: risks.append({'file':p,'score':score,'signals':sig})
+          risks.sort(key=lambda x:(-x['score'],x['file']))
+          report={'inventory':inv,'high_risk_files':risks[:120]}
+          Path('audit-static.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Flutter analyze
+        shell: bash
+        run: |
+          set +e
+          flutter analyze 2>&1 | tee flutter-analyze.txt
+          echo ${PIPESTATUS[0]} > flutter-analyze.exit
+          exit 0
+      - name: Flutter tests
+        shell: bash
+        run: |
+          set +e
+          flutter test 2>&1 | tee flutter-test.txt
+          echo ${PIPESTATUS[0]} > flutter-test.exit
+          exit 0
+      - name: Summary
+        shell: bash
+        run: |
+          echo "## Production QA Audit" >> "$GITHUB_STEP_SUMMARY"
+          echo "Analyzer exit: $(cat flutter-analyze.exit)" >> "$GITHUB_STEP_SUMMARY"
+          echo "Tests exit: $(cat flutter-test.exit)" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          head -120 audit-static.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production-audit
+          path: |
+            audit-static.json
+            flutter-analyze.txt
+            flutter-analyze.exit
+            flutter-test.txt
+            flutter-test.exit
