@@ -90,39 +90,35 @@ flutter:
     - assets/notification.mp3
 
   fonts:
-    - family: BPG SSP Crystal
+    - family: Noto Sans Georgian
       fonts:
-        - asset: assets/font/crystal/BPGSSPCrystal-Regular.ttf
+        - asset: assets/font/noto/NotoSansGeorgian-Thin.ttf
+          weight: 100
+        - asset: assets/font/noto/NotoSansGeorgian-ExtraLight.ttf
+          weight: 200
+        - asset: assets/font/noto/NotoSansGeorgian-Light.ttf
+          weight: 300
+        - asset: assets/font/noto/NotoSansGeorgian-Regular.ttf
           weight: 400
-        - asset: assets/font/crystal/BPGSSPCrystal-Bold.ttf
+        - asset: assets/font/noto/NotoSansGeorgian-Medium.ttf
+          weight: 500
+        - asset: assets/font/noto/NotoSansGeorgian-SemiBold.ttf
+          weight: 600
+        - asset: assets/font/noto/NotoSansGeorgian-Bold.ttf
           weight: 700
-        - asset: assets/font/crystal/BPGSSPCrystal-Italic.ttf
-          weight: 400
-          style: italic
-        - asset: assets/font/crystal/BPGSSPCrystal-BoldItalic.ttf
-          weight: 700
-          style: italic
-    - family: BPG SSP Crystal Caps
-      fonts:
-        - asset: assets/font/crystal/BPGSSPCrystalCaps-Regular.ttf
-          weight: 400
-        - asset: assets/font/crystal/BPGSSPCrystalCaps-Bold.ttf
-          weight: 700
-        - asset: assets/font/crystal/BPGSSPCrystalCaps-Italic.ttf
-          weight: 400
-          style: italic
-        - asset: assets/font/crystal/BPGSSPCrystalCaps-BoldItalic.ttf
-          weight: 700
-          style: italic
+        - asset: assets/font/noto/NotoSansGeorgian-ExtraBold.ttf
+          weight: 800
+        - asset: assets/font/noto/NotoSansGeorgian-Black.ttf
+          weight: 900
     - family: MILI Cyrillic
       fonts:
-        - asset: assets/font/crystal/MiliCyrillic-Regular.ttf
+        - asset: assets/font/noto/MiliCyrillic-Regular.ttf
           weight: 400
-        - asset: assets/font/crystal/MiliCyrillic-Bold.ttf
+        - asset: assets/font/noto/MiliCyrillic-Bold.ttf
           weight: 700
-        - asset: assets/font/crystal/MiliCyrillic-Italic.ttf
+        - asset: assets/font/noto/MiliCyrillic-Italic.ttf
           weight: 400
           style: italic
-        - asset: assets/font/crystal/MiliCyrillic-BoldItalic.ttf
+        - asset: assets/font/noto/MiliCyrillic-BoldItalic.ttf
           weight: 700
           style: italic

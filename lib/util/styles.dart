@@ -1,4 +1,4 @@
-// Legacy style identifiers now resolve exclusively to the bundled BPG faces.
+// Legacy style identifiers now resolve exclusively to the bundled Noto Sans Georgian faces.
 import 'package:sixam_mart_delivery/util/typography.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,14 +15,14 @@ const robotoRegular = TextStyle(
 const robotoMedium = TextStyle(
   fontFamily: AppConstants.fontFamily,
   fontFamilyFallback: MiliTypography.fallback,
-  fontWeight: FontWeight.w400,
+  fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontSizeDefault,
 );
 
 const robotoSemiBold = TextStyle(
   fontFamily: AppConstants.fontFamily,
   fontFamilyFallback: MiliTypography.fallback,
-  fontWeight: FontWeight.w700,
+  fontWeight: FontWeight.w600,
   fontSize: Dimensions.fontSizeDefault,
 );
 
@@ -36,7 +36,7 @@ const robotoBold = TextStyle(
 const robotoBlack = TextStyle(
   fontFamily: AppConstants.fontFamily,
   fontFamilyFallback: MiliTypography.fallback,
-  fontWeight: FontWeight.w700,
+  fontWeight: FontWeight.w900,
   fontSize: Dimensions.fontSizeDefault,
 );
 

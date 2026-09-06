@@ -11,19 +11,30 @@ import 'package:sixam_mart_delivery/common/widgets/custom_app_bar_widget.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
-    for (final family in [
-      ('BPG SSP Crystal', 'BPGSSPCrystal'),
-      ('BPG SSP Crystal Caps', 'BPGSSPCrystalCaps'),
-      ('MILI Cyrillic', 'MiliCyrillic'),
+    final primary = FontLoader('Noto Sans Georgian');
+    for (final style in [
+      'Thin',
+      'ExtraLight',
+      'Light',
+      'Regular',
+      'Medium',
+      'SemiBold',
+      'Bold',
+      'ExtraBold',
+      'Black',
     ]) {
-      final loader = FontLoader(family.$1);
-      for (final style in ['Regular', 'Bold', 'Italic', 'BoldItalic']) {
-        loader.addFont(
-          rootBundle.load('assets/font/crystal/${family.$2}-$style.ttf'),
-        );
-      }
-      await loader.load();
+      primary.addFont(
+        rootBundle.load('assets/font/noto/NotoSansGeorgian-$style.ttf'),
+      );
     }
+    await primary.load();
+    final cyrillic = FontLoader('MILI Cyrillic');
+    for (final style in ['Regular', 'Bold', 'Italic', 'BoldItalic']) {
+      cyrillic.addFont(
+        rootBundle.load('assets/font/noto/MiliCyrillic-$style.ttf'),
+      );
+    }
+    await cyrillic.load();
   });
 
   test(
@@ -50,7 +61,7 @@ void main() {
         expect(
           width(value, MiliTypography.regular),
           closeTo(
-            width(value, const TextStyle(fontFamily: 'BPG SSP Crystal')),
+            width(value, const TextStyle(fontFamily: 'Noto Sans Georgian')),
             .01,
           ),
         );

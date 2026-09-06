@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 /// Shared text faces. The fallback asset contains Cyrillic code points only.
 /// Icon fonts are intentionally independent from application typography.
 abstract final class MiliTypography {
-  static const bodyFamily = 'BPG SSP Crystal';
-  static const capsFamily = 'BPG SSP Crystal Caps';
+  static const bodyFamily = 'Noto Sans Georgian';
+  static const capsFamily = bodyFamily;
   static const fallback = ['MILI Cyrillic'];
 
   static const regular = TextStyle(

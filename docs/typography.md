@@ -1,45 +1,34 @@
-# MILI typography
+# MILI typography — Noto Sans Georgian
 
-## Faces and scope
+## Default family
 
-Application-owned text uses the bundled BPG SSP Crystal family supplied in `BPG_SSP_Crystal.zip` (SHA-256 `17625a809627336d12c54cb153607a39733464c17a68271f1d0fb4069b370846`). Regular, Bold, Italic and Bold Italic are registered separately for both the ordinary and CAPS families. The 2019 regular/bold pair is used because its vertical metrics align with the CAPS faces; all BPG TTFs are unchanged source files.
+Application-owned text uses **Noto Sans Georgian v2.005**, bundled from the user-provided `NotoSansGeorgian-v2.005.zip`. Archive SHA-256: `10e85011008108308e6feab0408242acb07804da61ede3d3ff236461ae07ab1b`.
 
-The archive has no Cyrillic glyphs. The user explicitly approved a **Cyrillic-only bundled fallback**. MILI Cyrillic is a subset of Roboto from the pinned Google Fonts source recorded in `font-manifest.json`; its cmap is restricted to U+0400–052F, U+2DE0–2DFF and U+A640–A69F. It cannot replace Georgian or Latin glyphs. Its Apache license is included beside the files. Web faces use WOFF2; Flutter uses TTF. No font CDN or runtime font download is required for these faces.
+Use the archive's `googlefonts/ttf` full-coverage files, which contain Georgian, Mtavruli uppercase, Latin and the lari sign. The Georgian-only/unhinted subsets are not used. All nine genuine normal-width weights (100–900) are registered explicitly. Source TTFs are unmodified; web assets are WOFF2 conversions. The SIL OFL license and author/contributor notices are included.
 
-Material/Cupertino icon fonts and native emoji rendering remain independent: they draw pictograms, not an alternate UI text face. OS interfaces, third-party hosted payment content, map tile imagery and raster brand artwork are outside the application text renderer.
+The archive has no Cyrillic. Preserve the user's previously approved **Cyrillic-only bundled fallback**, `MILI Cyrillic`, whose cmap is restricted to U+0400–052F, U+2DE0–2DFF and U+A640–A69F. It cannot substitute Georgian or Latin text. Its original source, hashes and Apache license remain beside the assets.
 
-## Usage policy
+The archive has no italic master. Existing semantic italic/emphasis styling uses a renderer-generated slant of the Noto face where supported; it does not load a second Georgian/Latin family. Web synthesis permits style only, never synthetic weight. The Cyrillic fallback retains its genuine italic faces.
 
-| Role | Family and treatment |
+## Roles
+
+| Text role | Treatment |
 |---|---|
-| Page titles, short section headings, category labels | CAPS, usually Bold; complete headings/words, never Georgian title casing |
-| Product/store names, descriptions, chat messages, forms | Ordinary family; preserve authored text and case |
-| Prices, totals, primary actions, selected or important labels | Ordinary Bold |
-| Explicit short emphasis, citations and existing rich-text `<em>` or markdown emphasis | Genuine Italic, or Bold Italic when both are intended |
-| Long body copy, hints, errors and navigation instructions | Ordinary; avoid long CAPS or italic passages |
+| Short page/section headings and category labels | Noto Bold; Unicode uppercase where the UI opts into CAPS |
+| Product/store names, forms, descriptions and chat | Noto normal letterforms; preserve authored case |
+| Prices, totals and primary actions | Medium, SemiBold or Bold as already selected by the UI |
+| Short existing emphasis and citations | Preserve semantic italic emphasis; no long italic body passages |
 
-Only display text is capitalized. Identifiers, URLs, credentials, API values and stored product names are unchanged. Flutter app-bar/section-title capitalization retains the original text as its semantics label. Web product/store display helpers preserve authored case; category labels keep their CAPS behavior.
+Mtavruli/CAPS uses uppercase characters in the same Noto family; no separate CAPS face is needed. Display transformations retain original semantics labels in Flutter. Identifiers, URLs, authentication, amounts, API payloads and stored values are not changed by typography.
 
-Flutter's `MiliTypography` defines global families/fallbacks and semantic styles. Legacy `robotoRegular`/`robotoBold` variable names remain compatible with their callers but resolve to BPG; old Roboto and auth-only text font assets are removed. Only genuine 400 and 700 faces exist, so legacy medium/semibold/black aliases resolve to Regular/Bold without a separate synthetic face.
+`MiliTypography` defines Flutter families and fallback. Existing style-variable identifiers remain compatible with their callers but now use Noto; medium, semibold and black aliases use their genuine 500, 600 and 900 weights. Web family names are centralized in `src/theme/typography.js`. All text font files are local, primary faces are preloaded, and Google Maps font injection remains disabled.
 
-Web family names are centralized in `src/theme/typography.js`. All font faces are local, the primary faces are preloaded, and `font-synthesis: none` prevents fabricated bold/italic. Existing Google/Rubik font links and Quicksand/monospace/system font declarations were removed. The shared Google Maps loader suppresses its own Google Fonts injection, and map UI text uses the local family. Body line-height uses scalable ratios instead of the old sub-font-size fixed line heights.
+Icon fonts, native emoji, operating-system interfaces, map tile imagery, raster branding and third-party hosted payment pages remain independent of the application's text renderer.
 
-## Validation and boundaries
+## Verification and release boundaries
 
-Font manifests record source and output SHA-256 values. Tests verify the asset hashes, preservation of names, local-only declarations, real Cyrillic fallback, scaled/light/dark Flutter rendering, forms and app bars. Browser verification records the actual rendered font family/PostScript face rather than relying only on computed CSS. The current en/ka/ru application translation letters and currency symbols are covered by BPG plus the permitted Cyrillic subset. Existing emoji remain native pictograms.
+The adjacent `font-manifest.json` records all source/output hashes. Regression tests cover text shaping, Cyrillic fallback, light/dark appearances, scaled text, forms and app bars. Browser checks inspect the actual rendered family and face, not just the declared CSS.
 
-No AAB, APK or iOS build is part of this typography change. The user placed AAB work on hold pending a separate command. The older app-local Customer AAB predates these font changes and must not be promoted as the typography release.
+AAB/APK/iOS builds remain on hold until a separate explicit user command. Older app-local and canonical release artifacts predate this typography and cannot represent the updated source. The known unrelated Counter template test in each Flutter repo is excluded from the regression run; other available tests are run.
 
-The previously identified unrelated `test/widget_test.dart` Counter template in each app is excluded from the regression run; other available regression tests are run. Physical-device and third-party hosted UI behavior cannot be proven by widget/browser fixtures alone.
-
-## Sources informing the policy
-
-- [Flutter community: explicit weight/style registration](https://www.reddit.com/r/flutterhelp/comments/oyb6tj)
-- [Flutter community: bundled fonts and unexpected font downloads](https://www.reddit.com/r/flutterhelp/comments/1pj26in/flutter_web_force_app_to_use_only_bundled_fonts/)
-- [Typography community: distinguish body emphasis from attention-grabbing bold](https://www.reddit.com/r/typography/comments/1h7ee2m/504_rules_of_type_my_professor_made_this/)
-- [UX discussion: All Caps versus Bold](https://ux.stackexchange.com/questions/110132/all-caps-vs-bold)
-- [UX discussion: italic text and readability](https://ux.stackexchange.com/questions/62742/are-italics-on-the-web-bad-for-accessibility)
-- [Georgian text guidance: Mtavruli is whole-word/all-caps typography](https://www.w3.org/TR/geor-lreq/)
-- [Flutter custom-font registration](https://docs.flutter.dev/cookbook/design/fonts)
-
-Community opinions inform the design; they do not establish a universally best design or replace validation in MILI's layouts.
+Live deployment preserves production-only footer layout and environment configuration, backs up old source/build/assets, verifies new fonts over HTTP, and removes retired font files from the active site. Historical Git commits and rollback backups are intentionally retained.
