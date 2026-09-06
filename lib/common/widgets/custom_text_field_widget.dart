@@ -72,98 +72,200 @@ class CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    final bool hasText = widget.controller?.text.isNotEmpty ?? false;
 
-      widget.showTitle ? Text(widget.hintText, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)) : const SizedBox(),
-      SizedBox(height: widget.showTitle ? Dimensions.paddingSizeExtraSmall : 0),
-
-      TextField(
-        maxLines: widget.maxLines,
-        controller: widget.controller,
-        focusNode: widget.focusNode,
-        style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge),
-        textInputAction: widget.inputAction,
-        keyboardType: widget.inputType,
-        cursorColor: Theme.of(context).primaryColor,
-        textCapitalization: widget.capitalization,
-        enabled: widget.isEnabled,
-        autofocus: false,
-        obscureText: widget.isPassword ? _obscureText : false,
-        inputFormatters: widget.inputType == TextInputType.phone ? <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp('[0-9+]'))] : null,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-            borderSide: BorderSide(style: widget.border ? BorderStyle.solid : BorderStyle.none, width: 0.3, color: Theme.of(context).disabledColor),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.showTitle)
+          Text(
+            widget.hintText,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: robotoRegular.copyWith(
+              fontSize: Dimensions.fontSizeSmall,
+              height: 1.25,
+            ),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-            borderSide: BorderSide(style: widget.border ? BorderStyle.solid : BorderStyle.none, width: 0.3, color: Theme.of(context).disabledColor),
+        SizedBox(
+          height: widget.showTitle ? Dimensions.paddingSizeExtraSmall : 0,
+        ),
+        TextField(
+          maxLines: widget.maxLines,
+          controller: widget.controller,
+          focusNode: widget.focusNode,
+          style: robotoRegular.copyWith(
+            fontSize: Dimensions.fontSizeLarge,
+            height: 1.25,
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-            borderSide: BorderSide(style: widget.border ? BorderStyle.solid : BorderStyle.none, width: 1, color: Theme.of(context).disabledColor),
-          ),
-          isDense: true,
-          hintText: widget.hintText,
-          fillColor: Theme.of(context).cardColor,
-          hintStyle: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).hintColor),
-          filled: true,
-          labelStyle : widget.showLabelText ? robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).hintColor) : null,
-          label: widget.showLabelText ? Text.rich(TextSpan(children: [
-            TextSpan(text: widget.labelText ?? '', style: robotoRegular.copyWith(
-              fontSize: widget.labelTextSize ?? Dimensions.fontSizeDefault,
-              color: ((widget.focusNode?.hasFocus == true || widget.controller!.text.isNotEmpty ) &&  widget.isEnabled) ? Theme.of(context).textTheme.bodyLarge?.color :  Theme.of(context).hintColor.withValues(alpha: 0.7),
-            )),
-            if(widget.isRequired && widget.labelText != null)
-              TextSpan(text : ' *', style: robotoRegular.copyWith(color: Theme.of(context).colorScheme.error, fontSize: Dimensions.fontSizeDefault)),
-          ])) : null,
-          prefixIcon: widget.isPhone ? SizedBox(width: 95, child: Row(children: [
-            Container(
-              width: 85, height: 50,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(Dimensions.radiusSmall),
-                  bottomLeft: Radius.circular(Dimensions.radiusSmall),
-                ),
-              ),
-              margin: const EdgeInsets.only(right: 0),
-              padding: const EdgeInsets.only(left: 5),
-              child: Center(
-                child: CodePickerWidget(
-                  backgroundColor: Theme.of(context).cardColor,
-                  dialogBackgroundColor: Theme.of(context).cardColor,
-                  flagWidth: 25,
-                  padding: EdgeInsets.zero,
-                  onChanged: widget.onCountryChanged,
-                  initialSelection: widget.countryDialCode,
-                  favorite: [widget.countryDialCode!],
-                  textStyle: robotoRegular.copyWith(
-                    fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyMedium!.color,
-                  ),
-                ),
+          textInputAction: widget.inputAction,
+          keyboardType: widget.inputType,
+          cursorColor: Theme.of(context).primaryColor,
+          textCapitalization: widget.capitalization,
+          enabled: widget.isEnabled,
+          autofocus: false,
+          obscureText: widget.isPassword ? _obscureText : false,
+          inputFormatters: widget.inputType == TextInputType.phone
+              ? <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp('[0-9+]')),
+                ]
+              : null,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+              borderSide: BorderSide(
+                style: widget.border ? BorderStyle.solid : BorderStyle.none,
+                width: 0.3,
+                color: Theme.of(context).disabledColor,
               ),
             ),
-
-            Container(
-              height: 20, width: 2,
-              color: Theme.of(context).disabledColor,
-            )
-          ])) : widget.prefixImage != null && widget.prefixIcon == null ? Padding(
-            padding: EdgeInsets.symmetric(horizontal: widget.prefixSize),
-            child: Image.asset(widget.prefixImage!, height: 20, width: 20),
-          ) : widget.prefixImage == null && widget.prefixIcon != null ? Icon(widget.prefixIcon, size: widget.iconSize) : null,
-          suffixIcon: widget.isPassword ? IconButton(
-            icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Theme.of(context).hintColor.withValues(alpha: 0.3)),
-            onPressed: _toggle,
-          ) : null,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+              borderSide: BorderSide(
+                style: widget.border ? BorderStyle.solid : BorderStyle.none,
+                width: 0.3,
+                color: Theme.of(context).disabledColor,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+              borderSide: BorderSide(
+                style: widget.border ? BorderStyle.solid : BorderStyle.none,
+                width: 1,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            isDense: true,
+            hintText: widget.hintText,
+            fillColor: Theme.of(context).cardColor,
+            hintStyle: robotoRegular.copyWith(
+              fontSize: Dimensions.fontSizeLarge,
+              color: Theme.of(context).hintColor,
+              height: 1.25,
+            ),
+            filled: true,
+            labelStyle: widget.showLabelText
+                ? robotoRegular.copyWith(
+                    fontSize: Dimensions.fontSizeDefault,
+                    color: Theme.of(context).hintColor,
+                    height: 1.2,
+                  )
+                : null,
+            label: widget.showLabelText
+                ? Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: widget.labelText ?? '',
+                          style: robotoRegular.copyWith(
+                            fontSize: widget.labelTextSize ??
+                                Dimensions.fontSizeDefault,
+                            color: ((widget.focusNode?.hasFocus == true || hasText) &&
+                                    widget.isEnabled)
+                                ? Theme.of(context).textTheme.bodyLarge?.color
+                                : Theme.of(context)
+                                    .hintColor
+                                    .withValues(alpha: 0.7),
+                          ),
+                        ),
+                        if (widget.isRequired && widget.labelText != null)
+                          TextSpan(
+                            text: ' *',
+                            style: robotoRegular.copyWith(
+                              color: Theme.of(context).colorScheme.error,
+                              fontSize: Dimensions.fontSizeDefault,
+                            ),
+                          ),
+                      ],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : null,
+            prefixIcon: widget.isPhone
+                ? SizedBox(
+                    width: 95,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 85,
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(Dimensions.radiusSmall),
+                              bottomLeft: Radius.circular(Dimensions.radiusSmall),
+                            ),
+                          ),
+                          padding: const EdgeInsets.only(left: 5),
+                          child: Center(
+                            child: CodePickerWidget(
+                              backgroundColor: Theme.of(context).cardColor,
+                              dialogBackgroundColor: Theme.of(context).cardColor,
+                              flagWidth: 25,
+                              padding: EdgeInsets.zero,
+                              onChanged: widget.onCountryChanged,
+                              initialSelection: widget.countryDialCode,
+                              favorite: widget.countryDialCode?.isNotEmpty == true
+                                  ? [widget.countryDialCode!]
+                                  : const [],
+                              textStyle: robotoRegular.copyWith(
+                                fontSize: Dimensions.fontSizeDefault,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .color,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 20,
+                          width: 2,
+                          color: Theme.of(context).disabledColor,
+                        ),
+                      ],
+                    ),
+                  )
+                : widget.prefixImage != null && widget.prefixIcon == null
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: widget.prefixSize,
+                        ),
+                        child: Image.asset(
+                          widget.prefixImage!,
+                          height: 20,
+                          width: 20,
+                        ),
+                      )
+                    : widget.prefixIcon != null
+                        ? Icon(widget.prefixIcon, size: widget.iconSize)
+                        : null,
+            suffixIcon: widget.isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: Theme.of(context).hintColor.withValues(alpha: 0.3),
+                    ),
+                    onPressed: _toggle,
+                  )
+                : null,
+          ),
+          onSubmitted: (text) => widget.nextFocus != null
+              ? FocusScope.of(context).requestFocus(widget.nextFocus)
+              : widget.onSubmit != null
+                  ? widget.onSubmit!(text)
+                  : null,
+          onChanged: widget.onChanged as void Function(String)?,
         ),
-        onSubmitted: (text) => widget.nextFocus != null ? FocusScope.of(context).requestFocus(widget.nextFocus) : widget.onSubmit != null ? widget.onSubmit!(text) : null,
-        onChanged: widget.onChanged as void Function(String)?,
-      ),
-
-      widget.divider ? const Padding(padding: EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge), child: Divider()) : const SizedBox(),
-
-    ]);
+        if (widget.divider)
+          const Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: Dimensions.paddingSizeLarge,
+            ),
+            child: Divider(),
+          ),
+      ],
+    );
   }
 
   void _toggle() {
