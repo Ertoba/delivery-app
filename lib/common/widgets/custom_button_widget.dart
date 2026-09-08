@@ -55,11 +55,11 @@ class CustomButtonWidget extends StatelessWidget {
           : transparent
           ? Colors.transparent
           : backgroundColor ?? Theme.of(context).primaryColor,
-      minimumSize: Size(
-        width != null ? width! : Dimensions.webMaxWidth,
-        height != null ? height! : 50,
+      minimumSize: Size(width ?? Dimensions.webMaxWidth, height ?? 50),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimensions.paddingSizeDefault,
+        vertical: Dimensions.paddingSizeExtraSmall,
       ),
-      padding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius),
         side: isBorder
@@ -77,93 +77,95 @@ class CustomButtonWidget extends StatelessWidget {
       child: SizedBox(
         width: width ?? Dimensions.webMaxWidth,
         child: Padding(
-          padding: margin == null ? const EdgeInsets.all(0) : margin!,
+          padding: margin ?? EdgeInsets.zero,
           child: TextButton(
             onPressed: isLoading ? null : onPressed as void Function()?,
             style: flatButtonStyle,
-            child: isLoading
-                ? Center(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Keep the label's layout while busy so the action never jumps.
+                ExcludeSemantics(
+                  excluding: isLoading,
+                  child: Opacity(
+                    opacity: isLoading ? 0 : 1,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(
-                          height: 15,
-                          width: 15,
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
-                            strokeWidth: 2,
+                        if (icon != null) ...[
+                          Icon(
+                            icon,
+                            color: transparent
+                                ? Theme.of(context).primaryColor
+                                : Theme.of(context).cardColor,
                           ),
-                        ),
-                        const SizedBox(width: Dimensions.paddingSizeSmall),
-
-                        Text(
-                          'loading'.tr,
-                          style: robotoMedium.copyWith(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      icon != null
-                          ? Padding(
-                              padding: const EdgeInsets.only(
-                                right: Dimensions.paddingSizeExtraSmall,
-                              ),
-                              child: Icon(
-                                icon,
-                                color: transparent
-                                    ? Theme.of(context).primaryColor
-                                    : Theme.of(context).cardColor,
-                              ),
-                            )
-                          : const SizedBox(),
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
+                          const SizedBox(
+                            width: Dimensions.paddingSizeExtraSmall,
+                          ),
+                        ],
+                        Flexible(
                           child: Text(
                             buttonText,
                             textAlign: TextAlign.center,
-                            maxLines: 1,
-                            style: isBold
-                                ? robotoBold.copyWith(
-                                    color: onPressed == null
-                                        ? (disabledFontColor ??
-                                              Theme.of(
-                                                context,
-                                              ).textTheme.bodyLarge!.color)
-                                        : fontColor ??
-                                              (transparent
-                                                  ? Theme.of(
-                                                      context,
-                                                    ).primaryColor
-                                                  : Colors.white),
-                                    fontSize:
-                                        fontSize ?? Dimensions.fontSizeLarge,
-                                  )
-                                : robotoRegular.copyWith(
-                                    color: onPressed == null
-                                        ? (disabledFontColor ??
-                                              Theme.of(
-                                                context,
-                                              ).textTheme.bodyLarge!.color)
-                                        : fontColor ??
-                                              (transparent
-                                                  ? Theme.of(
-                                                      context,
-                                                    ).primaryColor
-                                                  : Colors.white),
-                                    fontSize:
-                                        fontSize ?? Dimensions.fontSizeLarge,
-                                  ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: (isBold ? robotoBold : robotoRegular)
+                                .copyWith(
+                                  color: onPressed == null
+                                      ? (disabledFontColor ??
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyLarge!.color)
+                                      : fontColor ??
+                                            (transparent
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.white),
+                                  fontSize:
+                                      fontSize ?? Dimensions.fontSizeLarge,
+                                  height: 1.2,
+                                ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                ),
+                if (isLoading)
+                  Positioned.fill(
+                    child: Semantics(
+                      label: 'loading'.tr,
+                      liveRegion: true,
+                      child: Center(
+                        child: MediaQuery.disableAnimationsOf(context)
+                            ? Icon(
+                                Icons.hourglass_top_rounded,
+                                color:
+                                    fontColor ??
+                                    textColor ??
+                                    (transparent
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.white),
+                                size: 20,
+                              )
+                            : SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color:
+                                      fontColor ??
+                                      textColor ??
+                                      (transparent
+                                          ? Theme.of(context).primaryColor
+                                          : Colors.white),
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

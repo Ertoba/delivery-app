@@ -68,6 +68,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = WidgetsBinding.instance.platformDispatcher
+        .accessibilityFeatures.disableAnimations;
     if(GetPlatform.isWeb) {
       Get.find<SplashController>().initSharedData();
       _route();
@@ -82,7 +84,26 @@ class MyApp extends StatelessWidget {
     return GetBuilder<ThemeController>(builder: (themeController) {
       return GetBuilder<LocalizationController>(builder: (localizeController) {
         return GetBuilder<SplashController>(builder: (splashController) {
-          return (GetPlatform.isWeb && splashController.configModel == null) ? const SizedBox() : GetMaterialApp(
+          if (GetPlatform.isWeb && splashController.configModel == null) {
+            return Directionality(
+              textDirection: TextDirection.ltr,
+              child: ColoredBox(
+                color: Colors.white,
+                child: Center(
+                  child: Semantics(
+                    label: 'Loading',
+                    child: const SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(strokeWidth: 3),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return GetMaterialApp(
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
             navigatorKey: Get.key,
@@ -92,17 +113,18 @@ class MyApp extends StatelessWidget {
             fallbackLocale: Locale(AppConstants.languages[0].languageCode!, AppConstants.languages[0].countryCode),
             initialRoute: RouteHelper.getSplashRoute(body),
             getPages: RouteHelper.routes,
-            defaultTransition: Transition.topLevel,
-            transitionDuration: const Duration(milliseconds: 500),
+            defaultTransition: reduceMotion ? Transition.noTransition : Transition.topLevel,
+            transitionDuration: reduceMotion ? Duration.zero : const Duration(milliseconds: 250),
             builder: (BuildContext context, widget) {
-              return MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)), child: Material(
+              return Material(
                 child: SafeArea(
-                  top: false, bottom: GetPlatform.isAndroid,
+                  top: false,
+                  bottom: true,
                   child: Stack(children: [
                     widget!,
                   ]),
                 ),
-              ));
+              );
             },
           );
         });

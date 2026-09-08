@@ -1,30 +1,81 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:sixam_mart_delivery/main.dart';
+import 'package:get/get.dart';
+import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp(languages: null));
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+  setUp(() => Get.testMode = true);
+  tearDown(() => Get.reset());
+  for (final width in [320.0, 390.0, 768.0]) {
+    for (final scale in [1.0, 1.5, 2.0]) {
+      testWidgets('primary action at $width px and $scale text scale', (
+        tester,
+      ) async {
+        tester.view.physicalSize = Size(width, 800);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        var submitted = 0;
+        var busy = false;
+        late StateSetter update;
+        await tester.pumpWidget(
+          GetMaterialApp(
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(scale)),
+              child: child!,
+            ),
+            home: Scaffold(
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: StatefulBuilder(
+                    builder: (context, setState) {
+                      update = setState;
+                      return CustomButtonWidget(
+                        buttonText:
+                            'შეკვეთის გაფორმება და გადახდის უსაფრთხოდ გაგრძელება',
+                        fontSize: 16,
+                        isLoading: busy,
+                        icon: Icons.lock_outline,
+                        onPressed: () {
+                          submitted++;
+                          update(() => busy = true);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+        final action = find.byType(TextButton);
+        final before = tester.getSize(action);
+        expect(before.width, lessThanOrEqualTo(width - 32));
+        expect(before.height, greaterThanOrEqualTo(48));
+        await tester.tap(action);
+        await tester.pump();
+        expect(
+          tester.getSize(action),
+          before,
+          reason: 'Loading must retain the action bounds.',
+        );
+        expect(tester.widget<TextButton>(action).onPressed, isNull);
+        await tester.tap(action);
+        expect(
+          submitted,
+          1,
+          reason: 'A busy action must reject duplicate submissions.',
+        );
+        update(() => busy = false);
+        await tester.pump();
+        expect(tester.getSize(action), before);
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
 }

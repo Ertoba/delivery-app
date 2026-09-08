@@ -1,0 +1,659 @@
+{
+  "inventory": {
+    "source_files": 388,
+    "screens_pages": 54,
+    "widgets_components": 146,
+    "forms": 17,
+    "buttons": 183,
+    "dialogs_sheets": 98,
+    "loaders": 102,
+    "animations": 5,
+    "safe_area": 23,
+    "scaffold": 49,
+    "text_overflow": 84,
+    "expanded_flexible": 227,
+    "uppercase_calls": 17,
+    "print_calls": 41,
+    "hardcoded_font_sizes": 26,
+    "fixed_width_height_literals": 588
+  },
+  "files": [
+    "lib/api/api_checker.dart",
+    "lib/api/api_client.dart",
+    "lib/common/controllers/theme_controller.dart",
+    "lib/common/models/config_model.dart",
+    "lib/common/models/error_response.dart",
+    "lib/common/models/response_model.dart",
+    "lib/common/models/translation.dart",
+    "lib/common/widgets/chart_widget.dart",
+    "lib/common/widgets/code_picker_widget.dart",
+    "lib/common/widgets/confirmation_dialog_widget.dart",
+    "lib/common/widgets/custom_alert_dialog_widget.dart",
+    "lib/common/widgets/custom_app_bar_widget.dart",
+    "lib/common/widgets/custom_asset_image_widget.dart",
+    "lib/common/widgets/custom_bottom_sheet_widget.dart",
+    "lib/common/widgets/custom_button_widget.dart",
+    "lib/common/widgets/custom_card.dart",
+    "lib/common/widgets/custom_confirmation_bottom_sheet.dart",
+    "lib/common/widgets/custom_drop_down_button.dart",
+    "lib/common/widgets/custom_dropdown_widget.dart",
+    "lib/common/widgets/custom_image_widget.dart",
+    "lib/common/widgets/custom_ink_well_widget.dart",
+    "lib/common/widgets/custom_loader.dart",
+    "lib/common/widgets/custom_snackbar_widget.dart",
+    "lib/common/widgets/custom_text_field_widget.dart",
+    "lib/common/widgets/details_custom_card.dart",
+    "lib/common/widgets/drop_down_widget.dart",
+    "lib/common/widgets/filter_bottom_sheet_widget.dart",
+    "lib/common/widgets/google_map_custom_windows.dart",
+    "lib/common/widgets/level_congratulations_dialog_widget.dart",
+    "lib/common/widgets/no_data_widget.dart",
+    "lib/common/widgets/order_shimmer_widget.dart",
+    "lib/common/widgets/order_widget.dart",
+    "lib/common/widgets/paginated_list_view_widget.dart",
+    "lib/common/widgets/permission_dialog_widget.dart",
+    "lib/common/widgets/section_widget.dart",
+    "lib/common/widgets/slider_button_widget.dart",
+    "lib/common/widgets/sliver_delegate.dart",
+    "lib/common/widgets/text_field_widget.dart",
+    "lib/common/widgets/title_widget.dart",
+    "lib/common/widgets/trip_overview_widget.dart",
+    "lib/features/address/controllers/address_controller.dart",
+    "lib/features/address/domain/models/address_model.dart",
+    "lib/features/address/domain/models/record_location_body_model.dart",
+    "lib/features/address/domain/models/zone_model.dart",
+    "lib/features/address/domain/models/zone_response_model.dart",
+    "lib/features/address/domain/repositories/address_repository.dart",
+    "lib/features/address/domain/repositories/address_repository_interface.dart",
+    "lib/features/address/domain/services/address_service.dart",
+    "lib/features/address/domain/services/address_service_interface.dart",
+    "lib/features/auth/controllers/auth_controller.dart",
+    "lib/features/auth/domain/models/delivery_man_body_model.dart",
+    "lib/features/auth/domain/models/vehicle_model.dart",
+    "lib/features/auth/domain/repositories/auth_repository.dart",
+    "lib/features/auth/domain/repositories/auth_repository_interface.dart",
+    "lib/features/auth/domain/services/auth_service.dart",
+    "lib/features/auth/domain/services/auth_service_interface.dart",
+    "lib/features/auth/screens/dm_registration_screen.dart",
+    "lib/features/auth/screens/dm_registration_success_screen.dart",
+    "lib/features/auth/screens/sign_in_screen.dart",
+    "lib/features/auth/widgets/condition_check_box_widget.dart",
+    "lib/features/auth/widgets/mili_auth_ui.dart",
+    "lib/features/auth/widgets/pass_view_widget.dart",
+    "lib/features/chat/controllers/chat_controller.dart",
+    "lib/features/chat/domain/models/conversation_model.dart",
+    "lib/features/chat/domain/models/message_model.dart",
+    "lib/features/chat/domain/repositories/chat_repository.dart",
+    "lib/features/chat/domain/repositories/chat_repository_interface.dart",
+    "lib/features/chat/domain/services/chat_service.dart",
+    "lib/features/chat/domain/services/chat_service_interface.dart",
+    "lib/features/chat/screens/chat_screen.dart",
+    "lib/features/chat/screens/conversation_screen.dart",
+    "lib/features/chat/widgets/image_diaglog_widget.dart",
+    "lib/features/chat/widgets/message_bubble_shimmer_widget.dart",
+    "lib/features/chat/widgets/message_bubble_widget.dart",
+    "lib/features/chat/widgets/search_field_widget.dart",
+    "lib/features/dashboard/screens/dashboard_screen.dart",
+    "lib/features/dashboard/widgets/bottom_nav_item_widget.dart",
+    "lib/features/dashboard/widgets/new_request_dialog_widget.dart",
+    "lib/features/delivery_module/order/controllers/order_controller.dart",
+    "lib/features/delivery_module/order/domain/models/ignore_model.dart",
+    "lib/features/delivery_module/order/domain/models/order_cancellation_body.dart",
+    "lib/features/delivery_module/order/domain/models/order_count_model.dart",
+    "lib/features/delivery_module/order/domain/models/order_details_model.dart",
+    "lib/features/delivery_module/order/domain/models/order_model.dart",
+    "lib/features/delivery_module/order/domain/models/parcel_cancellation_reasons_model.dart",
+    "lib/features/delivery_module/order/domain/models/update_status_body_model.dart",
+    "lib/features/delivery_module/order/domain/repositories/order_repository.dart",
+    "lib/features/delivery_module/order/domain/repositories/order_repository_interface.dart",
+    "lib/features/delivery_module/order/domain/services/order_service.dart",
+    "lib/features/delivery_module/order/domain/services/order_service_interface.dart",
+    "lib/features/delivery_module/order/screens/my_order_screen.dart",
+    "lib/features/delivery_module/order/screens/order_details_screen.dart",
+    "lib/features/delivery_module/order/screens/order_location_screen.dart",
+    "lib/features/delivery_module/order/screens/order_request_location_screen.dart",
+    "lib/features/delivery_module/order/screens/order_request_screen.dart",
+    "lib/features/delivery_module/order/screens/order_screen.dart",
+    "lib/features/delivery_module/order/screens/order_status.dart",
+    "lib/features/delivery_module/order/screens/running_order_screen.dart",
+    "lib/features/delivery_module/order/widgets/bottom_view/delivery_confirmation_section.dart",
+    "lib/features/delivery_module/order/widgets/bottom_view/parcel_bottom_view.dart",
+    "lib/features/delivery_module/order/widgets/bottom_view/regular_order_bottom_view.dart",
+    "lib/features/delivery_module/order/widgets/camera_button_sheet_widget.dart",
+    "lib/features/delivery_module/order/widgets/cancellation_dialogue_widget.dart",
+    "lib/features/delivery_module/order/widgets/collect_money_delivery_sheet_widget.dart",
+    "lib/features/delivery_module/order/widgets/custom_order_details_card.dart",
+    "lib/features/delivery_module/order/widgets/dialogue_image_widget.dart",
+    "lib/features/delivery_module/order/widgets/history_order_widget.dart",
+    "lib/features/delivery_module/order/widgets/info_card_widget.dart",
+    "lib/features/delivery_module/order/widgets/location_card_widget.dart",
+    "lib/features/delivery_module/order/widgets/order_fee_receive_dialog_widget.dart",
+    "lib/features/delivery_module/order/widgets/order_item_widget.dart",
+    "lib/features/delivery_module/order/widgets/order_requset_widget.dart",
+    "lib/features/delivery_module/order/widgets/parcel_cancelation/cancellation_reason_bottom_sheet.dart",
+    "lib/features/delivery_module/order/widgets/parcel_cancelation/collect_money_bottom_sheet.dart",
+    "lib/features/delivery_module/order/widgets/parcel_cancelation/custom_check_box_widget.dart",
+    "lib/features/delivery_module/order/widgets/parcel_cancelation/otp_dialog.dart",
+    "lib/features/delivery_module/order/widgets/parcel_cancelation/parcel_cancel_confirm_bottom_sheet.dart",
+    "lib/features/delivery_module/order/widgets/parcel_cancelation/parcel_return_date_time_bottom_sheet.dart",
+    "lib/features/delivery_module/order/widgets/parcel_cancelation/time_picker_widget.dart",
+    "lib/features/delivery_module/order/widgets/request_location_card_widget.dart",
+    "lib/features/delivery_module/order/widgets/selected_type_button.dart",
+    "lib/features/delivery_module/order/widgets/verify_delivery_sheet_widget.dart",
+    "lib/features/disbursement/controllers/disbursement_controller.dart",
+    "lib/features/disbursement/domain/models/disbursement_method_model.dart",
+    "lib/features/disbursement/domain/models/disbursement_report_model.dart",
+    "lib/features/disbursement/domain/repositories/disbursement_repository.dart",
+    "lib/features/disbursement/domain/repositories/disbursement_repository_interface.dart",
+    "lib/features/disbursement/domain/services/disbursement_service.dart",
+    "lib/features/disbursement/domain/services/disbursement_service_interface.dart",
+    "lib/features/disbursement/helper/disbursement_helper.dart",
+    "lib/features/disbursement/screens/disbursement_screen.dart",
+    "lib/features/disbursement/widgets/disbursement_status_card_widget.dart",
+    "lib/features/disbursement/widgets/payment_information_dialog_widget.dart",
+    "lib/features/disbursement/widgets/withdraw_method_attention_dialog_widget.dart",
+    "lib/features/forgot_password/controllers/forgot_password_controller.dart",
+    "lib/features/forgot_password/domain/repositories/forgot_password_repository.dart",
+    "lib/features/forgot_password/domain/repositories/forgot_password_repository_interface.dart",
+    "lib/features/forgot_password/domain/services/forgot_password_service.dart",
+    "lib/features/forgot_password/domain/services/forgot_password_service_interface.dart",
+    "lib/features/forgot_password/screens/forget_pass_screen.dart",
+    "lib/features/forgot_password/screens/new_pass_screen.dart",
+    "lib/features/forgot_password/screens/verification_screen.dart",
+    "lib/features/home/helper/home_screen_helper.dart",
+    "lib/features/home/screens/home_screen.dart",
+    "lib/features/home/widgets/active_order_widget.dart",
+    "lib/features/home/widgets/active_ride_widget.dart",
+    "lib/features/home/widgets/cash_in_hand_card_widget.dart",
+    "lib/features/home/widgets/count_card_widget.dart",
+    "lib/features/home/widgets/earning_widget.dart",
+    "lib/features/home/widgets/home_earning_widget.dart",
+    "lib/features/home/widgets/location_access_dialog.dart",
+    "lib/features/home/widgets/order_count_card_widget.dart",
+    "lib/features/home/widgets/order_count_widget.dart",
+    "lib/features/home/widgets/orders_and_rides_view.dart",
+    "lib/features/home/widgets/referal_card_widget.dart",
+    "lib/features/home/widgets/ride_activity_view.dart",
+    "lib/features/home/widgets/ride_floating_button_widget.dart",
+    "lib/features/home/widgets/ride_order_count_widget.dart",
+    "lib/features/home/widgets/vehicle_add_widget.dart",
+    "lib/features/html/controllers/html_controller.dart",
+    "lib/features/html/domain/repositories/html_repository.dart",
+    "lib/features/html/domain/repositories/html_repository_interface.dart",
+    "lib/features/html/domain/services/html_service.dart",
+    "lib/features/html/domain/services/html_service_interface.dart",
+    "lib/features/html/screens/html_viewer_screen.dart",
+    "lib/features/language/controllers/language_controller.dart",
+    "lib/features/language/domain/models/language_model.dart",
+    "lib/features/language/domain/repositories/language_repository.dart",
+    "lib/features/language/domain/repositories/language_repository_interface.dart",
+    "lib/features/language/domain/services/language_service.dart",
+    "lib/features/language/domain/services/language_service_interface.dart",
+    "lib/features/language/screens/language_screen.dart",
+    "lib/features/language/widgets/language_bottom_sheet_widget.dart",
+    "lib/features/language/widgets/language_card_widget.dart",
+    "lib/features/my_account/controllers/my_account_controller.dart",
+    "lib/features/my_account/domain/models/earning_report_model.dart",
+    "lib/features/my_account/domain/models/loyalty_point_model.dart",
+    "lib/features/my_account/domain/models/loyalty_report_model.dart",
+    "lib/features/my_account/domain/models/referral_report_model.dart",
+    "lib/features/my_account/domain/models/wallet_payment_model.dart",
+    "lib/features/my_account/domain/models/withdraw_method_model.dart",
+    "lib/features/my_account/domain/models/withdraw_request_model.dart",
+    "lib/features/my_account/domain/repositories/my_account_repository.dart",
+    "lib/features/my_account/domain/repositories/my_account_repository_interface.dart",
+    "lib/features/my_account/domain/services/my_account_service.dart",
+    "lib/features/my_account/domain/services/my_account_service_interface.dart",
+    "lib/features/my_account/helpers/payment_method_filter_helper.dart",
+    "lib/features/my_account/screens/add_withdraw_method_screen.dart",
+    "lib/features/my_account/screens/edit_withdraw_method_screen.dart",
+    "lib/features/my_account/screens/my_account_screen.dart",
+    "lib/features/my_account/screens/my_earning_filter_screen.dart",
+    "lib/features/my_account/screens/my_earning_screen.dart",
+    "lib/features/my_account/screens/payment_screen.dart",
+    "lib/features/my_account/screens/transaction_history_screen.dart",
+    "lib/features/my_account/screens/wallet_provided_earning_history_screen.dart",
+    "lib/features/my_account/screens/withdraw_method_screen.dart",
+    "lib/features/my_account/widgets/account/my_point_view.dart",
+    "lib/features/my_account/widgets/account/point_filter_bottom_sheet_widget.dart",
+    "lib/features/my_account/widgets/account/point_to_wallet_money_widget.dart",
+    "lib/features/my_account/widgets/account/wallet_overview_widget.dart",
+    "lib/features/my_account/widgets/amount_card_widget.dart",
+    "lib/features/my_account/widgets/confirm_dialog_widget.dart",
+    "lib/features/my_account/widgets/custom_drop_down.dart",
+    "lib/features/my_account/widgets/earning_history_bottom_sheet.dart",
+    "lib/features/my_account/widgets/empty_state_bottom_sheet.dart",
+    "lib/features/my_account/widgets/fund_payment_dialog_widget.dart",
+    "lib/features/my_account/widgets/loyalty_history_bottom_sheet.dart",
+    "lib/features/my_account/widgets/payment_method_bottom_sheet_widget.dart",
+    "lib/features/my_account/widgets/payment_successful_widget.dart",
+    "lib/features/my_account/widgets/referral_history_bottom_sheet.dart",
+    "lib/features/my_account/widgets/reports/earning_report_card.dart",
+    "lib/features/my_account/widgets/reports/loyalty_view_widget.dart",
+    "lib/features/my_account/widgets/reports/order_view_widget.dart",
+    "lib/features/my_account/widgets/reports/refer_view_widget.dart",
+    "lib/features/my_account/widgets/success_dialog_widget.dart",
+    "lib/features/my_account/widgets/tab_section_widget.dart",
+    "lib/features/my_account/widgets/transaction_section_widget.dart",
+    "lib/features/my_account/widgets/wallet_attention_alert_widget.dart",
+    "lib/features/my_account/widgets/withdrawal_bottomsheet.dart",
+    "lib/features/notification/controllers/notification_controller.dart",
+    "lib/features/notification/domain/models/notification_body_model.dart",
+    "lib/features/notification/domain/models/notification_model.dart",
+    "lib/features/notification/domain/repositories/notification_repository.dart",
+    "lib/features/notification/domain/repositories/notification_repository_interface.dart",
+    "lib/features/notification/domain/services/notification_service.dart",
+    "lib/features/notification/domain/services/notification_service_interface.dart",
+    "lib/features/notification/screens/notification_screen.dart",
+    "lib/features/notification/widgets/notification_dialog_widget.dart",
+    "lib/features/order/controllers/order_controller.dart",
+    "lib/features/order/domain/models/ignore_model.dart",
+    "lib/features/order/domain/models/order_cancellation_body.dart",
+    "lib/features/order/domain/models/order_count_model.dart",
+    "lib/features/order/domain/models/order_details_model.dart",
+    "lib/features/order/domain/models/order_model.dart",
+    "lib/features/order/domain/models/parcel_cancellation_reasons_model.dart",
+    "lib/features/order/domain/models/update_status_body_model.dart",
+    "lib/features/order/domain/repositories/order_repository.dart",
+    "lib/features/order/domain/repositories/order_repository_interface.dart",
+    "lib/features/order/domain/services/order_service.dart",
+    "lib/features/order/domain/services/order_service_interface.dart",
+    "lib/features/order/screens/my_order_screen.dart",
+    "lib/features/order/screens/order_details_screen.dart",
+    "lib/features/order/screens/order_location_screen.dart",
+    "lib/features/order/screens/order_request_screen.dart",
+    "lib/features/order/screens/order_screen.dart",
+    "lib/features/order/screens/order_status.dart",
+    "lib/features/order/screens/running_order_screen.dart",
+    "lib/features/order/widgets/bottom_view/delivery_confirmation_section.dart",
+    "lib/features/order/widgets/bottom_view/parcel_bottom_view.dart",
+    "lib/features/order/widgets/bottom_view/regular_order_bottom_view.dart",
+    "lib/features/order/widgets/camera_button_sheet_widget.dart",
+    "lib/features/order/widgets/cancellation_dialogue_widget.dart",
+    "lib/features/order/widgets/collect_money_delivery_sheet_widget.dart",
+    "lib/features/order/widgets/custom_order_details_card.dart",
+    "lib/features/order/widgets/dialogue_image_widget.dart",
+    "lib/features/order/widgets/history_order_widget.dart",
+    "lib/features/order/widgets/info_card_widget.dart",
+    "lib/features/order/widgets/location_card_widget.dart",
+    "lib/features/order/widgets/order_fee_receive_dialog_widget.dart",
+    "lib/features/order/widgets/order_item_widget.dart",
+    "lib/features/order/widgets/order_requset_widget.dart",
+    "lib/features/order/widgets/parcel_cancelation/cancellation_reason_bottom_sheet.dart",
+    "lib/features/order/widgets/parcel_cancelation/collect_money_bottom_sheet.dart",
+    "lib/features/order/widgets/parcel_cancelation/custom_check_box_widget.dart",
+    "lib/features/order/widgets/parcel_cancelation/otp_dialog.dart",
+    "lib/features/order/widgets/parcel_cancelation/parcel_cancel_confirm_bottom_sheet.dart",
+    "lib/features/order/widgets/parcel_cancelation/parcel_return_date_time_bottom_sheet.dart",
+    "lib/features/order/widgets/parcel_cancelation/time_picker_widget.dart",
+    "lib/features/order/widgets/selected_type_button.dart",
+    "lib/features/order/widgets/slider_button_widget.dart",
+    "lib/features/order/widgets/sliver_delegate.dart",
+    "lib/features/order/widgets/verify_delivery_sheet_widget.dart",
+    "lib/features/profile/controllers/profile_controller.dart",
+    "lib/features/profile/domain/models/level_model.dart",
+    "lib/features/profile/domain/models/profile_model.dart",
+    "lib/features/profile/domain/repositories/profile_repository.dart",
+    "lib/features/profile/domain/repositories/profile_repository_interface.dart",
+    "lib/features/profile/domain/services/location_permission_coordinator.dart",
+    "lib/features/profile/domain/services/profile_service.dart",
+    "lib/features/profile/domain/services/profile_service_interface.dart",
+    "lib/features/profile/screens/profile_screen.dart",
+    "lib/features/profile/screens/update_profile_screen.dart",
+    "lib/features/profile/widgets/notification_status_change_bottom_sheet.dart",
+    "lib/features/profile/widgets/profile_bg_widget.dart",
+    "lib/features/profile/widgets/profile_button_widget.dart",
+    "lib/features/profile/widgets/profile_card_widget.dart",
+    "lib/features/profile/widgets/profile_level_details_widget.dart",
+    "lib/features/refer_and_earn/controllers/refer_and_earn_controller.dart",
+    "lib/features/refer_and_earn/domain/models/refer_and_earn_model.dart",
+    "lib/features/refer_and_earn/domain/models/transaction_model.dart",
+    "lib/features/refer_and_earn/domain/repositories/refer_and_earn_repository.dart",
+    "lib/features/refer_and_earn/domain/repositories/refer_and_earn_repository_interface.dart",
+    "lib/features/refer_and_earn/domain/services/refer_and_earn_service.dart",
+    "lib/features/refer_and_earn/domain/services/refer_and_earn_service_interface.dart",
+    "lib/features/refer_and_earn/screens/refer_and_earn_screen.dart",
+    "lib/features/refer_and_earn/widgets/custom_title.dart",
+    "lib/features/refer_and_earn/widgets/earning_card_widget.dart",
+    "lib/features/refer_and_earn/widgets/refer_bottom_sheet.dart",
+    "lib/features/refer_and_earn/widgets/referral_details.dart",
+    "lib/features/refer_and_earn/widgets/referral_earn_bottomsheet_widget.dart",
+    "lib/features/refer_and_earn/widgets/referral_earning.dart",
+    "lib/features/ride_module/add_vehicle/controllers/add_vehicle_controller.dart",
+    "lib/features/ride_module/add_vehicle/domain/models/ride_categoty_model.dart",
+    "lib/features/ride_module/add_vehicle/domain/models/vehicle_body.dart",
+    "lib/features/ride_module/add_vehicle/domain/models/vehicle_brand_model.dart",
+    "lib/features/ride_module/add_vehicle/domain/repositories/add_vehicle_repository.dart",
+    "lib/features/ride_module/add_vehicle/domain/repositories/add_vehicle_repository_interface.dart",
+    "lib/features/ride_module/add_vehicle/domain/services/add_vehicle_service.dart",
+    "lib/features/ride_module/add_vehicle/domain/services/add_vehicle_service_interface.dart",
+    "lib/features/ride_module/add_vehicle/screens/add_vehicle_screen.dart",
+    "lib/features/ride_module/add_vehicle/screens/vehicle_details_screen.dart",
+    "lib/features/ride_module/help_and_support/screens/help_and_support_screen.dart",
+    "lib/features/ride_module/leaderboard/controllers/leader_board_controller.dart",
+    "lib/features/ride_module/leaderboard/domain/repositories/leader_board_repository.dart",
+    "lib/features/ride_module/leaderboard/domain/repositories/leader_board_repository_interface.dart",
+    "lib/features/ride_module/leaderboard/domain/services/leader_board_service.dart",
+    "lib/features/ride_module/leaderboard/domain/services/leader_board_service_interface.dart",
+    "lib/features/ride_module/leaderboard/screens/leaderboard_screen.dart",
+    "lib/features/ride_module/map/controllers/otp_time_count_Controller.dart",
+    "lib/features/ride_module/map/controllers/ride_map_controller.dart",
+    "lib/features/ride_module/map/screens/map_screen.dart",
+    "lib/features/ride_module/review/controllers/review_controller.dart",
+    "lib/features/ride_module/review/domain/repositories/review_repository.dart",
+    "lib/features/ride_module/review/domain/repositories/review_repository_interface.dart",
+    "lib/features/ride_module/review/domain/services/review_service.dart",
+    "lib/features/ride_module/review/domain/services/review_service_interface.dart",
+    "lib/features/ride_module/review/screens/review_screen.dart",
+    "lib/features/ride_module/ride_order/controllers/ride_controller.dart",
+    "lib/features/ride_module/ride_order/domain/enums/refund_status_enum.dart",
+    "lib/features/ride_module/ride_order/domain/models/pending_ride_request_model.dart",
+    "lib/features/ride_module/ride_order/domain/models/trip_details_model.dart",
+    "lib/features/ride_module/ride_order/domain/repositories/ride_order_repository.dart",
+    "lib/features/ride_module/ride_order/domain/repositories/ride_order_repository_interface.dart",
+    "lib/features/ride_module/ride_order/domain/services/ride_order_service.dart",
+    "lib/features/ride_module/ride_order/domain/services/ride_order_service_interface.dart",
+    "lib/features/ride_module/ride_order/screens/ongoing_ride_list_screen.dart",
+    "lib/features/ride_module/ride_order/screens/pending_ride_list_screen.dart",
+    "lib/features/ride_module/ride_order/screens/ride_details_screen.dart",
+    "lib/features/ride_module/ride_order/screens/ride_order_screen.dart",
+    "lib/features/ride_module/safety/controllers/safety_alert_controller.dart",
+    "lib/features/ride_module/safety/domain/repositories/safety_alert_repository.dart",
+    "lib/features/ride_module/safety/domain/repositories/safety_alert_repository_interface.dart",
+    "lib/features/ride_module/safety/domain/services/safety_alert_service.dart",
+    "lib/features/ride_module/safety/domain/services/safety_alert_service_interface.dart",
+    "lib/features/ride_module/safety/screen/safety_policy_screen.dart",
+    "lib/features/ride_module/trip/controllers/trip_controller.dart",
+    "lib/features/ride_module/trip/domain/models/trip_model.dart",
+    "lib/features/ride_module/trip/domain/models/trip_overview_model.dart",
+    "lib/features/ride_module/trip/domain/repositories/trip_repository.dart",
+    "lib/features/ride_module/trip/domain/repositories/trip_repository_interface.dart",
+    "lib/features/ride_module/trip/domain/services/trip_service.dart",
+    "lib/features/ride_module/trip/domain/services/trip_service_interface.dart",
+    "lib/features/splash/controllers/splash_controller.dart",
+    "lib/features/splash/domain/repositories/splash_repository.dart",
+    "lib/features/splash/domain/repositories/splash_repository_interface.dart",
+    "lib/features/splash/domain/services/splash_service.dart",
+    "lib/features/splash/domain/services/splash_service_interface.dart",
+    "lib/features/splash/screens/splash_screen.dart",
+    "lib/features/update/screens/update_screen.dart",
+    "lib/helper/api_error_helper.dart",
+    "lib/helper/custom_print_helper.dart",
+    "lib/helper/custom_validator_helper.dart",
+    "lib/helper/date_converter_helper.dart",
+    "lib/helper/email_checker_helper.dart",
+    "lib/helper/get_di.dart",
+    "lib/helper/image_size_checker.dart",
+    "lib/helper/marker_helper.dart",
+    "lib/helper/notification_helper.dart",
+    "lib/helper/price_converter_helper.dart",
+    "lib/helper/product_type_helper.dart",
+    "lib/helper/pusher_helper.dart",
+    "lib/helper/responsive_helper.dart",
+    "lib/helper/ride_helper.dart",
+    "lib/helper/route_helper.dart",
+    "lib/helper/server_message_translator.dart",
+    "lib/helper/string_extension.dart",
+    "lib/interface/repository_interface.dart",
+    "lib/main.dart",
+    "lib/theme/dark_theme.dart",
+    "lib/theme/light_theme.dart",
+    "lib/util/app_constants.dart",
+    "lib/util/color_resources.dart",
+    "lib/util/dimensions.dart",
+    "lib/util/enums.dart",
+    "lib/util/images.dart",
+    "lib/util/messages.dart",
+    "lib/util/styles.dart",
+    "lib/util/typography.dart"
+  ],
+  "high_risk_files": [
+    {
+      "file": "lib/features/profile/widgets/profile_bg_widget.dart",
+      "score": 15,
+      "signals": [
+        "fixed_dimension:6",
+        "stack_positioned:5"
+      ]
+    },
+    {
+      "file": "lib/features/my_account/screens/payment_screen.dart",
+      "score": 11,
+      "signals": [
+        "print:11",
+        "stack_positioned:1"
+      ]
+    },
+    {
+      "file": "lib/helper/notification_helper.dart",
+      "score": 10,
+      "signals": [
+        "print:8"
+      ]
+    },
+    {
+      "file": "lib/helper/pusher_helper.dart",
+      "score": 10,
+      "signals": [
+        "print:11"
+      ]
+    },
+    {
+      "file": "lib/features/chat/screens/chat_screen.dart",
+      "score": 7,
+      "signals": [
+        "fixed_dimension:1",
+        "stack_positioned:7"
+      ]
+    },
+    {
+      "file": "lib/features/delivery_module/order/screens/order_location_screen.dart",
+      "score": 6,
+      "signals": [
+        "print:2",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/delivery_module/order/screens/order_request_location_screen.dart",
+      "score": 6,
+      "signals": [
+        "print:2",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/delivery_module/order/widgets/bottom_view/parcel_bottom_view.dart",
+      "score": 6,
+      "signals": [
+        "fixed_dimension:3"
+      ]
+    },
+    {
+      "file": "lib/features/order/screens/order_location_screen.dart",
+      "score": 6,
+      "signals": [
+        "print:2",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/order/widgets/bottom_view/parcel_bottom_view.dart",
+      "score": 6,
+      "signals": [
+        "fixed_dimension:3"
+      ]
+    },
+    {
+      "file": "lib/features/ride_module/help_and_support/screens/help_and_support_screen.dart",
+      "score": 6,
+      "signals": [
+        "fixed_dimension:3"
+      ]
+    },
+    {
+      "file": "lib/common/widgets/code_picker_widget.dart",
+      "score": 5,
+      "signals": [
+        "uppercase:13"
+      ]
+    },
+    {
+      "file": "lib/features/auth/screens/dm_registration_screen.dart",
+      "score": 5,
+      "signals": [
+        "stack_positioned:12"
+      ]
+    },
+    {
+      "file": "lib/features/chat/screens/conversation_screen.dart",
+      "score": 5,
+      "signals": [
+        "fixed_dimension:1",
+        "stack_positioned:3"
+      ]
+    },
+    {
+      "file": "lib/common/widgets/google_map_custom_windows.dart",
+      "score": 4,
+      "signals": [
+        "print:1",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/common/widgets/order_shimmer_widget.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/common/widgets/trip_overview_widget.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:1",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/delivery_module/order/screens/my_order_screen.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:1",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/delivery_module/order/screens/order_details_screen.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:1",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/delivery_module/order/widgets/bottom_view/regular_order_bottom_view.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/features/delivery_module/order/widgets/cancellation_dialogue_widget.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/features/delivery_module/order/widgets/parcel_cancelation/otp_dialog.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/features/disbursement/widgets/disbursement_status_card_widget.dart",
+      "score": 4,
+      "signals": [
+        "hardcoded_font:1",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/forgot_password/screens/forget_pass_screen.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/orders_and_rides_view.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/features/language/screens/language_screen.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/features/order/screens/my_order_screen.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:1",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/order/screens/order_details_screen.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:1",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/order/widgets/bottom_view/regular_order_bottom_view.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/features/order/widgets/cancellation_dialogue_widget.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/features/order/widgets/parcel_cancelation/otp_dialog.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:2"
+      ]
+    },
+    {
+      "file": "lib/features/profile/screens/profile_screen.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:1",
+        "stack_positioned:2"
+      ]
+    },
+    {
+      "file": "lib/features/profile/screens/update_profile_screen.dart",
+      "score": 4,
+      "signals": [
+        "fixed_dimension:1",
+        "stack_positioned:2"
+      ]
+    }
+  ]
+}
