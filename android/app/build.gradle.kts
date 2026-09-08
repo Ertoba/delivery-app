@@ -31,6 +31,11 @@ if (!hasReleaseKeystore) {
 }
 
 android {
+    // Preserve native-library extraction through the supported AGP DSL.
+    packaging {
+        jniLibs.useLegacyPackaging = true
+    }
+
     namespace = "ge.mili.delivery"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion

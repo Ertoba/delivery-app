@@ -40,7 +40,6 @@
         tools:replace="android:label"
         android:label="მილი კურიერი"
         android:name="${applicationName}"
-        android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
