@@ -50,7 +50,7 @@ class BottomNavItemWidget extends StatelessWidget {
         ]),
         const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-        Text(label, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),)
+        Text(label, maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),)
 
       ]),
     ));

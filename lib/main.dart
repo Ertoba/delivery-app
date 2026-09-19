@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:sixam_mart_delivery/common/widgets/navigation_safe_area.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:sixam_mart_delivery/features/auth/controllers/auth_controller.dart';
@@ -117,9 +118,7 @@ class MyApp extends StatelessWidget {
             transitionDuration: reduceMotion ? Duration.zero : const Duration(milliseconds: 250),
             builder: (BuildContext context, widget) {
               return Material(
-                child: SafeArea(
-                  top: false,
-                  bottom: true,
+                child: AppSafeArea(
                   child: Stack(children: [
                     widget!,
                   ]),
