@@ -67,4 +67,14 @@ class MyAccountService implements MyAccountServiceInterface {
     return await myAccountRepositoryInterface.convertPoint(point, isRideActive: isRideActive);
   }
 
+  @override
+  Future<Response> getRideIncomeStatement(int offset) async {
+    return (await myAccountRepositoryInterface.getRideIncomeStatement(offset))!;
+  }
+
+  @override
+  Future<Response> getDeliveryIncomeStatement(int offset) async {
+    return (await myAccountRepositoryInterface.getDeliveryIncomeStatement(offset))!;
+  }
+
 }

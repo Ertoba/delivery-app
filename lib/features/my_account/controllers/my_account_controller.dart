@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart_delivery/api/api_checker.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
+import 'package:sixam_mart_delivery/features/my_account/domain/models/delivery_income_statement_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/earning_report_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/loyalty_point_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/loyalty_report_model.dart';
@@ -16,6 +17,7 @@ import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/withdraw_request_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/services/my_account_service_interface.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart_delivery/features/ride_module/trip/domain/models/trip_model.dart';
 
 class MyAccountController extends GetxController implements GetxService {
   final MyAccountServiceInterface myAccountServiceInterface;
@@ -101,6 +103,13 @@ class MyAccountController extends GetxController implements GetxService {
 
   String? _selectedTransactionType;
   String? get selectedTransactionType => _selectedTransactionType;
+
+  TripModel? _rideIncomeStatement;
+  TripModel? get rideIncomeStatement => _rideIncomeStatement;
+
+  DeliveryIncomeStatementModel? _deliveryIncomeStatementModel;
+  DeliveryIncomeStatementModel? get deliveryIncomeStatementModel =>
+      _deliveryIncomeStatementModel;
 
   void setSelectedTransactionType(String type) {
     _selectedTransactionType = type;
@@ -518,6 +527,54 @@ class MyAccountController extends GetxController implements GetxService {
       _withdrawRequestList = [];
       _withdrawRequestList!.addAll(withdrawRequestList);
     }
+    update();
+  }
+
+  Future<void> getRideIncomeStatement(int offset) async {
+    _isLoading = true;
+    update();
+
+    final Response response =
+        await myAccountServiceInterface.getRideIncomeStatement(offset);
+    if (response.statusCode == 200) {
+      final TripModel page = TripModel.fromJson(response.body);
+      if (offset == 1) {
+        _rideIncomeStatement = page;
+      } else {
+        _rideIncomeStatement?.tripList?.addAll(page.tripList ?? []);
+        _rideIncomeStatement?.offset = page.offset;
+        _rideIncomeStatement?.totalSize = page.totalSize;
+      }
+    } else {
+      ApiChecker.checkApi(response);
+    }
+
+    _isLoading = false;
+    update();
+  }
+
+  Future<void> getDeliveryIncomeStatement(int offset) async {
+    _isLoading = true;
+    update();
+
+    final Response response =
+        await myAccountServiceInterface.getDeliveryIncomeStatement(offset);
+    if (response.statusCode == 200) {
+      final DeliveryIncomeStatementModel page =
+          DeliveryIncomeStatementModel.fromJson(response.body);
+      if (offset == 1) {
+        _deliveryIncomeStatementModel = page;
+      } else {
+        _deliveryIncomeStatementModel?.transactions
+            ?.addAll(page.transactions ?? []);
+        _deliveryIncomeStatementModel?.offset = page.offset;
+        _deliveryIncomeStatementModel?.totalSize = page.totalSize;
+      }
+    } else {
+      ApiChecker.checkApi(response);
+    }
+
+    _isLoading = false;
     update();
   }
 }

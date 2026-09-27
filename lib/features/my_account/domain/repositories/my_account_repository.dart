@@ -170,6 +170,20 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
   }
 
   @override
+  Future<Response?> getRideIncomeStatement(int offset) async {
+    return await apiClient.getData(
+      '${AppConstants.rideIncomeStatementListUri}$offset&token=${_getUserToken()}',
+    );
+  }
+
+  @override
+  Future<Response?> getDeliveryIncomeStatement(int offset) async {
+    return await apiClient.getData(
+      '${AppConstants.deliveryIncomeStatementListUri}$offset&token=${_getUserToken()}',
+    );
+  }
+
+  @override
   Future add(value) {
     throw UnimplementedError();
   }

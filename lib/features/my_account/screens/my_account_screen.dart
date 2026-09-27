@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/features/disbursement/controllers/disbursement_controller.dart';
+import 'package:sixam_mart_delivery/features/my_account/widgets/account/income_statement_view.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/account/my_point_view.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/account/wallet_overview_widget.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
@@ -20,7 +21,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   late final MyAccountController _accountController;
   late final ProfileController _profileController;
 
-  List<String> types = ['wallet_overview', 'my_point'];
+  List<String> types = ['wallet_overview', 'my_point', 'income_statement'];
   int selectedIndex = 0;
 
   @override
@@ -51,6 +52,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
       transactionType:
           Get.find<MyAccountController>().selectedTransactionType ?? 'both',
     );
+    _accountController.getRideIncomeStatement(1);
+    _accountController.getDeliveryIncomeStatement(1);
   }
 
   Future<void> _refreshData() async {
@@ -61,7 +64,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         _accountController.getWalletPaymentList(),
         _accountController.getWalletProvidedEarningList(),
       ]);
-    } else {
+    } else if (selectedIndex == 1) {
       await _accountController.getLoyaltyPointList(
         offset: 1,
         startDate: Get.find<MyAccountController>().from,
@@ -71,6 +74,11 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         transactionType:
             Get.find<MyAccountController>().selectedTransactionType ?? 'both',
       );
+    } else {
+      await Future.wait([
+        _accountController.getRideIncomeStatement(1),
+        _accountController.getDeliveryIncomeStatement(1),
+      ]);
     }
   }
 
@@ -149,7 +157,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
             selectedIndex == 0
                 ? const WalletOverviewWidget()
-                : const MyPointView(),
+                : selectedIndex == 1
+                    ? const MyPointView()
+                    : const IncomeStatementView(),
           ],
         ),
       ),

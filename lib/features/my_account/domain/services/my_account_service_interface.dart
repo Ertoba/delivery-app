@@ -18,4 +18,6 @@ abstract class MyAccountServiceInterface {
   Future<List<WithdrawRequestModel>?> getWithdrawRequestList();
   Future<Response?> getLoyaltyPointList({String? offset, String? dateRange, String? startDate, String? endDate, String? transactionType, bool? fromFilter});
   Future<Response> convertPoint(String point, {required bool isRideActive});
+  Future<Response> getRideIncomeStatement(int offset);
+  Future<Response> getDeliveryIncomeStatement(int offset);
 }

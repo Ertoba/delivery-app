@@ -112,6 +112,13 @@ class Images {
   static const String callIcon = 'assets/image/call_icon.png';
   static const String fileIcon = 'assets/image/clip.png';
   static const String coinIcon = 'assets/image/coin_icon.png';
+  static const String totalIncome = 'assets/image/rider/total_income.png';
+  static const String rideIncome = 'assets/image/rider/ride_income.png';
+  static const String deliveryIncome = 'assets/image/rider/delivery_income.png';
+  static const String totalTips = 'assets/image/rider/total_tips.png';
+  static const String farePrice = 'assets/image/fare_price.png';
+  static const String discountAmount = 'assets/image/discount_amount.png';
+  static const String tipsSmallIcon = 'assets/image/rider/tips_small_icon.png';
 
   ///Svg Images
   static const String changePasswordBgImage =
