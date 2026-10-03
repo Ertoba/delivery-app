@@ -1,5 +1,6 @@
   import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:sixam_mart_delivery/features/refer_and_earn/domain/models/refer_and_earn_model.dart';
   import '../domain/services/refer_and_earn_service_interface.dart';
 
@@ -12,6 +13,12 @@ import 'package:sixam_mart_delivery/features/refer_and_earn/domain/models/refer_
     ScrollController scrollController = ScrollController();
     ReferEarningModel? referralModel;
     bool isLoading = false;
+
+    @override
+    void onClose() {
+      scrollController.dispose();
+      super.onClose();
+    }
 
     String? _dateRange = 'this_year';
     String? get dateRange => _dateRange;
@@ -43,11 +50,11 @@ import 'package:sixam_mart_delivery/features/refer_and_earn/domain/models/refer_
       if (response.statusCode == 200) {
         isLoading = false;
         if(offset == 1){
-          referralModel = ReferEarningModel.fromJson(response.body);
+          referralModel = ReferEarningModel.fromJson(response.content);
         }else{
-          referralModel!.refrealEarnings!.addAll(ReferEarningModel.fromJson(response.body).refrealEarnings!);
-          referralModel!.offset = ReferEarningModel.fromJson(response.body).offset;
-          referralModel!.total = ReferEarningModel.fromJson(response.body).total;
+          referralModel!.refrealEarnings!.addAll(ReferEarningModel.fromJson(response.content).refrealEarnings!);
+          referralModel!.offset = ReferEarningModel.fromJson(response.content).offset;
+          referralModel!.total = ReferEarningModel.fromJson(response.content).total;
         }
 
       }else{

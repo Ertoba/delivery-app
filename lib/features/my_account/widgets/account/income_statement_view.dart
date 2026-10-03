@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart_delivery/common/widgets/paginated_list_view_widget.dart';
+import 'package:sixam_mart_delivery/common/widgets/paginated_sliver_list_view_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/delivery_income_statement_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/delivery_income_bottom_sheet.dart';
@@ -58,6 +58,12 @@ class _IncomeStatementViewState extends State<IncomeStatementView> {
     _selectedIndex = isActiveRide ? 1 : 0;
   }
 
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
   void _changeTabIndex(int index){
     setState(() {
       _selectedIndex = index;
@@ -68,10 +74,11 @@ class _IncomeStatementViewState extends State<IncomeStatementView> {
   Widget build(BuildContext context) {
     return Expanded(
       child: GetBuilder<MyAccountController>(builder: (transactionController){
-        return SingleChildScrollView(
+        return CustomScrollView(
           controller : scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          slivers: [
+            SliverToBoxAdapter(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge, vertical: Dimensions.paddingSizeSmall),
               child: Text("income_statements".tr, style: robotoBold),
@@ -156,11 +163,13 @@ class _IncomeStatementViewState extends State<IncomeStatementView> {
               child: Text("transaction_history".tr, style: robotoBold),
             ),
 
+            ])),
+
             _selectedIndex == 1
                 ? _RideStatementPaginatedView(transactionController, scrollController)
-                : _DeliveryStatementPaginatedView(transactionController, scrollController)
+                : _DeliveryStatementPaginatedView(transactionController, scrollController),
 
-          ]),
+          ],
         );
       }),
     );
@@ -178,24 +187,22 @@ class _RideStatementPaginatedView extends StatelessWidget {
 
     TripModel? tripModel = transactionController.rideIncomeStatement;
 
-    return tripModel != null && tripModel.tripList != null && tripModel.tripList!.isNotEmpty ? PaginatedListViewWidget(
-      scrollController: scrollController,
-      totalSize: transactionController.rideIncomeStatement?.totalSize,
-      offset: transactionController.rideIncomeStatement?.offset,
-      onPaginate: (int? offset) async => await transactionController.getRideIncomeStatement(offset!),
-      productView: ListView.builder(
-        itemCount:  transactionController.rideIncomeStatement?.tripList?.length,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+    return tripModel != null && tripModel.tripList != null && tripModel.tripList!.isNotEmpty ? SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+      sliver: PaginatedSliverListViewWidget(
+        scrollController: scrollController,
+        totalSize: transactionController.rideIncomeStatement?.totalSize,
+        offset: transactionController.rideIncomeStatement?.offset,
+        onPaginate: (int? offset) async => await transactionController.getRideIncomeStatement(offset!),
+        itemCount: transactionController.rideIncomeStatement?.tripList?.length ?? 0,
         itemBuilder: (context, index) {
           return  _RideStatementCard(tripDetails:  transactionController.rideIncomeStatement?.tripList?[index],);
         },
       ),
     ) : tripModel != null && tripModel.tripList != null && tripModel.tripList!.isEmpty ?
-    SizedBox( height: Get.height * 0.2,child: Center(child: Text('no_transaction_found'.tr))) : SizedBox(
+    SliverToBoxAdapter(child: SizedBox( height: Get.height * 0.2,child: Center(child: Text('no_transaction_found'.tr)))) : SliverToBoxAdapter(child: SizedBox(
         height: Get.height * 0.2, child: const Center(child: CircularProgressIndicator(),
-    ));
+    )));
   }
 }
 
@@ -210,24 +217,22 @@ class _DeliveryStatementPaginatedView extends StatelessWidget {
 
     DeliveryIncomeStatementModel? deliveryStatement = transactionController.deliveryIncomeStatementModel;
 
-    return deliveryStatement != null && deliveryStatement.transactions != null && deliveryStatement.transactions!.isNotEmpty ? PaginatedListViewWidget(
-      scrollController: scrollController,
-      totalSize: transactionController.deliveryIncomeStatementModel?.totalSize,
-      offset: transactionController.deliveryIncomeStatementModel?.offset,
-      onPaginate: (int? offset) async => await transactionController.getDeliveryIncomeStatement(offset!),
-      productView: ListView.builder(
-        itemCount: transactionController.deliveryIncomeStatementModel?.transactions?.length,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+    return deliveryStatement != null && deliveryStatement.transactions != null && deliveryStatement.transactions!.isNotEmpty ? SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+      sliver: PaginatedSliverListViewWidget(
+        scrollController: scrollController,
+        totalSize: transactionController.deliveryIncomeStatementModel?.totalSize,
+        offset: transactionController.deliveryIncomeStatementModel?.offset,
+        onPaginate: (int? offset) async => await transactionController.getDeliveryIncomeStatement(offset!),
+        itemCount: transactionController.deliveryIncomeStatementModel?.transactions?.length ?? 0,
         itemBuilder: (context, index) {
           return  _DeliveryStatementCard(statement:  transactionController.deliveryIncomeStatementModel?.transactions?[index],);
         },
       ),
     ) : deliveryStatement != null && deliveryStatement.transactions != null && deliveryStatement.transactions!.isEmpty ?
-    SizedBox( height: Get.height * 0.2,child: Center(child: Text('no_transaction_found'.tr))) : SizedBox(
+    SliverToBoxAdapter(child: SizedBox( height: Get.height * 0.2,child: Center(child: Text('no_transaction_found'.tr)))) : SliverToBoxAdapter(child: SizedBox(
         height: Get.height * 0.2, child: const Center(child: CircularProgressIndicator(),
-    ));
+    )));
   }
 }
 

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_delivery/api/api_client.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/earning_report_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/loyalty_report_model.dart';
@@ -27,14 +28,14 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     }, handleError: false);
 
     if (response.statusCode == 200) {
-      String redirectUrl = response.body['redirect_link'];
+      String redirectUrl = response.content['redirect_link'];
       Get.back();
       if(GetPlatform.isWeb) {
         // html.window.open(redirectUrl,"_self");
       } else{
         Get.toNamed(RouteHelper.getPaymentRoute(redirectUrl));
       }
-      responseModel = ResponseModel(true, response.body.toString());
+      responseModel = ResponseModel(true, response.apiMessage);
     } else {
       responseModel = ResponseModel(false, response.statusText);
     }
@@ -47,7 +48,7 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.walletPaymentListUri}?token=${_getUserToken()}');
     if(response.statusCode == 200) {
       transactions = [];
-      WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.body);
+      WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.content);
       transactions.addAll(walletPaymentModel.transactions!);
     }
     return transactions;
@@ -59,7 +60,7 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.walletProvidedEarningListUri}?token=${_getUserToken()}');
     if(response.statusCode == 200) {
       walletProvidedTransactions = [];
-      WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.body);
+      WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.content);
       walletProvidedTransactions.addAll(walletPaymentModel.transactions!);
     }
     return walletProvidedTransactions;
@@ -93,7 +94,7 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     }
 
     if(response.statusCode == 200) {
-      earningReportModel = EarningReportModel.fromJson(response.body);
+      earningReportModel = EarningReportModel.fromJson(response.content);
     }
     return earningReportModel;
   }
@@ -110,7 +111,7 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     }
 
     if(response.statusCode == 200) {
-      referralReportModel = ReferralReportModel.fromJson(response.body);
+      referralReportModel = ReferralReportModel.fromJson(response.content);
     }
     return referralReportModel;
   }
@@ -127,7 +128,7 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     }
 
     if(response.statusCode == 200) {
-      loyaltyReportModel = LoyaltyReportModel.fromJson(response.body);
+      loyaltyReportModel = LoyaltyReportModel.fromJson(response.content);
     }
     return loyaltyReportModel;
   }
@@ -150,7 +151,7 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.getWithdrawList}?token=${_getUserToken()}');
     if (response.statusCode == 200) {
       withdrawRequestList = [];
-      withdrawRequestList = (response.body as List).map((e) => WithdrawRequestModel.fromJson(e)).toList();
+      withdrawRequestList = response.contentList.map((e) => WithdrawRequestModel.fromJson(e)).toList();
     }
     return withdrawRequestList;
   }
@@ -167,6 +168,16 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
   @override
   Future<Response> convertPoint(String point, {required bool isRideActive}) async {
     return await apiClient.getData('${isRideActive ? AppConstants.riderPointConvertUri : AppConstants.dmPointConvertUri}?points=$point&token=${_getUserToken()}');
+  }
+
+    @override
+  Future<Response?> getRideIncomeStatement(int offset) async {
+    return await apiClient.getData('${AppConstants.rideIncomeStatementListUri}$offset&token=${_getUserToken()}');
+  }
+
+  @override
+  Future<Response?> getDeliveryIncomeStatement(int offset) async {
+    return await apiClient.getData('${AppConstants.deliveryIncomeStatementListUri}$offset&token=${_getUserToken()}');
   }
 
   @override

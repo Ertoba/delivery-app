@@ -7,9 +7,15 @@ class OrderCancellationBody {
   OrderCancellationBody({this.totalSize, this.limit, this.offset, this.reasons});
 
   OrderCancellationBody.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
+    if (json['pagination'] != null) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page']?.toString();
+      offset = json['pagination']['current_page']?.toString();
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
     if (json['data'] != null) {
       reasons = <CancellationData>[];
       json['data'].forEach((v) {

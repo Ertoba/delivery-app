@@ -23,6 +23,13 @@ class WithdrawBottomSheet extends StatefulWidget {
 class _WithdrawBottomSheetState extends State<WithdrawBottomSheet> {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
+  final TextInputFormatter _amountInputFormatter = TextInputFormatter.withFunction((oldValue, newValue) {
+    final String text = newValue.text;
+    if (text.isEmpty || RegExp(r'^\d*\.?\d{0,2}$').hasMatch(text)) {
+      return newValue;
+    }
+    return oldValue;
+  });
 
   List<DropdownItem<int>> payments = [];
 
@@ -37,6 +44,13 @@ class _WithdrawBottomSheetState extends State<WithdrawBottomSheet> {
     amountController.text = "${widget.withdrawAmount}";
     Get.find<DisbursementController>().updateSelectedWithdrawMethod(shouldUpdate: false);
     Get.find<DisbursementController>().setMethod(isUpdate: false);
+  }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    noteController.dispose();
+    super.dispose();
   }
 
   @override
@@ -141,13 +155,14 @@ class _WithdrawBottomSheetState extends State<WithdrawBottomSheet> {
 
                 TextField(
                   controller: amountController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   textAlign: TextAlign.center,
                   style: robotoBold.copyWith(
                     color: widget.withdrawAmount >= _convertDouble(amountController.text) ?
                     Theme.of(context).primaryColor : Theme.of(context).colorScheme.error,
                     fontSize: Dimensions.fontSizeExtraLarge,
                   ),
-                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
+                  inputFormatters: [_amountInputFormatter],
                   decoration: InputDecoration(
                     hintText: 'enter_amount'.tr,
                     hintStyle: robotoRegular.copyWith(color: Theme.of(context).disabledColor),

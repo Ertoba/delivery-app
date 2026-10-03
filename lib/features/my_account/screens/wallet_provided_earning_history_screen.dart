@@ -29,7 +29,7 @@ class _WalletProvidedHistoryScreenState extends State<WalletProvidedHistoryScree
       body: GetBuilder<MyAccountController>(builder: (myAccountController) {
         return myAccountController.walletProvidedTransactions != null ? myAccountController.walletProvidedTransactions!.isNotEmpty ? ListView.builder(
           itemCount: myAccountController.walletProvidedTransactions!.length,
-          shrinkWrap: true,
+          // Body-level list: no shrinkWrap so items build lazily (viewport-only).
           padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault, left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault),
           physics: const BouncingScrollPhysics(),
           itemBuilder: (context, index) {

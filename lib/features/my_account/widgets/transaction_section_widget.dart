@@ -11,29 +11,23 @@ import 'package:sixam_mart_delivery/util/styles.dart';
 class TransactionSectionWidget extends StatelessWidget {
   final MyAccountController myAccountController;
 
-  const TransactionSectionWidget({
-    super.key,
-    required this.myAccountController,
-  });
+  const TransactionSectionWidget({super.key, required this.myAccountController});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    // Emits slivers so the (potentially long) transaction list builds lazily inside the host
+    // CustomScrollView instead of eagerly via a shrinkWrap ListView.
+    return SliverMainAxisGroup(slivers: [
+      SliverToBoxAdapter(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
-          myAccountController.selectedIndex == 0
-              ? 'withdraw_request'.tr
-              : myAccountController.selectedIndex == 1
-              ? 'transaction_history'.tr
-              : 'wallet_history'.tr,
+          myAccountController.selectedIndex == 0 ? 'withdraw_request'.tr : myAccountController.selectedIndex == 1 ? 'transaction_history'.tr : 'wallet_history'.tr,
           style: robotoSemiBold,
         ),
         const SizedBox(height: Dimensions.paddingSizeDefault),
+      ])),
 
-        _buildTransactionContent(context),
-      ],
-    );
+      _buildTransactionContent(context),
+    ]);
   }
 
   Widget _buildTransactionContent(BuildContext context) {
@@ -54,103 +48,63 @@ class TransactionSectionWidget extends StatelessWidget {
           selectedIndex: myAccountController.selectedIndex,
         );
       default:
-        return const SizedBox();
+        return const SliverToBoxAdapter(child: SizedBox());
     }
   }
 }
 
+
 class EarningListWidget extends StatelessWidget {
   final List<dynamic>? transactions;
   final int selectedIndex;
-  const EarningListWidget({
-    super.key,
-    required this.transactions,
-    required this.selectedIndex,
-  });
+  const EarningListWidget({super.key, required this.transactions, required this.selectedIndex});
 
   @override
   Widget build(BuildContext context) {
     if (transactions == null) {
-      return const Center(
+      return const SliverToBoxAdapter(child: Center(
         child: Padding(
           padding: EdgeInsets.only(top: 250),
           child: CircularProgressIndicator(),
         ),
-      );
+      ));
     }
 
     if (transactions!.isEmpty) {
-      return Center(
+      return SliverToBoxAdapter(child: Center(
         child: Padding(
           padding: EdgeInsets.only(top: selectedIndex == 0 ? 115 : 250),
           child: Column(
             children: [
-              Image.asset(Images.emptyTransaction, width: 50, height: 50),
-              SizedBox(height: Dimensions.paddingSizeSmall),
+              Image.asset(Images.emptyTransaction, width: 50, height: 50,),
+              SizedBox(height: Dimensions.paddingSizeSmall,),
 
-              Text(
-                selectedIndex == 0
-                    ? 'no_withdraw_found'.tr
-                    : selectedIndex == 1
-                    ? 'no_transaction_found'.tr
-                    : 'no_wallet_history'.tr,
-              ),
+              Text(selectedIndex == 0 ? 'no_withdraw_found'.tr : selectedIndex == 1 ? 'no_transaction_found'.tr : 'no_wallet_history'.tr),
             ],
-          ),
+          )
         ),
-      );
+      ));
     }
 
-    return ListView.builder(
-      itemCount: transactions!.length,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
+    return SliverList(delegate: SliverChildBuilderDelegate(
+      (context, index) {
         final item = transactions![index];
         return TransactionItemWidget(
           amount: item.amount,
-          method: _localizedMethod(item),
-          date: selectedIndex == 0
-              ? DateConverterHelper.utcToDateTime(item.requestedAt)
-              : item.paymentTime.toString(),
-          status: _localizedStatus(item.status),
+          method: selectedIndex == 0 ? '${'withdraw_via'.tr} ${item.bankName}' : '${selectedIndex == 1 ? 'paid_via'.tr : 'wallet'.tr} ${item.method}',
+          date: selectedIndex == 0 ? DateConverterHelper.utcToDateTime(item.requestedAt) : item.paymentTime.toString(),
+          status: item.status,
           statusColor: _getStatusColor(context, item.status),
           fromWalletEarning: selectedIndex == 2,
         );
       },
-    );
-  }
-
-  String _localizedMethod(dynamic item) {
-    if (selectedIndex == 0) {
-      return '${'withdraw_via'.tr} ${item.bankName}';
-    }
-    if (selectedIndex == 1) {
-      return '${'paid_via'.tr} ${item.method}';
-    }
-    final String method = item.method?.toString().trim().toLowerCase() ?? '';
-    if (method == 'adjustment') {
-      return 'wallet_adjustment'.tr;
-    }
-    if (method.isEmpty) {
-      return 'wallet'.tr;
-    }
-    return '${'wallet'.tr} ${method.replaceAll('_', ' ').toTitleCase()}';
-  }
-
-  String _localizedStatus(String? status) {
-    final String rawStatus = status?.trim() ?? '';
-    final String key = rawStatus.toLowerCase();
-    if (key.isEmpty) {
-      return '';
-    }
-    final String translated = key.tr;
-    return translated == key ? rawStatus.toTitleCase() : translated;
+      childCount: transactions!.length,
+    ));
   }
 
   Color _getStatusColor(BuildContext context, String? status) {
-    switch (status?.trim().toLowerCase()) {
-      case 'approved':
+    switch (status) {
+      case 'approved' || 'Approved':
         return Theme.of(context).primaryColor;
       case 'denied':
         return Theme.of(context).colorScheme.error;
@@ -167,106 +121,80 @@ class TransactionItemWidget extends StatelessWidget {
   final String status;
   final Color statusColor;
   final bool fromWalletEarning;
-  const TransactionItemWidget({
-    super.key,
-    required this.amount,
-    required this.method,
-    required this.date,
-    required this.status,
-    required this.statusColor,
-    required this.fromWalletEarning,
-  });
+  const TransactionItemWidget({super.key, required this.amount, required this.method, required this.date, required this.status, required this.statusColor, required this.fromWalletEarning});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: Dimensions.paddingSizeLarge,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          PriceConverterHelper.convertPrice(amount),
-                          style: robotoMedium.copyWith(
-                            fontSize: Dimensions.fontSizeDefault,
-                          ),
-                          textDirection: TextDirection.ltr,
-                        ),
-
-                        if (fromWalletEarning)
-                          Container(
-                            decoration: BoxDecoration(
-                              color: statusColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(
-                                Dimensions.radiusSmall,
-                              ),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: Dimensions.paddingSizeExtraSmall,
-                              vertical: 2,
-                            ),
-                            margin: const EdgeInsets.only(
-                              left: Dimensions.paddingSizeExtraSmall,
-                            ),
-                            child: Text(
-                              status,
-                              style: robotoRegular.copyWith(
-                                fontSize: Dimensions.fontSizeSmall,
-                                color: statusColor,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-                    Text(
-                      method.toTitleCase(),
-                      style: robotoRegular.copyWith(
-                        fontSize: Dimensions.fontSizeExtraSmall,
-                        color: Theme.of(context).disabledColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeLarge),
+        child: Row(children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(
                 children: [
                   Text(
-                    date,
-                    style: robotoRegular.copyWith(
-                      fontSize: Dimensions.fontSizeSmall,
-                      color: Theme.of(context).disabledColor,
-                    ),
+                    PriceConverterHelper.convertPrice(amount),
+                    style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault),
+                    textDirection: TextDirection.ltr,
                   ),
-                  const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                  if (!fromWalletEarning)
-                    Text(
-                      status.tr,
-                      style: robotoRegular.copyWith(
-                        fontSize: Dimensions.fontSizeSmall,
-                        color: statusColor,
+                  if(fromWalletEarning)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: Dimensions.paddingSizeExtraSmall,
+                        vertical: 2,
+                      ),
+                      margin: const EdgeInsets.only(left: Dimensions.paddingSizeExtraSmall),
+                      child: Text(
+                        status.tr,
+                        style: robotoRegular.copyWith(
+                          fontSize: Dimensions.fontSizeSmall,
+                          color: statusColor,
+                        ),
                       ),
                     ),
                 ],
               ),
-            ],
-          ),
-        ),
+              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-        const Divider(height: 1),
-      ],
-    );
+              Text(
+                method.toTitleCase(),
+                style: robotoRegular.copyWith(
+                  fontSize: Dimensions.fontSizeExtraSmall,
+                  color: Theme.of(context).disabledColor,
+                ),
+              ),
+            ]),
+          ),
+
+          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text(
+              date,
+              style: robotoRegular.copyWith(
+                fontSize: Dimensions.fontSizeSmall,
+                color: Theme.of(context).disabledColor,
+              ),
+            ),
+            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+
+            if(!fromWalletEarning)
+            Text(
+              status.tr,
+              style: robotoRegular.copyWith(
+                fontSize: Dimensions.fontSizeSmall,
+                color: statusColor,
+              ),
+            ),
+          ]),
+        ]),
+      ),
+
+      const Divider(height: 1),
+    ]);
   }
 }

@@ -7,6 +7,7 @@ import 'package:sixam_mart_delivery/features/profile/controllers/profile_control
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_model.dart';
 import 'package:sixam_mart_delivery/helper/date_converter_helper.dart';
+import 'package:sixam_mart_delivery/helper/distance_converter_helper.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
@@ -61,7 +62,7 @@ class LocationCardWidget extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
                 child: Text(
-                  '${restaurantDistance > 1000 ? '1000+' : restaurantDistance.toStringAsFixed(2)} ${'km_aprox'.tr} ', maxLines: 1, overflow: TextOverflow.ellipsis,
+                  '${DistanceConverterHelper.getDistanceAprox(restaurantDistance)} ', maxLines: 1, overflow: TextOverflow.ellipsis,
                   style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
                 ),
               ),
@@ -92,7 +93,7 @@ class LocationCardWidget extends StatelessWidget {
               ),
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
               child: Text(
-                '${restaurantToCustomerDistance > 1000 ? '1000+' : restaurantToCustomerDistance.toStringAsFixed(2)} ${'km_aprox'.tr}', maxLines: 1, overflow: TextOverflow.ellipsis,
+                DistanceConverterHelper.getDistanceAprox(restaurantToCustomerDistance), maxLines: 1, overflow: TextOverflow.ellipsis,
                 style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
               ),
             ),

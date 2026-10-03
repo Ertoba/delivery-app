@@ -1,6 +1,7 @@
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_details_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_model.dart';
+import 'package:sixam_mart_delivery/helper/image_cache_helper.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
@@ -23,15 +24,21 @@ class OrderItemWidget extends StatelessWidget {
 
     String? variationText = '';
     if(orderDetails.variation!.isNotEmpty) {
-      List<String> variationTypes = orderDetails.variation![0].type!.split('-');
-      if(variationTypes.length == orderDetails.itemDetails!.choiceOptions!.length) {
+      final String variationType = orderDetails.variation![0].type ?? '';
+      final List<ChoiceOptions> choiceOptions = orderDetails.itemDetails?.choiceOptions ?? [];
+      // Map the ordered variation type (e.g. "BBQ-soy-free") back to each choice's selected value.
+      // Splitting on '-' is unsafe because an option value can itself contain '-' (e.g. "soy-free"),
+      // so match each choice's options against the type string instead.
+      final List<String>? values = _matchVariationValues(variationType, choiceOptions);
+      if(values != null && values.length == choiceOptions.length) {
         int index = 0;
-        for (var choice in orderDetails.itemDetails!.choiceOptions!) {
-          variationText = '${variationText!}${(index == 0) ? '' : ',  '}${choice.title} - ${variationTypes[index]}';
+        for (var choice in choiceOptions) {
+          variationText = '${variationText!}${(index == 0) ? '' : ',  '}${choice.title} - ${values[index]}';
           index = index + 1;
         }
       }else {
-        variationText = orderDetails.itemDetails!.variations![0].type;
+        // Fallback: show the ordered variation type itself (never the first *available* variation).
+        variationText = variationType;
       }
     }else if(orderDetails.foodVariation!.isNotEmpty) {
       for(FoodVariation variation in orderDetails.foodVariation!) {
@@ -50,12 +57,12 @@ class OrderItemWidget extends StatelessWidget {
         orderDetails.itemDetails!.imageFullUrl != null ? ClipRRect(
           borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
           child: CustomImageWidget(
-            height: 50, width: 50, fit: BoxFit.cover,
+            height: 50, width: 50, fit: BoxFit.cover, cacheWidth: context.cacheSize(50),
             image: '${orderDetails.itemDetails!.imageFullUrl}',
           ),
         ) : CustomImageWidget(
           height: 50, width: 50, fit: BoxFit.cover,
-          image: Images.pictureIcon,
+          image: Images.pictureIcon, cacheWidth: context.cacheSize(50),
         ),
         SizedBox(width:  Dimensions.paddingSizeSmall),
 
@@ -117,5 +124,32 @@ class OrderItemWidget extends StatelessWidget {
         ]),
       ) : const SizedBox(),
     ]);
+  }
+
+  // Reconstructs the selected value for each choice option from an ordered variation `type`
+  // string (option values joined by '-'), tolerating option values that themselves contain '-'
+  // (e.g. "soy-free"). Returns null if the type can't be cleanly mapped to the choice options.
+  List<String>? _matchVariationValues(String type, List<ChoiceOptions> choiceOptions) {
+    if (choiceOptions.isEmpty || type.isEmpty) return null;
+    String remaining = type;
+    final List<String> values = [];
+    for (int i = 0; i < choiceOptions.length; i++) {
+      final bool isLast = i == choiceOptions.length - 1;
+      // Try the longest option first so a multi-hyphen value wins over a shorter prefix.
+      final List<String> options = (choiceOptions[i].options ?? [])
+          .map((o) => o.trim()).where((o) => o.isNotEmpty).toList()
+        ..sort((a, b) => b.length.compareTo(a.length));
+      String? found;
+      for (final opt in options) {
+        if (isLast ? remaining == opt : remaining.startsWith('$opt-')) {
+          found = opt;
+          break;
+        }
+      }
+      if (found == null) return null;
+      values.add(found);
+      remaining = isLast ? '' : remaining.substring(found.length + 1);
+    }
+    return remaining.isEmpty ? values : null;
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/address/domain/models/address_model.dart';
@@ -76,9 +77,9 @@ class AddressController extends GetxController implements GetxService {
     Response response = await addressServiceInterface.getZone(lat, long);
     if(response.statusCode == 200) {
       _inZone = true;
-      _zoneID = int.parse(jsonDecode(response.body['zone_id'])[0].toString());
+      _zoneID = int.parse(jsonDecode(response.content['zone_id'])[0].toString());
       List<int> zoneIds = [];
-      jsonDecode(response.body['zone_id']).forEach((zoneId){
+      jsonDecode(response.content['zone_id']).forEach((zoneId){
         zoneIds.add(int.parse(zoneId.toString()));
       });
     }else {

@@ -33,6 +33,7 @@ class ConfigModel {
   bool? toggleRiderRegistration;
   int? scheduleOrderSlotDuration;
   int? digitAfterDecimalPoint;
+  String? distanceUnit;
   double? parcelPerKmShippingCharge;
   double? parcelMinimumShippingCharge;
   ModuleConfig? moduleConfig;
@@ -71,6 +72,10 @@ class ConfigModel {
   bool? riderCanReviewCustomer;
   List<RiderFaqs>? riderFaqs;
   double? completionRadius;
+  double? riderMaxCashInHand;
+  MaintenanceModeData? maintenanceModeData;
+  bool? productBundleStatus;
+  List<String>? productBundleModuleTypes;
 
   ConfigModel({
     this.businessName,
@@ -106,6 +111,7 @@ class ConfigModel {
     this.toggleRiderRegistration,
     this.scheduleOrderSlotDuration,
     this.digitAfterDecimalPoint,
+    this.distanceUnit,
     this.moduleConfig,
     this.parcelPerKmShippingCharge,
     this.parcelMinimumShippingCharge,
@@ -143,7 +149,11 @@ class ConfigModel {
     this.riderCanReviewCustomer,
     this.completionRadius,
     this.showRiderEarning,
-    this.riderFaqs
+    this.riderFaqs,
+    this.riderMaxCashInHand,
+    this.maintenanceModeData,
+    this.productBundleStatus,
+    this.productBundleModuleTypes,
   });
 
   ConfigModel.fromJson(Map<String, dynamic> json) {
@@ -186,6 +196,7 @@ class ConfigModel {
     toggleRiderRegistration = json['toggle_rider_registration'];
     scheduleOrderSlotDuration = json['schedule_order_slot_duration'] == 0 ? 30 : json['schedule_order_slot_duration'];
     digitAfterDecimalPoint = json['digit_after_decimal_point'];
+    distanceUnit = json['distance_unit'];
     moduleConfig = json['module_config'] != null ? ModuleConfig.fromJson(json['module_config']) : null;
     parcelPerKmShippingCharge = json['parcel_per_km_shipping_charge']?.toDouble();
     parcelMinimumShippingCharge = json['parcel_minimum_shipping_charge']?.toDouble();
@@ -237,6 +248,10 @@ class ConfigModel {
       }
     }
     showRiderEarning = json['show_rider_earning'];
+    riderMaxCashInHand = json['rider_max_cash_in_hand']?.toDouble();
+    maintenanceModeData = json['maintenance_mode_data'] != null ? MaintenanceModeData.fromJson(json['maintenance_mode_data']) : null;
+    productBundleStatus = json['product_bundle_status'];
+    productBundleModuleTypes = json['product_bundle_module_types'] != null ? json['product_bundle_module_types'].cast<String>() : [];
   }
 
   Map<String, dynamic> toJson() {
@@ -277,6 +292,7 @@ class ConfigModel {
     data['toggle_dm_registration'] = toggleDmRegistration;
     data['schedule_order_slot_duration'] = scheduleOrderSlotDuration;
     data['digit_after_decimal_point'] = digitAfterDecimalPoint;
+    data['distance_unit'] = distanceUnit;
     if (moduleConfig != null) {
       data['module_config'] = moduleConfig!.toJson();
     }
@@ -308,6 +324,11 @@ class ConfigModel {
     if (dmReferralData != null) {
       data['dm_referral_data'] = dmReferralData!.toJson();
     }
+    if (maintenanceModeData != null) {
+      data['maintenance_mode_data'] = maintenanceModeData!.toJson();
+    }
+    data['product_bundle_status'] = productBundleStatus;
+    data['product_bundle_module_types'] = productBundleModuleTypes;
     return data;
   }
 }
@@ -592,6 +613,87 @@ class ReferralData {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['referal_status'] = referalStatus;
     data['referal_amount'] = referalAmount;
+    return data;
+  }
+}
+
+class MaintenanceModeData {
+  List<String>? maintenanceSystemSetup;
+  MaintenanceDurationSetup? maintenanceDurationSetup;
+  MaintenanceMessageSetup? maintenanceMessageSetup;
+
+  MaintenanceModeData({
+    this.maintenanceSystemSetup,
+    this.maintenanceDurationSetup,
+    this.maintenanceMessageSetup,
+  });
+
+  MaintenanceModeData.fromJson(Map<String, dynamic> json) {
+    maintenanceSystemSetup = json['maintenance_system_setup'] != null ? json['maintenance_system_setup'].cast<String>() : null;
+    maintenanceDurationSetup = json['maintenance_duration_setup'] != null ? MaintenanceDurationSetup.fromJson(json['maintenance_duration_setup']) : null;
+    maintenanceMessageSetup = json['maintenance_message_setup'] != null ? MaintenanceMessageSetup.fromJson(json['maintenance_message_setup']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['maintenance_system_setup'] = maintenanceSystemSetup;
+    if (maintenanceDurationSetup != null) {
+      data['maintenance_duration_setup'] = maintenanceDurationSetup!.toJson();
+    }
+    if (maintenanceMessageSetup != null) {
+      data['maintenance_message_setup'] = maintenanceMessageSetup!.toJson();
+    }
+    return data;
+  }
+}
+
+class MaintenanceDurationSetup {
+  String? maintenanceDuration;
+  String? startDate;
+  String? endDate;
+
+  MaintenanceDurationSetup({
+    this.maintenanceDuration,
+    this.startDate,
+    this.endDate,
+  });
+
+  MaintenanceDurationSetup.fromJson(Map<String, dynamic> json) {
+    maintenanceDuration = json['maintenance_duration'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['maintenance_duration'] = maintenanceDuration;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    return data;
+  }
+}
+
+class MaintenanceMessageSetup {
+  int? businessNumber;
+  int? businessEmail;
+  String? maintenanceMessage;
+  String? messageBody;
+
+  MaintenanceMessageSetup({this.businessNumber, this.businessEmail, this.maintenanceMessage, this.messageBody});
+
+  MaintenanceMessageSetup.fromJson(Map<String, dynamic> json) {
+    businessNumber = json['business_number'];
+    businessEmail = json['business_email'];
+    maintenanceMessage = json['maintenance_message'];
+    messageBody = json['message_body'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['business_number'] = businessNumber;
+    data['business_email'] = businessEmail;
+    data['maintenance_message'] = maintenanceMessage;
+    data['message_body'] = messageBody;
     return data;
   }
 }

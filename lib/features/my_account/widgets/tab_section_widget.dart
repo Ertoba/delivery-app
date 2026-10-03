@@ -7,73 +7,70 @@ class TabSectionWidget extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTabChanged;
 
-  const TabSectionWidget({
-    super.key,
-    required this.selectedIndex,
-    required this.onTabChanged,
-  });
+  const TabSectionWidget({super.key, required this.selectedIndex, required this.onTabChanged});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        top: Dimensions.paddingSizeLarge,
-        bottom: Dimensions.paddingSizeSmall,
-      ),
-      child: Row(
-        children: [
-          _buildTab(context: context, title: 'withdraw_history'.tr, index: 0),
+      padding: const EdgeInsets.only(top: Dimensions.paddingSizeLarge, bottom: Dimensions.paddingSizeSmall),
+      child: Row(children: [
+        _TabItem(
+          selectedIndex: selectedIndex, onTabChanged: onTabChanged,
+          title: 'withdraw_history'.tr,
+          index: 0,
+        ),
 
-          _buildTab(context: context, title: 'payment_history'.tr, index: 1),
+        _TabItem(
+          selectedIndex: selectedIndex, onTabChanged: onTabChanged,
+          title: 'payment_history'.tr,
+          index: 1,
+        ),
 
-          _buildTab(context: context, title: 'wallet_earning'.tr, index: 2),
-        ],
-      ),
+        _TabItem(
+          selectedIndex: selectedIndex, onTabChanged: onTabChanged,
+          title: 'wallet_earning'.tr,
+          index: 2,
+        ),
+      ]),
     );
   }
 
-  Widget _buildTab({
-    required BuildContext context,
-    required String title,
-    required int index,
-  }) {
+}
+
+class _TabItem extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onTabChanged;
+  final String title;
+  final int index;
+  const _TabItem({required this.selectedIndex, required this.onTabChanged, required this.title, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
     final isSelected = selectedIndex == index;
 
     return Expanded(
       child: InkWell(
         onTap: () => onTabChanged(index),
         hoverColor: Colors.transparent,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                title,
-                maxLines: 1,
-                style: robotoMedium.copyWith(
-                  color: isSelected
-                      ? Theme.of(context).textTheme.bodyLarge?.color
-                      : Theme.of(context).disabledColor,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  fontSize: Dimensions.fontSizeSmall,
-                ),
-              ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Text(
+            title,
+            style: robotoMedium.copyWith(
+              color: isSelected ? Theme.of(context).textTheme.bodyLarge?.color : Theme.of(context).disabledColor,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
-            const SizedBox(height: 3),
+          ),
+          const SizedBox(height: 3),
 
-            Container(
-              height: 3,
-              margin: const EdgeInsets.only(
-                top: Dimensions.paddingSizeExtraSmall,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                color: isSelected ? Theme.of(context).primaryColor : null,
-              ),
+          Container(
+            height: 3,
+            margin: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+              color: isSelected ? Theme.of(context).primaryColor : null,
             ),
-          ],
-        ),
+          ),
+        ]),
       ),
     );
   }

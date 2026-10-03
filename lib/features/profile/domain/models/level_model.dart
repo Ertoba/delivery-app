@@ -23,7 +23,7 @@ class LevelModel {
     limit = json['limit'];
     offset = json['offset'];
     data = json['data'] != null ?  Data.fromJson(json['data']) : null;
-    errors = json['errors'].cast<String>();
+    errors = json['errors'] != null ? List<String>.from(json['errors'].map((e) => e.toString())) : null;
   }
 
 }
@@ -95,14 +95,14 @@ class NextLevel {
     rewardType = json['reward_type'];
     rewardAmount = json['reward_amount'];
     image = json['image'];
-    targetedRide = double.parse(json['targeted_ride'].toString());
-    targetedRidePoint = double.parse(json['targeted_ride_point'].toString());
-    targetedAmount = double.parse(json['targeted_amount'].toString());
-    targetedAmountPoint = double.parse(json['targeted_amount_point'].toString());
-    targetedCancel = double.parse(json['targeted_cancel'].toString());
-    targetedCancelPoint = double.parse(json['targeted_cancel_point'].toString());
-    targetedReview = double.parse(json['targeted_review'].toString());
-    targetedReviewPoint = double.parse(json['targeted_review_point'].toString());
+    targetedRide = double.tryParse(json['targeted_ride'].toString()) ?? 0;
+    targetedRidePoint = double.tryParse(json['targeted_ride_point'].toString()) ?? 0;
+    targetedAmount = double.tryParse(json['targeted_amount'].toString()) ?? 0;
+    targetedAmountPoint = double.tryParse(json['targeted_amount_point'].toString()) ?? 0;
+    targetedCancel = double.tryParse(json['targeted_cancel'].toString()) ?? 0;
+    targetedCancelPoint = double.tryParse(json['targeted_cancel_point'].toString()) ?? 0;
+    targetedReview = double.tryParse(json['targeted_review'].toString()) ?? 0;
+    targetedReviewPoint = double.tryParse(json['targeted_review_point'].toString()) ?? 0;
     userType = json['user_type'];
     isActive = json['is_active'];
   }
@@ -152,14 +152,14 @@ class CurrentLevel {
     rewardType = json['reward_type'];
     rewardAmount = json['reward_amount'];
     image = json['image'];
-    targetedRide = double.parse(json['targeted_ride'].toString());
-    targetedRidePoint = double.parse(json['targeted_ride_point'].toString());
-    targetedAmount = double.parse(json['targeted_amount'].toString());
-    targetedAmountPoint = double.parse(json['targeted_amount_point'].toString());
-    targetedCancel = double.parse(json['targeted_cancel'].toString());
-    targetedCancelPoint = double.parse(json['targeted_cancel_point'].toString());
-    targetedReview = double.parse(json['targeted_review'].toString());
-    targetedReviewPoint = double.parse(json['targeted_review_point'].toString());
+    targetedRide = double.tryParse(json['targeted_ride'].toString()) ?? 0;
+    targetedRidePoint = double.tryParse(json['targeted_ride_point'].toString()) ?? 0;
+    targetedAmount = double.tryParse(json['targeted_amount'].toString()) ?? 0;
+    targetedAmountPoint = double.tryParse(json['targeted_amount_point'].toString()) ?? 0;
+    targetedCancel = double.tryParse(json['targeted_cancel'].toString()) ?? 0;
+    targetedCancelPoint = double.tryParse(json['targeted_cancel_point'].toString()) ?? 0;
+    targetedReview = double.tryParse(json['targeted_review'].toString()) ?? 0;
+    targetedReviewPoint = double.tryParse(json['targeted_review_point'].toString()) ?? 0;
     userType = json['user_type'];
     isActive = json['is_active'];
   }
@@ -188,14 +188,14 @@ class CompletedCurrentLevelTarget {
       });
 
   CompletedCurrentLevelTarget.fromJson(Map<String, dynamic> json) {
-    reviewGiven = double.parse(json['review_given'].toString());
-    rideComplete = double.parse(json['ride_complete'].toString());
-    earningAmount = double.parse(json['earning_amount'].toString());
-    cancellationRate = double.parse(json['cancellation_rate'].toString());
-    reviewGivenPoint = double.parse(json['review_given_point'].toString());
-    rideCompletePoint = double.parse(json['ride_complete_point'].toString());
-    earningAmountPoint = double.parse(json['earning_amount_point'].toString());
-    cancellationRatePoint = double.parse(json['cancellation_rate_point'].toString());
+    reviewGiven = double.tryParse(json['review_given'].toString()) ?? 0;
+    rideComplete = double.tryParse(json['ride_complete'].toString()) ?? 0;
+    earningAmount = double.tryParse(json['earning_amount'].toString()) ?? 0;
+    cancellationRate = double.tryParse(json['cancellation_rate'].toString()) ?? 0;
+    reviewGivenPoint = double.tryParse(json['review_given_point'].toString()) ?? 0;
+    rideCompletePoint = double.tryParse(json['ride_complete_point'].toString()) ?? 0;
+    earningAmountPoint = double.tryParse(json['earning_amount_point'].toString()) ?? 0;
+    cancellationRatePoint = double.tryParse(json['cancellation_rate_point'].toString()) ?? 0;
   }
 
 }

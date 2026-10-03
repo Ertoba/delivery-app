@@ -9,12 +9,19 @@ class LoyaltyPointModel {
   LoyaltyPointModel({this.total, this.limit, this.offset, this.loyalityPoints});
 
   LoyaltyPointModel.fromJson(Map<String, dynamic> json) {
-    total = json['total'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['loyalityPoints'] != null) {
+    if (json['pagination'] != null) {
+      total = json['pagination']['total'];
+      limit = json['pagination']['per_page']?.toString();
+      offset = json['pagination']['current_page']?.toString();
+    } else {
+      total = json['total'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
+    var pointList = json['loyalityPoints'] ?? json['data'];
+    if (pointList != null) {
       loyalityPoints = <LoyalityPoints>[];
-      json['loyalityPoints'].forEach((v) {
+      pointList.forEach((v) {
         loyalityPoints!.add(LoyalityPoints.fromJson(v));
       });
     }

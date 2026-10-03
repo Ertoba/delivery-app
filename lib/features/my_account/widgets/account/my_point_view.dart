@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
-import 'package:sixam_mart_delivery/common/widgets/paginated_list_view_widget.dart';
+import 'package:sixam_mart_delivery/common/widgets/paginated_sliver_list_view_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/account/point_filter_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/account/point_to_wallet_money_widget.dart';
@@ -38,20 +38,23 @@ class _MyPointViewState extends State<MyPointView> {
       transactionType: Get.find<MyAccountController>().selectedTransactionType ?? 'both',
     );
   }
-  
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var config = Get.find<SplashController>().configModel;
     bool loyaltyPointStatus = isRideActive ? (config!.riderLoyalityPointData?.loyalityPointStatus ?? false) : ((config!.dmLoyalityPointData?.loyalityPointStatus ?? false)) ;
 
     if(!loyaltyPointStatus) {
-      return Expanded(child: emptyView('your_loyalty_points_are_safe'.tr, context));
+      return Expanded(child: _EmptyView(text: 'your_loyalty_points_are_safe'.tr));
     }
     return Expanded(
-      child: SingleChildScrollView(
-        controller: scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: GetBuilder<ProfileController>(builder: (profileController){
+      child: GetBuilder<ProfileController>(builder: (profileController){
           return GetBuilder<MyAccountController>(builder: (myAccountController){
             if(myAccountController.loyaltyPointModel == null || myAccountController.isLoading) {
               return Padding(
@@ -59,11 +62,15 @@ class _MyPointViewState extends State<MyPointView> {
                 child: const Center(child: CircularProgressIndicator()),
               );
             } else if (!myAccountController.isFiltered && myAccountController.loyaltyPointModel!.loyalityPoints != null && myAccountController.loyaltyPointModel!.loyalityPoints!.isEmpty) {
-              return emptyView('our_loyalty_program_is_temporary_paused'.tr, context);
+              return _EmptyView(text: 'our_loyalty_program_is_temporary_paused'.tr);
             }
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            return CustomScrollView(
+              controller: scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                sliver: SliverToBoxAdapter(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
                 const SizedBox(height: Dimensions.paddingSizeDefault),
 
@@ -215,7 +222,11 @@ class _MyPointViewState extends State<MyPointView> {
                   ),
                 ),
 
-                myAccountController.loyaltyPointModel != null ? (myAccountController.loyaltyPointModel?.loyalityPoints?.isNotEmpty ?? false) ? PaginatedListViewWidget(
+                ]))),
+
+                myAccountController.loyaltyPointModel != null ? (myAccountController.loyaltyPointModel?.loyalityPoints?.isNotEmpty ?? false) ? SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                  sliver: PaginatedSliverListViewWidget(
                   scrollController: scrollController,
                   totalSize: myAccountController.loyaltyPointModel?.total,
                   offset: int.tryParse(myAccountController.loyaltyPointModel?.offset??'1'),
@@ -226,12 +237,8 @@ class _MyPointViewState extends State<MyPointView> {
                     dateRange: Get.find<MyAccountController>().selectedDateType,
                     transactionType: Get.find<MyAccountController>().selectedTransactionType ?? 'both',
                   ),
-                  productView: ListView.builder(
-                    itemCount:  myAccountController.loyaltyPointModel?.loyalityPoints?.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding:  EdgeInsets.zero,
-                    itemBuilder: (context, index) {
+                  itemCount:  myAccountController.loyaltyPointModel?.loyalityPoints?.length ?? 0,
+                  itemBuilder: (context, index) {
 
                       var point = myAccountController.loyaltyPointModel?.loyalityPoints?[index];
                       bool isCredit = point?.type == 'credit';
@@ -276,23 +283,29 @@ class _MyPointViewState extends State<MyPointView> {
                         const Divider(height: 1, thickness: 0.5,),
                       ]);
                     },
-                  ),
-                ) : SizedBox(
+                  )) : SliverToBoxAdapter(child: SizedBox(
                   height: Get.height * 0.3,
                   child: Center(child: Text('no_point_history_found'.tr)),
-                ): SizedBox(
+                )): SliverToBoxAdapter(child: SizedBox(
                   height: Get.height * 0.3,
                   child: const Center(child: CircularProgressIndicator()),
-                ),
-              ]),
+                )),
+
+              ],
             );
           });
         }),
-      ),
     );
   }
 
-  Widget emptyView(String text, BuildContext context) {
+}
+
+class _EmptyView extends StatelessWidget {
+  final String text;
+  const _EmptyView({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       SizedBox(height: context.height * 0.2),
 

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:sixam_mart_delivery/features/html/domain/services/html_service_interface.dart';
 
 class HtmlController extends GetxController implements GetxService {
@@ -12,8 +13,8 @@ class HtmlController extends GetxController implements GetxService {
     _htmlText = null;
     Response response = await htmlServiceInterface.getHtmlText(isPrivacyPolicy);
     if (response.statusCode == 200) {
-      if(response.body != null && response.body.isNotEmpty && response.body is String) {
-        _htmlText = response.body.replaceAll('href=', 'target="_blank" href=');
+      if(response.content is String && response.content.isNotEmpty) {
+        _htmlText = response.content.replaceAll('href=', 'target="_blank" href=');
       }else {
         _htmlText = '';
       }

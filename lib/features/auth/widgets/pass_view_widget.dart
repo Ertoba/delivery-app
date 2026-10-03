@@ -15,15 +15,15 @@ class PassViewWidget extends StatelessWidget {
           padding: const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
           child: Wrap(children: [
 
-            view('8_or_more_character'.tr, authController.lengthCheck),
+            _View(title: '8_or_more_character'.tr, done: authController.lengthCheck),
 
-            view('1_number'.tr, authController.numberCheck),
+            _View(title: '1_number'.tr, done: authController.numberCheck),
 
-            view('1_upper_case'.tr, authController.uppercaseCheck),
+            _View(title: '1_upper_case'.tr, done: authController.uppercaseCheck),
 
-            view('1_lower_case'.tr, authController.lowercaseCheck),
+            _View(title: '1_lower_case'.tr, done: authController.lowercaseCheck),
 
-            view('1_special_character'.tr, authController.spatialCheck),
+            _View(title: '1_special_character'.tr, done: authController.spatialCheck),
 
           ]),
         );
@@ -31,7 +31,15 @@ class PassViewWidget extends StatelessWidget {
     );
   }
 
-  Widget view(String title, bool done){
+}
+
+class _View extends StatelessWidget {
+  final String title;
+  final bool done;
+  const _View({required this.title, required this.done});
+
+  @override
+  Widget build(BuildContext context){
     return Padding(
       padding: const EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
       child: Row(mainAxisSize: MainAxisSize.min, children: [

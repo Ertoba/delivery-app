@@ -14,7 +14,7 @@ import 'package:sixam_mart_delivery/common/widgets/custom_app_bar_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_image_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_ink_well_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_snackbar_widget.dart';
-import 'package:sixam_mart_delivery/common/widgets/paginated_list_view_widget.dart';
+import 'package:sixam_mart_delivery/common/widgets/paginated_sliver_list_view_widget.dart';
 import 'package:sixam_mart_delivery/features/chat/widgets/search_field_widget.dart';
 
 import '../../auth/controllers/auth_controller.dart';
@@ -39,6 +39,14 @@ class _ConversationScreenState extends State<ConversationScreen> with TickerProv
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _initCall();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _initCall() {
@@ -165,18 +173,17 @@ class _ConversationScreenState extends State<ConversationScreen> with TickerProv
               ),
 
               // Conversation List
-              SliverToBoxAdapter(child: (conversation0 != null && conversation0.conversations != null) ?
+              (conversation0 != null && conversation0.conversations != null) ?
                 conversation0.conversations!.isNotEmpty ?
                 conversationList(chatController, conversation0)
-                : Padding(padding: const EdgeInsets.only(top: 100), child: Center(child:
+                : SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.only(top: 100), child: Center(child:
                     Column(children: [
                       Icon(Icons.chat_bubble_outline, size: 70, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
                       const SizedBox(height: Dimensions.paddingSizeSmall),
                       Text('no_conversation_found'.tr, style: robotoMedium.copyWith(color: Theme.of(context).disabledColor))
                     ]),
-                ))
-              : const Padding(padding: EdgeInsets.only(top: 100), child: Center(child: CircularProgressIndicator())),
-              )
+                )))
+              : const SliverToBoxAdapter(child: Padding(padding: EdgeInsets.only(top: 100), child: Center(child: CircularProgressIndicator()))),
             ])
           ))
         ])
@@ -186,20 +193,17 @@ class _ConversationScreenState extends State<ConversationScreen> with TickerProv
 
 
   Widget conversationList(ChatController chatController, ConversationsModel? conversation0) {
-    return Container(
-      width: Dimensions.webMaxWidth,
-      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-      child: PaginatedListViewWidget(
-        scrollController: _scrollController,
-        onPaginate: (int? offset) => chatController.getConversationList(offset!),
-        totalSize: conversation0?.totalSize,
-        offset: conversation0?.offset,
-        enabledPagination: chatController.searchConversationModel == null,
-        productView: ListView.builder(
-          itemCount: conversation0?.conversations!.length,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
+    return SliverConstrainedCrossAxis(
+      maxExtent: Dimensions.webMaxWidth,
+      sliver: SliverPadding(
+        padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+        sliver: PaginatedSliverListViewWidget(
+          scrollController: _scrollController,
+          onPaginate: (int? offset) => chatController.getConversationList(offset!),
+          totalSize: conversation0?.totalSize,
+          offset: conversation0?.offset,
+          enabledPagination: chatController.searchConversationModel == null,
+          itemCount: conversation0?.conversations?.length ?? 0,
           itemBuilder: (context, index) {
 
             Conversation conversation = conversation0!.conversations![index];

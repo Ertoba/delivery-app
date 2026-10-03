@@ -25,7 +25,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
       if (scrollController.position.pixels == scrollController.position.maxScrollExtent
           && Get.find<OrderController>().completedOrderList != null
           && !Get.find<OrderController>().paginate) {
-        int pageSize = (Get.find<OrderController>().pageSize! / 10).ceil();
+        int pageSize = Get.find<OrderController>().lastPage ?? (Get.find<OrderController>().pageSize! / 10).ceil();
         if (Get.find<OrderController>().offset < pageSize) {
           Get.find<OrderController>().setOffset(Get.find<OrderController>().offset+1);
           debugPrint('end of the page');
@@ -52,36 +52,42 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
               await orderController.getCompletedOrders(1);
               await orderController.getOrderCount('history');
             },
-            child: SingleChildScrollView(
-              controller: scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Center(child: SizedBox(width: 1170,
-                child: Column(children: [
-                  GetBuilder<OrderController>(
-                    id: 'order_count',
-                    builder: (controller) {
-                      return (controller.historyOrderCountList != null && controller.historyOrderCountList!.isNotEmpty)
-                          ? SizedBox(height: 40 + Dimensions.paddingSizeExtraSmall) : const SizedBox();
-                    },
+            // CustomScrollView + SliverList so the (paginated, unbounded) order history builds
+            // lazily — only visible rows are instantiated instead of the whole list up front.
+            child: Center(child: SizedBox(width: 1170,
+              child: CustomScrollView(
+                controller: scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: GetBuilder<OrderController>(
+                      id: 'order_count',
+                      builder: (controller) {
+                        return (controller.historyOrderCountList != null && controller.historyOrderCountList!.isNotEmpty)
+                            ? SizedBox(height: 40 + Dimensions.paddingSizeExtraSmall) : const SizedBox();
+                      },
+                    ),
                   ),
 
-                  ListView.builder(
+                  SliverPadding(
                     padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                    itemCount: orderController.completedOrderList!.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return HistoryOrderWidget(orderModel: orderController.completedOrderList![index], isRunning: false, index: index);
-                    },
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => HistoryOrderWidget(orderModel: orderController.completedOrderList![index], isRunning: false, index: index),
+                        childCount: orderController.completedOrderList!.length,
+                      ),
+                    ),
                   ),
 
-                  orderController.paginate ? const Center(child: Padding(
-                      padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
-                    child: CircularProgressIndicator()
-                  )) : const SizedBox(),
-                ]),
-              )),
-            ),
+                  SliverToBoxAdapter(
+                    child: orderController.paginate ? const Center(child: Padding(
+                        padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
+                      child: CircularProgressIndicator()
+                    )) : const SizedBox(),
+                  ),
+                ],
+              ),
+            )),
           ) : Center(child: Text('no_order_found'.tr)) : const Center(child: CircularProgressIndicator());
         }),
 

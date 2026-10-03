@@ -90,7 +90,6 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
       case AppLifecycleState.resumed:
         checkPermission();
-        Get.find<ProfileController>().resumeLocationTrackingIfPermitted();
         break;
       case AppLifecycleState.inactive:
         break;
@@ -176,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 2,
           leading: Padding(
             padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-            child: Image.asset(Images.brandMark, height: 34, width: 34, fit: BoxFit.contain),
+            child: Image.asset(Images.logo, height: 30, width: 30),
           ),
           titleSpacing: 0,
           title: Text(AppConstants.appName, maxLines: 1, overflow: TextOverflow.ellipsis, style: robotoMedium.copyWith(
@@ -212,14 +211,14 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(children: [
 
             if(!_isNotificationPermissionGranted)
-              permissionWarning(isBatteryPermission: false, onTap: requestNotificationPermission, closeOnTap: () {
+              _PermissionWarning(isBatteryPermission: false, onTap: requestNotificationPermission, closeOnTap: () {
                 setState(() {
                   _isNotificationPermissionGranted = true;
                 });
               }),
 
             if(!_isBatteryOptimizationGranted)
-              permissionWarning(isBatteryPermission: true, onTap: requestBatteryOptimization, closeOnTap: () {
+              _PermissionWarning(isBatteryPermission: true, onTap: requestBatteryOptimization, closeOnTap: () {
                 setState(() {
                   _isBatteryOptimizationGranted = true;
                 });
@@ -280,7 +279,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Widget permissionWarning({required bool isBatteryPermission, required Function() onTap, required Function() closeOnTap}) {
+}
+
+class _PermissionWarning extends StatelessWidget {
+  final bool isBatteryPermission;
+  final Function() onTap;
+  final Function() closeOnTap;
+  const _PermissionWarning({required this.isBatteryPermission, required this.onTap, required this.closeOnTap});
+
+  @override
+  Widget build(BuildContext context) {
     return GetPlatform.isAndroid ? Container(
       width: double.infinity,
       decoration: BoxDecoration(

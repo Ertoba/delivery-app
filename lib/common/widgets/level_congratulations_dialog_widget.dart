@@ -56,8 +56,8 @@ class LevelCongratulationsDialogWidget extends StatelessWidget {
                 if(rewardType == 'wallet' || rewardType == 'loyalty_points')...[
                   Text('${'you_have_earned'.tr} '
                       '${rewardType == 'wallet' ?
-                  PriceConverterHelper.convertPrice(double.parse(reward)) :
-                  '${double.parse(reward).toInt()} ${'points'.tr}'}',
+                  PriceConverterHelper.convertPrice(double.tryParse(reward) ?? 0) :
+                  '${(double.tryParse(reward) ?? 0).toInt()} ${'points'.tr}'}',
                     style: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color),
                   ),
                   const SizedBox(height: Dimensions.paddingSizeDefault),

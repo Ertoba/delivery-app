@@ -33,6 +33,12 @@ class _CancellationReasonBottomSheetState extends State<CancellationReasonBottom
   }
 
   @override
+  void dispose() {
+    commentController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GetBuilder<OrderController>(builder: (orderController) {
       return Container(

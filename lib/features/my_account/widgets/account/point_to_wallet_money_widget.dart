@@ -35,6 +35,12 @@ class _PointToWalletMoneyWidgetState extends State<PointToWalletMoneyWidget> {
   }
 
   @override
+  void dispose() {
+    amountController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Dialog(
       surfaceTintColor: Theme.of(context).cardColor,
@@ -164,9 +170,9 @@ class _PointToWalletMoneyWidgetState extends State<PointToWalletMoneyWidget> {
 
             /// Validation Messages
             if (enteredPoint < minPoint)
-              _errorText('${'conversion_point_must_be_at_least'.tr} $minPoint')
+              _ErrorText(text: '${'conversion_point_must_be_at_least'.tr} $minPoint')
             else if (enteredPoint > availablePoint)
-              _errorText('${'you_can_convert_up_to'.tr} $availablePoint ${'points'.tr}'),
+              _ErrorText(text: '${'you_can_convert_up_to'.tr} $availablePoint ${'points'.tr}'),
 
             /// Convert Button
             Padding(
@@ -197,7 +203,14 @@ class _PointToWalletMoneyWidgetState extends State<PointToWalletMoneyWidget> {
     );
   }
 
-  Widget _errorText(String text) {
+}
+
+class _ErrorText extends StatelessWidget {
+  final String text;
+  const _ErrorText({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Text(

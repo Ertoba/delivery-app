@@ -22,7 +22,7 @@ class ReferEarnRepository implements ReferEarnRepositoryInterface{
 
   @override
   Future<Response> getReferralDetails() async{
-    return await apiClient.getData('$AppConstants?token=${_getUserToken()}');
+    return await apiClient.getData('${AppConstants.referralDetails}?token=${_getUserToken()}');
   }
 }
   

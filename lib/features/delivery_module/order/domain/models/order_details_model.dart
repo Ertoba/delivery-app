@@ -1,4 +1,5 @@
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_model.dart';
+import 'package:sixam_mart_delivery/helper/data_parser_helper.dart';
 
 
 class OrderDetailsModel {
@@ -21,6 +22,12 @@ class OrderDetailsModel {
   double? totalAddOnPrice;
   int? vendorId;
   ParcelCancellation? parcelCancellation;
+  int? bogoOfferId;
+  String? bogoGroupId;
+  int? isFreeItem;
+  int? bundleId;
+  String? bundleGroupId;
+  String? bundleName;
 
   OrderDetailsModel({
     this.id,
@@ -42,7 +49,21 @@ class OrderDetailsModel {
     this.totalAddOnPrice,
     this.vendorId,
     this.parcelCancellation,
+    this.bogoOfferId,
+    this.bogoGroupId,
+    this.isFreeItem,
+    this.bundleId,
+    this.bundleGroupId,
+    this.bundleName,
   });
+
+  bool get isBogoItem => bogoGroupId != null;
+  bool get isFree => isFreeItem == 1;
+
+  /// A line that belongs to a bundle package. Mirrors [isBogoItem]: bundle lines are
+  /// priced and grouped as a unit under `bundleGroupId`, so their add-ons are already
+  /// inside the bundle price and must not be re-added to the bill.
+  bool get isBundleItem => bundleGroupId != null;
 
   OrderDetailsModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -80,6 +101,16 @@ class OrderDetailsModel {
     totalAddOnPrice = json['total_add_on_price']?.toDouble();
     vendorId = json['vendor_id'];
     parcelCancellation = json['parcel_cancellation'] != null ? ParcelCancellation.fromJson(json['parcel_cancellation']) : null;
+    bogoOfferId = json['bogo_offer_id'];
+    bogoGroupId = json['bogo_group_id'];
+    isFreeItem = json['is_free_item'];
+    /// A bundle-package member: every row sharing a `bundle_group_id` is one copy of the
+    /// bundle named `bundle_name`. Unlike the cart response, the order-details endpoint
+    /// does not fold these into a `bundle_details` object — each member keeps its own
+    /// full row (with its own `item_details`), exactly like a BOGO member row.
+    bundleId = json['bundle_id'] != null ? DataParserHelper.parseInt(json['bundle_id'], keepDefaultZero: false) : null;
+    bundleGroupId = json['bundle_group_id']?.toString();
+    bundleName = json['bundle_name'];
   }
 
   Map<String, dynamic> toJson() {
@@ -112,6 +143,12 @@ class OrderDetailsModel {
     if (parcelCancellation != null) {
       data['parcel_cancellation'] = parcelCancellation!.toJson();
     }
+    data['bogo_offer_id'] = bogoOfferId;
+    data['bogo_group_id'] = bogoGroupId;
+    data['is_free_item'] = isFreeItem;
+    data['bundle_id'] = bundleId;
+    data['bundle_group_id'] = bundleGroupId;
+    data['bundle_name'] = bundleName;
     return data;
   }
 }
@@ -126,7 +163,7 @@ class AddOn {
   AddOn.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     price = json['price']?.toDouble();
-    quantity = json['quantity'];
+    quantity = DataParserHelper.parseInt(json['quantity']);
   }
 
   Map<String, dynamic> toJson() {
@@ -357,7 +394,7 @@ class ChoiceOptions {
   ChoiceOptions.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     title = json['title'];
-    options = json['options'].cast<String>();
+    options = json['options']?.cast<String>();
   }
 
   Map<String, dynamic> toJson() {

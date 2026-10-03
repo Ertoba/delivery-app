@@ -63,6 +63,12 @@ class CustomDropdownState<T> extends State<CustomDropdown<T?>>
   }
 
   @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var style = widget.dropdownButtonStyle;
     // link the overlay to the button

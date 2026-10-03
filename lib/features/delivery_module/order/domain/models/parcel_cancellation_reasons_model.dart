@@ -7,9 +7,15 @@ class ParcelCancellationReasonsModel {
   ParcelCancellationReasonsModel({this.totalSize, this.limit, this.offset, this.data});
 
   ParcelCancellationReasonsModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = int.parse(json['limit']);
-    offset = int.parse(json['offset']);
+    if (json['pagination'] != null) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page'];
+      offset = json['pagination']['current_page'];
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'] != null ? int.tryParse(json['limit'].toString()) : null;
+      offset = json['offset'] != null ? int.tryParse(json['offset'].toString()) : null;
+    }
     if (json['data'] != null) {
       data = <Reason>[];
       json['data'].forEach((v) {

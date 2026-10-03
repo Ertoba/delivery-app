@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Free runner disk space and remove archived source copies
         run: |
           sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost /opt/hostedtoolcache/CodeQL || true
@@ -30,6 +32,13 @@ jobs:
           channel: stable
           cache: true
       - run: flutter --version
+      - name: Validate MILI Delivery identity
+        run: |
+          grep -Fxq 'version: 4.2.0+40' pubspec.yaml
+          grep -Fq 'ge.mili.delivery' android/app/build.gradle.kts
+          grep -Fq '"package_name": "ge.mili.delivery"' android/app/google-services.json
+          grep -Fq 'ge.mili.delivery' ios/Runner.xcodeproj/project.pbxproj
+          grep -Fq 'https://mili.ge' lib/util/app_constants.dart
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos --no-fatal-warnings
       - run: flutter test
@@ -38,6 +47,7 @@ jobs:
         if: ${{ hashFiles('.mili-v42-source-merged') != '' }}
         run: |
           grep -Fxq 'MILI-V42-SOURCE-MERGED-20261002' .mili-v42-source-merged
-          git fetch origin main
+          git fetch --no-tags origin main upgrade-v42-20261002
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/upgrade-v42-20261002)"
           git merge-base --is-ancestor origin/main HEAD
           git push origin HEAD:main

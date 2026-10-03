@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart_delivery/api/api_checker.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/delivery_income_statement_model.dart';
@@ -39,8 +39,7 @@ class MyAccountController extends GetxController implements GetxService {
   int get selectedIndex => _selectedIndex;
 
   List<Transactions>? _walletProvidedTransactions;
-  List<Transactions>? get walletProvidedTransactions =>
-      _walletProvidedTransactions;
+  List<Transactions>? get walletProvidedTransactions => _walletProvidedTransactions;
 
   late DateTimeRange _selectedDateRange;
 
@@ -67,11 +66,7 @@ class MyAccountController extends GetxController implements GetxService {
   List<Data>? _earningList;
   List<Data>? get earningList => _earningList;
 
-  final List<String> _earningTypes = [
-    'all_types_earning',
-    'delivery_fee',
-    'delivery_tips',
-  ];
+  final List<String> _earningTypes = ['all_types_earning', 'delivery_fee', 'delivery_tips'];
   List<String> get earningTypes => _earningTypes;
 
   String? _selectedEarningType = 'all_types_earning';
@@ -116,37 +111,17 @@ class MyAccountController extends GetxController implements GetxService {
     update();
   }
 
-  Future<Response> getLoyaltyPointList({
-    required int offset,
-    required String? dateRange,
-    required String? startDate,
-    required String? endDate,
-    bool fromFilter = false,
-    required String transactionType,
-  }) async {
+  Future<Response> getLoyaltyPointList({required int offset, required String? dateRange, required String? startDate, required String? endDate, bool fromFilter = false, required String transactionType}) async {
     _isLoading = true;
 
-    Response? response = await myAccountServiceInterface.getLoyaltyPointList(
-      offset: offset.toString(),
-      dateRange: dateRange,
-      startDate: startDate,
-      endDate: endDate,
-      transactionType: transactionType,
-      fromFilter: fromFilter,
-    );
+    Response? response = await myAccountServiceInterface.getLoyaltyPointList(offset: offset.toString(), dateRange: dateRange, startDate: startDate, endDate: endDate, transactionType: transactionType, fromFilter: fromFilter);
     if (response!.statusCode == 200) {
       if (offset == 1) {
-        _loyaltyPointModel = LoyaltyPointModel.fromJson(response.body);
+        _loyaltyPointModel = LoyaltyPointModel.fromJson(response.content);
       } else {
-        _loyaltyPointModel!.loyalityPoints!.addAll(
-          LoyaltyPointModel.fromJson(response.body).loyalityPoints!,
-        );
-        _loyaltyPointModel!.offset = LoyaltyPointModel.fromJson(
-          response.body,
-        ).offset;
-        _loyaltyPointModel!.total = LoyaltyPointModel.fromJson(
-          response.body,
-        ).total;
+        _loyaltyPointModel!.loyalityPoints!.addAll(LoyaltyPointModel.fromJson(response.content).loyalityPoints!);
+        _loyaltyPointModel!.offset = LoyaltyPointModel.fromJson(response.content).offset;
+        _loyaltyPointModel!.total = LoyaltyPointModel.fromJson(response.content).total;
       }
       _isFiltered = fromFilter;
       _isLoading = false;
@@ -157,25 +132,12 @@ class MyAccountController extends GetxController implements GetxService {
     return response;
   }
 
-  Future<Response> convertPoint(
-    String point, {
-    required bool isRideActive,
-  }) async {
+  Future<Response> convertPoint(String point, {required bool isRideActive}) async {
     _isLoading = true;
     update();
-    Response response = await myAccountServiceInterface.convertPoint(
-      point,
-      isRideActive: isRideActive,
-    );
+    Response response = await myAccountServiceInterface.convertPoint(point, isRideActive: isRideActive);
     if (response.statusCode == 200) {
-      await getLoyaltyPointList(
-        offset: 1,
-        dateRange: 'this_year',
-        startDate: null,
-        endDate: null,
-        fromFilter: false,
-        transactionType: 'both',
-      );
+      await getLoyaltyPointList(offset: 1, dateRange: 'this_year', startDate: null, endDate: null, fromFilter: false, transactionType: 'both');
       Get.find<ProfileController>().getProfile();
       _isLoading = false;
     } else {
@@ -185,14 +147,10 @@ class MyAccountController extends GetxController implements GetxService {
     return response;
   }
 
-  Future<ResponseModel> makeCollectCashPayment(
-    double amount,
-    String paymentGatewayName,
-  ) async {
+  Future<ResponseModel> makeCollectCashPayment(double amount, String paymentGatewayName) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await myAccountServiceInterface
-        .makeCollectCashPayment(amount, paymentGatewayName);
+    ResponseModel responseModel = await myAccountServiceInterface.makeCollectCashPayment(amount, paymentGatewayName);
     _isLoading = false;
     update();
     return responseModel;
@@ -200,9 +158,8 @@ class MyAccountController extends GetxController implements GetxService {
 
   Future<void> getWalletPaymentList() async {
     _transactions = null;
-    List<Transactions>? transactions = await myAccountServiceInterface
-        .getWalletPaymentList();
-    if (transactions != null) {
+    List<Transactions>? transactions = await myAccountServiceInterface.getWalletPaymentList();
+    if(transactions != null) {
       _transactions = [];
       _transactions!.addAll(transactions);
     }
@@ -211,9 +168,8 @@ class MyAccountController extends GetxController implements GetxService {
 
   Future<void> getWalletProvidedEarningList() async {
     _walletProvidedTransactions = null;
-    List<Transactions>? walletProvidedTransactions =
-        await myAccountServiceInterface.getWalletProvidedEarningList();
-    if (walletProvidedTransactions != null) {
+    List<Transactions>? walletProvidedTransactions = await myAccountServiceInterface.getWalletProvidedEarningList();
+    if(walletProvidedTransactions != null) {
       _walletProvidedTransactions = [];
       _walletProvidedTransactions!.addAll(walletProvidedTransactions);
     }
@@ -223,14 +179,13 @@ class MyAccountController extends GetxController implements GetxService {
   Future<void> makeWalletAdjustment() async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await myAccountServiceInterface
-        .makeWalletAdjustment();
-    if (responseModel.isSuccess) {
+    ResponseModel responseModel = await myAccountServiceInterface.makeWalletAdjustment();
+    if(responseModel.isSuccess) {
       await Get.find<ProfileController>().getProfile();
       await getWalletProvidedEarningList();
       Get.back();
       showCustomSnackBar(responseModel.message, isError: false);
-    } else {
+    }else{
       Get.back();
       showCustomSnackBar(responseModel.message, isError: true);
     }
@@ -238,14 +193,14 @@ class MyAccountController extends GetxController implements GetxService {
     update();
   }
 
-  void setPaymentIndex(int index) {
+  void setPaymentIndex(int index){
     _paymentIndex = index;
     update();
   }
 
-  void changeDigitalPaymentName(String? name, {bool canUpdate = true}) {
+  void changeDigitalPaymentName(String? name, {bool canUpdate = true}){
     _digitalPaymentName = name;
-    if (canUpdate) {
+    if(canUpdate) {
       update();
     }
   }
@@ -281,15 +236,9 @@ class MyAccountController extends GetxController implements GetxService {
     debugPrint('===$_from / ===$_to');
   }
 
-  Future<void> getEarningReport({
-    required String offset,
-    required String? type,
-    required String? dateRange,
-    required String? startDate,
-    required String? endDate,
-    bool fromFilter = false,
-  }) async {
-    if (offset == '1') {
+  Future<void> getEarningReport({required String offset, required String? type, required String? dateRange, required String? startDate, required String? endDate, bool fromFilter = false}) async {
+
+    if(offset == '1') {
       _offsetList = [];
       _offset = 1;
       _earningList = null;
@@ -298,14 +247,7 @@ class MyAccountController extends GetxController implements GetxService {
     if (!_offsetList.contains(offset)) {
       _offsetList.add(offset);
 
-      EarningReportModel? earningReportModel = await myAccountServiceInterface
-          .getEarningReport(
-            offset: offset,
-            type: type == 'all_types_earning' ? 'all' : type,
-            dateRange: dateRange,
-            startDate: startDate,
-            endDate: endDate,
-          );
+      EarningReportModel? earningReportModel = await myAccountServiceInterface.getEarningReport(offset: offset, type: type == 'all_types_earning' ? 'all' : type, dateRange: dateRange, startDate: startDate, endDate: endDate);
       if (earningReportModel != null) {
         if (offset == '1') {
           _earningList = [];
@@ -317,23 +259,18 @@ class MyAccountController extends GetxController implements GetxService {
         _isFiltered = fromFilter;
         update();
       }
-    } else {
-      if (isLoading) {
+    }else {
+      if(isLoading) {
         _isLoading = false;
         update();
       }
     }
   }
 
-  Future<void> getReferralReport({
-    required String offset,
-    required String? type,
-    required String? dateRange,
-    required String? startDate,
-    required String? endDate,
-    bool fromFilter = false,
-  }) async {
-    if (offset == '1') {
+
+  Future<void> getReferralReport({required String offset, required String? type, required String? dateRange, required String? startDate, required String? endDate, bool fromFilter = false}) async {
+
+    if(offset == '1') {
       _offsetList = [];
       _offset = 1;
       _referralEarningsList = null;
@@ -342,14 +279,7 @@ class MyAccountController extends GetxController implements GetxService {
     if (!_offsetList.contains(offset)) {
       _offsetList.add(offset);
 
-      ReferralReportModel? referralRepostModel = await myAccountServiceInterface
-          .getReferralReport(
-            offset: offset,
-            type: type == 'all_types_earning' ? 'all' : type,
-            dateRange: dateRange,
-            startDate: startDate,
-            endDate: endDate,
-          );
+      ReferralReportModel? referralRepostModel = await myAccountServiceInterface.getReferralReport(offset: offset, type: type == 'all_types_earning' ? 'all' : type, dateRange: dateRange, startDate: startDate, endDate: endDate);
       if (referralRepostModel != null) {
         if (offset == '1') {
           _referralEarningsList = [];
@@ -361,23 +291,17 @@ class MyAccountController extends GetxController implements GetxService {
         _isFiltered = fromFilter;
         update();
       }
-    } else {
-      if (isLoading) {
+    }else {
+      if(isLoading) {
         _isLoading = false;
         update();
       }
     }
   }
 
-  Future<void> getLoyaltyReport({
-    required String offset,
-    required String? type,
-    required String? dateRange,
-    required String? startDate,
-    required String? endDate,
-    bool fromFilter = false,
-  }) async {
-    if (offset == '1') {
+  Future<void> getLoyaltyReport({required String offset, required String? type, required String? dateRange, required String? startDate, required String? endDate, bool fromFilter = false}) async {
+
+    if(offset == '1') {
       _offsetList = [];
       _offset = 1;
       _loyalityPointsReport = null;
@@ -386,14 +310,7 @@ class MyAccountController extends GetxController implements GetxService {
     if (!_offsetList.contains(offset)) {
       _offsetList.add(offset);
 
-      LoyaltyReportModel? loyaltyRepostModel = await myAccountServiceInterface
-          .getLoyaltyReport(
-            offset: offset,
-            type: type == 'all_types_earning' ? 'all' : type,
-            dateRange: dateRange,
-            startDate: startDate,
-            endDate: endDate,
-          );
+      LoyaltyReportModel? loyaltyRepostModel = await myAccountServiceInterface.getLoyaltyReport(offset: offset, type: type == 'all_types_earning' ? 'all' : type, dateRange: dateRange, startDate: startDate, endDate: endDate);
       if (loyaltyRepostModel != null) {
         if (offset == '1') {
           _loyalityPointsReport = [];
@@ -405,8 +322,8 @@ class MyAccountController extends GetxController implements GetxService {
         _isFiltered = fromFilter;
         update();
       }
-    } else {
-      if (isLoading) {
+    }else {
+      if(isLoading) {
         _isLoading = false;
         update();
       }
@@ -440,90 +357,46 @@ class MyAccountController extends GetxController implements GetxService {
     _isFiltered = false;
     _offset = 1;
     _selectedTransactionType = null;
-    if (isUpdate) {
+    if(isUpdate) {
       update();
     }
   }
 
-  Future<void> downloadEarningInvoice({
-    required int dmId,
-    String? earningType,
-    required Rect sharePositionOrigin,
-  }) async {
-    if (_downloadLoading == true) {
-      return;
-    }
-
+  Future<void> downloadEarningInvoice({required int dmId, String? earningType}) async {
     _downloadLoading = true;
     update();
 
-    try {
-      final response = await myAccountServiceInterface.downloadEarningInvoice(
-        dmId: dmId,
-        earningType: earningType,
-      );
+    final response = await myAccountServiceInterface.downloadEarningInvoice(dmId: dmId, earningType: earningType);
 
-      if (response.statusCode == 200) {
+    if (response.statusCode == 200) {
+
+      try {
+
+        // Get the document directory path
         final directory = await getApplicationDocumentsDirectory();
         final filePath = '${directory.path}/earning_invoice_$dmId.pdf';
 
-        final Stream<List<int>>? bodyBytes = response.bodyBytes;
-        if (bodyBytes == null) {
-          throw const FormatException('Missing PDF response');
-        }
-
-        final List<int> pdfBytes = await bodyBytes.fold<List<int>>(
-          <int>[],
-          (bytes, chunk) => bytes..addAll(chunk),
-        );
-        if (pdfBytes.isEmpty) {
-          throw const FormatException('Empty PDF response');
-        }
-
+        // Save the PDF file
         final file = File(filePath);
-        await file.writeAsBytes(pdfBytes, flush: true);
+        await file.writeAsBytes(response.bodyString!.codeUnits);
 
-        _setDownloadLoading(false);
-
-        if (Platform.isIOS) {
-          await SharePlus.instance.share(
-            ShareParams(
-              files: [XFile(filePath, mimeType: 'application/pdf')],
-              fileNameOverrides: ['earning_invoice_$dmId.pdf'],
-              sharePositionOrigin: sharePositionOrigin,
-            ),
-          );
-        } else {
-          final OpenResult openResult = await OpenFile.open(
-            filePath,
-            type: 'application/pdf',
-          ).timeout(const Duration(seconds: 15));
-          if (openResult.type != ResultType.done) {
-            throw FileSystemException(openResult.message, filePath);
-          }
-        }
-      } else {
-        ApiChecker.checkApi(response);
+        // Open the PDF file
+        OpenFile.open(filePath);
+      } catch (e) {
+        showCustomSnackBar('file_opening_failed'.tr);
       }
-    } catch (_) {
-      showCustomSnackBar('file_opening_failed'.tr);
-    } finally {
-      _setDownloadLoading(false);
-    }
-  }
 
-  void _setDownloadLoading(bool value) {
-    if (_downloadLoading == value) {
-      return;
+    } else {
+      ApiChecker.checkApi(response);
     }
-    _downloadLoading = value;
+
+    _downloadLoading = false;
     update();
   }
 
   Future<void> getWithdrawRequestList() async {
-    List<WithdrawRequestModel>? withdrawRequestList =
-        await myAccountServiceInterface.getWithdrawRequestList();
-    if (withdrawRequestList != null) {
+    List<WithdrawRequestModel>? withdrawRequestList = await myAccountServiceInterface.getWithdrawRequestList();
+    if(withdrawRequestList != null) {
       _withdrawRequestList = [];
       _withdrawRequestList!.addAll(withdrawRequestList);
     }

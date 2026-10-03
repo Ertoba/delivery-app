@@ -7,12 +7,19 @@ class DisbursementMethodBody {
   DisbursementMethodBody({this.totalSize, this.limit, this.offset, this.methods});
 
   DisbursementMethodBody.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['methods'] != null) {
+    if (json['pagination'] != null) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page']?.toString();
+      offset = json['pagination']['current_page']?.toString();
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
+    var methodList = json['data'] ?? json['methods'];
+    if (methodList != null) {
       methods = <Methods>[];
-      json['methods'].forEach((v) {
+      methodList.forEach((v) {
         methods!.add(Methods.fromJson(v));
       });
     }
@@ -65,7 +72,8 @@ class Methods {
         methodFields!.add(MethodField.fromJson(v));
       });
     }
-    isDefault = json['is_default'];
+    /// Saved methods report this as a bool, the method catalogue as 1/0 — accept either.
+    isDefault = json['is_default'] is bool ? json['is_default'] : json['is_default'] == 1;
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -90,18 +98,30 @@ class Methods {
 class MethodField {
   String? userInput;
   String? userData;
+  String? inputType;
+  String? placeholder;
+  int? isRequired;
 
-  MethodField({this.userInput, this.userData});
+  MethodField({this.userInput, this.userData, this.inputType, this.placeholder, this.isRequired});
 
   MethodField.fromJson(Map<String, dynamic> json) {
-    userInput = json['user_input'];
-    userData = json['user_data'];
+    /// A saved method names its field `user_input` and carries the rider's
+    /// answer in `user_data`. The method catalogue describes the same field as
+    /// `input_name` with no answer attached, so read whichever is present.
+    userInput = json['user_input'] ?? json['input_name'];
+    userData = json['user_data'] ?? json['value'];
+    inputType = json['input_type'];
+    placeholder = json['placeholder'];
+    isRequired = json['is_required'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['user_input'] = userInput;
     data['user_data'] = userData;
+    data['input_type'] = inputType;
+    data['placeholder'] = placeholder;
+    data['is_required'] = isRequired;
     return data;
   }
 }

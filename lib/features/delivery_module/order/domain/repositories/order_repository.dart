@@ -1,12 +1,14 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_delivery/api/api_client.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/ignore_model.dart';
-import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_details_model.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_cancellation_body.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_details_response_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/parcel_cancellation_reasons_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/update_status_body_model.dart';
@@ -26,7 +28,7 @@ class OrderRepository implements OrderRepositoryInterface {
     List<CancellationData>? orderCancelReasons;
     Response response = await apiClient.getData('${AppConstants.orderCancellationUri}?offset=1&limit=30&type=deliveryman');
     if (response.statusCode == 200) {
-      OrderCancellationBody orderCancellationBody = OrderCancellationBody.fromJson(response.body);
+      OrderCancellationBody orderCancellationBody = OrderCancellationBody.fromJson(response.content);
       orderCancelReasons = [];
       for (var element in orderCancellationBody.reasons!) {
         orderCancelReasons.add(element);
@@ -48,7 +50,7 @@ class OrderRepository implements OrderRepositoryInterface {
         '${AppConstants.allOrdersUri}?token=${_getUserToken()}&offset=$offset&limit=10&order_status=$orderStatus'
     );
     if (response.statusCode == 200) {
-      paginatedOrderModel = PaginatedOrderModel.fromJson(response.body);
+      paginatedOrderModel = PaginatedOrderModel.fromJson(response.content);
     }
     return paginatedOrderModel;
   }
@@ -69,7 +71,9 @@ class OrderRepository implements OrderRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.latestOrdersUri + _getUserToken());
     if(response.statusCode == 200) {
       latestOrderList = [];
-      response.body.forEach((order) => latestOrderList!.add(OrderModel.fromJson(order)));
+      for (var order in response.contentList) {
+        latestOrderList.add(OrderModel.fromJson(order));
+      }
     }
     return latestOrderList;
   }
@@ -91,7 +95,7 @@ class OrderRepository implements OrderRepositoryInterface {
 
     Response response = await apiClient.postMultipartData(AppConstants.updateOrderStatusUri, data, proofAttachment, handleError: false);
     if (response.statusCode == 200) {
-      responseModel = ResponseModel(true, response.body['message']);
+      responseModel = ResponseModel(true, response.apiMessage);
     }else {
       responseModel = ResponseModel(false, response.statusText);
     }
@@ -99,36 +103,19 @@ class OrderRepository implements OrderRepositoryInterface {
   }
 
   @override
-  Future<List<OrderDetailsModel>?> getOrderDetails(int? orderID) async {
-    List<OrderDetailsModel>? orderDetailsModel;
+  Future<OrderDetailsResponseModel?> getOrderDetails(int? orderID) async {
+    OrderDetailsResponseModel? orderDetailsResponse;
     Response response = await apiClient.getData('${AppConstants.orderDetailsUri}${_getUserToken()}&order_id=$orderID');
     if (response.statusCode == 200) {
-      orderDetailsModel = [];
-      response.body.forEach((orderDetails) => orderDetailsModel!.add(OrderDetailsModel.fromJson(orderDetails)));
+      orderDetailsResponse = OrderDetailsResponseModel.fromResponse(response.content);
     }
-    return orderDetailsModel;
+    return orderDetailsResponse;
   }
 
   @override
   Future<ResponseModel> acceptOrder(int? orderID) async {
-    Position? locationResult;
-    try {
-      locationResult = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 12),
-        ),
-      );
-    } on TimeoutException {
-      locationResult = await _recentLastKnownPosition();
-    } catch (_) {
-      locationResult = await _recentLastKnownPosition();
-    }
-    if (locationResult == null) {
-      return ResponseModel(false, 'location_timeout_try_again'.tr);
-    }
-
     ResponseModel responseModel;
+    final Position locationResult = await Geolocator.getCurrentPosition();
     Response response = await apiClient.postData(
         AppConstants.acceptOrderUri,
         {
@@ -140,24 +127,11 @@ class OrderRepository implements OrderRepositoryInterface {
         },
         handleError: false);
     if (response.statusCode == 200) {
-      responseModel = ResponseModel(true, response.body['message']);
+      responseModel = ResponseModel(true, response.apiMessage);
     }else {
       responseModel = ResponseModel(false, response.statusText);
     }
     return responseModel;
-  }
-
-  Future<Position?> _recentLastKnownPosition() async {
-    try {
-      final Position? position = await Geolocator.getLastKnownPosition();
-      if (position == null) {
-        return null;
-      }
-      final Duration age = DateTime.now().difference(position.timestamp).abs();
-      return age <= const Duration(minutes: 10) ? position : null;
-    } catch (_) {
-      return null;
-    }
   }
 
   @override
@@ -188,7 +162,7 @@ class OrderRepository implements OrderRepositoryInterface {
     ParcelCancellationReasonsModel? cancellationReasonsModel;
     Response response = await apiClient.getData('${AppConstants.getParcelCancellationReasons}?limit=25&offset=1&user_type=customer&cancellation_type=${isBeforePickup ? 'before_pickup' : 'after_pickup'}');
     if(response.statusCode == 200){
-      cancellationReasonsModel = ParcelCancellationReasonsModel.fromJson(response.body);
+      cancellationReasonsModel = ParcelCancellationReasonsModel.fromJson(response.content);
     }
     return cancellationReasonsModel;
   }
@@ -221,9 +195,15 @@ class OrderRepository implements OrderRepositoryInterface {
     PaginatedOrderModel? paginatedOrderModel;
     Response response = await apiClient.getData('${AppConstants.currentOrdersUri + _getUserToken()}&offset=$offset&limit=10&order_status=$orderStatus');
     if(response.statusCode == 200) {
-      paginatedOrderModel = PaginatedOrderModel.fromJson(response.body);
+      paginatedOrderModel = PaginatedOrderModel.fromJson(response.content);
     }
     return paginatedOrderModel;
+  }
+
+  @override
+  Future<Response?> getDirection({required LatLng origin, required LatLng destination}) async {
+    return await apiClient.getData('${AppConstants.directionUri}?origin_lat=${origin.latitude}&origin_lng=${origin.longitude}'
+        '&destination_lat=${destination.latitude}&destination_lng=${destination.longitude}');
   }
 
   @override
@@ -231,7 +211,7 @@ class OrderRepository implements OrderRepositoryInterface {
     List<OrderCountModel>? orderCountList;
     Response response = await apiClient.getData('${AppConstants.orderCount}?type=$type&token=${_getUserToken()}');
     if (response.statusCode == 200) {
-      orderCountList = (response.body as List).map((item) => OrderCountModel.fromJson(item)).toList();
+      orderCountList = response.contentList.map((item) => OrderCountModel.fromJson(item)).toList();
     }
     return orderCountList;
   }

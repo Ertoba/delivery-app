@@ -10,22 +10,24 @@ class ReferViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return myAccountController.referralEarningsList != null ? myAccountController.referralEarningsList!.isNotEmpty ? ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: myAccountController.referralEarningsList!.length,
-      itemBuilder: (context, index) {
-        return EarningReportCard(
-          index: index,
-          myAccountController: myAccountController,
-          earning: null,
-          refrealEarnings: myAccountController.referralEarningsList![index],
-          loyalityPoints: null,
-          createdAt: myAccountController.referralEarningsList![index].createdAt!,
-          showDivider: index != myAccountController.referralEarningsList!.length - 1,
-        );
-      },
-    ) : Center(
+    // Returns a sliver (hosted inside my_earning_screen's CustomScrollView) so the paginated,
+    // growing referral list builds lazily instead of eagerly via shrinkWrap.
+    return myAccountController.referralEarningsList != null ? myAccountController.referralEarningsList!.isNotEmpty ? SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return EarningReportCard(
+            index: index,
+            myAccountController: myAccountController,
+            earning: null,
+            refrealEarnings: myAccountController.referralEarningsList![index],
+            loyalityPoints: null,
+            createdAt: myAccountController.referralEarningsList![index].createdAt!,
+            showDivider: index != myAccountController.referralEarningsList!.length - 1,
+          );
+        },
+        childCount: myAccountController.referralEarningsList!.length,
+      ),
+    ) : SliverToBoxAdapter(child: Center(
       child: Padding(
         padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
         child: Text(
@@ -33,6 +35,8 @@ class ReferViewWidget extends StatelessWidget {
           style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
         ),
       ),
-    ) : Center(child: CircularProgressIndicator());
+    )) : const SliverToBoxAdapter(child: Center(child: Padding(
+      padding: EdgeInsets.all(Dimensions.paddingSizeLarge), child: CircularProgressIndicator(),
+    )));
   }
 }

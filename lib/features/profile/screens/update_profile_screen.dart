@@ -40,6 +40,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   }
 
   @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _firstNameFocus.dispose();
+    _lastNameFocus.dispose();
+    _emailFocus.dispose();
+    _phoneFocus.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: GetBuilder<ProfileController>(builder: (profileController) {
@@ -121,7 +134,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 const SizedBox(height: Dimensions.paddingSizeLarge),
 
                 TextFieldWidget(
-                  hintText: 'XXX-XXXXXX',
+                  hintText: 'phone'.tr,
                   controller: _phoneController,
                   focusNode: _phoneFocus,
                   inputType: TextInputType.phone,

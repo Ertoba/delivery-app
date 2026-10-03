@@ -1,11 +1,13 @@
 import 'package:get/get.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_delivery/api/api_client.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/ignore_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_cancellation_body.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_count_model.dart';
-import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_details_model.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_details_response_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/parcel_cancellation_reasons_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/update_status_body_model.dart';
@@ -47,7 +49,7 @@ class OrderService implements OrderServiceInterface {
   }
 
   @override
-  Future<List<OrderDetailsModel>?> getOrderDetails(int? orderID) async {
+  Future<OrderDetailsResponseModel?> getOrderDetails(int? orderID) async {
     return await orderRepositoryInterface.getOrderDetails(orderID);
   }
 
@@ -125,6 +127,60 @@ class OrderService implements OrderServiceInterface {
   @override
   Future<List<OrderCountModel>?> getOrderCount(String type) async {
     return await orderRepositoryInterface.getOrderCount(type);
+  }
+
+  @override
+  Future<List<LatLng>> getDirectionPolyline({required LatLng origin, required LatLng destination}) async {
+    List<LatLng> coordinates = [];
+    final Response? response = await orderRepositoryInterface.getDirection(origin: origin, destination: destination);
+    if (response != null && response.statusCode == 200) {
+      try {
+        final dynamic body = response.content;
+        String? encoded;
+        if (body is Map && body['routes'] is List && (body['routes'] as List).isNotEmpty) {
+          final dynamic route = body['routes'][0];
+          // Routes API v2 shape: routes[0].polyline.encodedPolyline
+          encoded = route['polyline']?['encodedPolyline'];
+          // Legacy Directions shape fallback: routes[0].overview_polyline.points
+          encoded ??= route['overview_polyline']?['points'];
+        }
+        if ((encoded == null || encoded.isEmpty) && body is Map) {
+          encoded = body['encoded_polyline'];
+        }
+        if (encoded != null && encoded.isNotEmpty) {
+          coordinates = _decodeEncodedPolyline(encoded);
+        }
+      } catch (_) {}
+    }
+    return coordinates;
+  }
+
+  /// Decodes a Google encoded polyline string into a list of [LatLng] points.
+  List<LatLng> _decodeEncodedPolyline(String encoded) {
+    List<LatLng> poly = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+      poly.add(LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble()));
+    }
+    return poly;
   }
 
 }

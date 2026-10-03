@@ -30,7 +30,8 @@ class ZoneModel {
   ZoneModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    coordinates = json['coordinates'] != null ? Coordinates.fromJson(json['coordinates']) : null;
+    coordinates = json['coordinates'] != null ? Coordinates.fromJson(json['coordinates'])
+        : json['formated_coordinates'] != null ? Coordinates.fromFormattedJson(json['formated_coordinates']) : null;
     status = json['status'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
@@ -73,6 +74,15 @@ class Coordinates {
       json['coordinates'][0].forEach((v) {
         coordinates!.add(LatLng(double.parse(v[0].toString()), double.parse(v[1].toString())));
       });
+    }
+  }
+
+  /// Zones now expose their polygon as a flat `formated_coordinates` list of {lat, lng}.
+  Coordinates.fromFormattedJson(List<dynamic> json) {
+    type = 'Polygon';
+    coordinates = <LatLng>[];
+    for (var point in json) {
+      coordinates!.add(LatLng(double.parse(point['lat'].toString()), double.parse(point['lng'].toString())));
     }
   }
 

@@ -205,7 +205,7 @@ class _WithdrawMethodScreenState extends State<WithdrawMethodScreen> {
                                   Expanded(
                                     flex: 1,
                                     child: Text(
-                                      method.methodFields![index].userInput!.replaceAll('_', ' ').toTitleCase(), style: robotoRegular.copyWith(color: Theme.of(context).hintColor),
+                                      (method.methodFields![index].userInput ?? '').replaceAll('_', ' ').toTitleCase(), style: robotoRegular.copyWith(color: Theme.of(context).hintColor),
                                       maxLines: 1, overflow: TextOverflow.ellipsis,
                                     ),
                                   ),

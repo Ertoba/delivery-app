@@ -20,16 +20,23 @@ class DisbursementReportModel {
   });
 
   DisbursementReportModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
+    if (json['pagination'] != null) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page']?.toString();
+      offset = json['pagination']['current_page']?.toString();
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
     pending = json['pending']?.toDouble();
     completed = json['completed']?.toDouble();
     canceled = json['canceled']?.toDouble();
     completeDay = json['complete_day'];
-    if (json['disbursements'] != null) {
+    var disbursementList = json['data'] ?? json['disbursements'];
+    if (disbursementList != null) {
       disbursements = <Disbursements>[];
-      json['disbursements'].forEach((v) {
+      disbursementList.forEach((v) {
         disbursements!.add(Disbursements.fromJson(v));
       });
     }

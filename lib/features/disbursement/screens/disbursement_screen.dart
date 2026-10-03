@@ -55,11 +55,11 @@ class _DisbursementScreenState extends State<DisbursementScreen> {
       ),
 
       body: GetBuilder<DisbursementController>(builder: (disbursementController) {
-        return disbursementController.disbursementReportModel != null ? SingleChildScrollView(
+        return disbursementController.disbursementReportModel != null ? CustomScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          slivers: [
 
-            SizedBox(
+            SliverToBoxAdapter(child: SizedBox(
               height: 160,
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -89,9 +89,9 @@ class _DisbursementScreenState extends State<DisbursementScreen> {
 
                 ]),
               ),
-            ),
+            )),
 
-            Padding(
+            SliverToBoxAdapter(child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
               child: Text(
                 "disbursement_history".tr,
@@ -100,14 +100,12 @@ class _DisbursementScreenState extends State<DisbursementScreen> {
                   color: Theme.of(context).textTheme.bodyLarge!.color,
                 ),
               ),
-            ),
+            )),
 
-            (disbursementController.disbursementReportModel!.disbursements != null  && disbursementController.disbursementReportModel!.disbursements!.isNotEmpty)? ListView.builder(
+            (disbursementController.disbursementReportModel!.disbursements != null  && disbursementController.disbursementReportModel!.disbursements!.isNotEmpty)? SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeLarge),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: disbursementController.disbursementReportModel!.disbursements!.length,
-              itemBuilder: (context, index) {
+              sliver: SliverList(delegate: SliverChildBuilderDelegate(
+                (context, index) {
                 Disbursements disbursement = disbursementController.disbursementReportModel!.disbursements![index];
                 return Column(children: [
 
@@ -153,9 +151,10 @@ class _DisbursementScreenState extends State<DisbursementScreen> {
                   Divider(height: 2, thickness: 1, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
                 ]);
               },
-            ) : Padding(padding: const EdgeInsets.only(top: 200), child: Center(child: Text('no_history_available'.tr, style: robotoMedium))),
+              childCount: disbursementController.disbursementReportModel!.disbursements!.length,
+            )) ) : SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.only(top: 200), child: Center(child: Text('no_history_available'.tr, style: robotoMedium)))),
 
-          ]),
+          ],
 
         ) : const Center(child: CircularProgressIndicator());
       }),

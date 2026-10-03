@@ -66,7 +66,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
             child: ListView.builder(
               itemCount: notificationController.notificationList!.length,
               padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-              shrinkWrap: true,
+              // Body-level list: no shrinkWrap so items build lazily; AlwaysScrollable keeps
+              // pull-to-refresh working even when the list is short.
+              physics: const AlwaysScrollableScrollPhysics(),
               itemBuilder: (context, index) {
 
                 DateTime originalDateTime = DateConverterHelper.dateTimeStringToDate(notificationController.notificationList![index].createdAt!);

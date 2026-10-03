@@ -7,9 +7,15 @@ class DeliveryIncomeStatementModel {
   DeliveryIncomeStatementModel({this.totalSize, this.limit, this.offset, this.transactions});
 
   DeliveryIncomeStatementModel.fromJson(Map<String, dynamic> json) {
-    totalSize = int.tryParse(json['total_size'].toString());
-    limit = int.tryParse(json['limit'].toString());
-    offset = int.tryParse(json['offset'].toString());
+    if (json['pagination'] != null) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page'];
+      offset = json['pagination']['current_page'];
+    } else {
+      totalSize = int.tryParse(json['total_size'].toString());
+      limit = int.tryParse(json['limit'].toString());
+      offset = int.tryParse(json['offset'].toString());
+    }
     if (json['data'] != null) {
       transactions = <DeliveryIncomeStatement>[];
       json['data'].forEach((v) {
@@ -58,9 +64,9 @@ class DeliveryIncomeStatement {
 
   DeliveryIncomeStatement.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    vendorId = json['vendor_id'];
-    deliveryManId = json['delivery_man_id'];
-    orderId = json['order_id'];
+    vendorId = int.tryParse(json['vendor_id'].toString());
+    deliveryManId = int.tryParse(json['delivery_man_id'].toString());
+    orderId = int.tryParse(json['order_id'].toString());
     orderAmount = double.tryParse(json['order_amount'].toString());
     storeAmount = double.tryParse(json['store_amount'].toString());
     adminCommission = double.tryParse(json['admin_commission'].toString());

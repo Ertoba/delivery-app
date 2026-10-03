@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
@@ -7,7 +8,9 @@ import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/api/api_client.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_details_model.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_details_response_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/update_status_body_model.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/ignore_model.dart';
@@ -33,6 +36,9 @@ class OrderController extends GetxController implements GetxService {
   
   List<OrderDetailsModel>? _orderDetailsModel;
   List<OrderDetailsModel>? get orderDetailsModel => _orderDetailsModel;
+
+  EtaModel? _orderDetailsEta;
+  EtaModel? get orderDetailsEta => _orderDetailsEta;
   
   List<IgnoreModel> _ignoredRequests = [];
   List<IgnoreModel> get ignoredRequests => _ignoredRequests;
@@ -48,6 +54,10 @@ class OrderController extends GetxController implements GetxService {
   
   int? _pageSize;
   int? get pageSize => _pageSize;
+
+  /// Page count as reported by the API, so it stays right whatever page size the server uses.
+  int? _lastPage;
+  int? get lastPage => _lastPage;
   
   List<int> _offsetList = [];
   List<int> get offsetList => _offsetList;
@@ -57,8 +67,6 @@ class OrderController extends GetxController implements GetxService {
   
   OrderModel? _orderModel;
   OrderModel? get orderModel => _orderModel;
-  final Set<int> _refreshingOrderIds = <int>{};
-  int? _currentOrderRequestId;
   
   String? _cancelReason = '';
   String? get cancelReason => _cancelReason;
@@ -149,37 +157,18 @@ class OrderController extends GetxController implements GetxService {
     update();
   }
 
-  Future<bool> getOrderWithId(int? orderId, {bool showLoading = true, bool popOnError = true}) async {
-    if (orderId == null) {
-      return false;
-    }
-    _currentOrderRequestId = orderId;
-    if (_refreshingOrderIds.contains(orderId)) {
-      return false;
-    }
-    _refreshingOrderIds.add(orderId);
-    if (showLoading) {
-      _orderModel = null;
-      update();
-    }
+  Future<void> getOrderWithId(int? orderId) async {
+    _orderModel = null;
+    Response response = await orderServiceInterface.getOrderWithId(orderId);
+    if(response.statusCode == 200) {
+      _orderModel = OrderModel.fromJson(response.content);
 
-    try {
-      final Response response = await orderServiceInterface.getOrderWithId(orderId);
-      if(response.statusCode == 200) {
-        if (_currentOrderRequestId == orderId) {
-          _orderModel = OrderModel.fromJson(response.body);
-          update();
-        }
-        return true;
-      }
-      if (popOnError && _currentOrderRequestId == orderId && Get.context != null) {
-        Navigator.pop(Get.context!);
-        await getRunningOrders(offset);
-      }
-      return false;
-    } finally {
-      _refreshingOrderIds.remove(orderId);
+      debugPrint(_orderModel.toString());
+    }else {
+      Navigator.pop(Get.context!);
+      await Get.find<OrderController>().getRunningOrders(offset);
     }
+    update();
   }
 
   Future<void> getCompletedOrders(int offset, {bool willUpdate = true, String? status}) async {
@@ -202,6 +191,7 @@ class OrderController extends GetxController implements GetxService {
         }
         _completedOrderList!.addAll(paginatedOrderModel.orders!);
         _pageSize = paginatedOrderModel.totalSize;
+        _lastPage = paginatedOrderModel.lastPage;
         _paginate = false;
         update();
       }
@@ -245,6 +235,7 @@ class OrderController extends GetxController implements GetxService {
         }
         _currentOrderList!.addAll(paginatedOrderModel.orders!);
         _pageSize = paginatedOrderModel.totalSize;
+        _lastPage = paginatedOrderModel.lastPage;
         _paginate = false;
         update();
       } else {
@@ -312,10 +303,12 @@ class OrderController extends GetxController implements GetxService {
       _orderDetailsModel = [];
     }else {
       _orderDetailsModel = null;
-      List<OrderDetailsModel>? orderDetailsModel = await orderServiceInterface.getOrderDetails(orderID);
-      if(orderDetailsModel != null) {
+      _orderDetailsEta = null;
+      OrderDetailsResponseModel? orderDetailsResponse = await orderServiceInterface.getOrderDetails(orderID);
+      if(orderDetailsResponse != null) {
         _orderDetailsModel = [];
-        _orderDetailsModel!.addAll(orderDetailsModel);
+        _orderDetailsModel!.addAll(orderDetailsResponse.details);
+        _orderDetailsEta = orderDetailsResponse.eta;
       }
       update();
     }
@@ -324,38 +317,17 @@ class OrderController extends GetxController implements GetxService {
   Future<bool> acceptOrder(int? orderID, int index, OrderModel orderModel) async {
     _isLoading = true;
     update();
-    try {
-      final ResponseModel responseModel = await orderServiceInterface.acceptOrder(orderID);
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
-      if(responseModel.isSuccess) {
-        final List<OrderModel>? latestOrders = _latestOrderList;
-        if (latestOrders != null) {
-          final int resolvedIndex = index >= 0 && index < latestOrders.length && latestOrders[index].id == orderID
-              ? index : latestOrders.indexWhere((order) => order.id == orderID);
-          if (resolvedIndex >= 0) {
-            latestOrders.removeAt(resolvedIndex);
-          }
-        }
-        _currentOrderList ??= <OrderModel>[];
-        if (!_currentOrderList!.any((order) => order.id == orderID)) {
-          _currentOrderList!.add(orderModel);
-        }
-      }else {
-        showCustomSnackBar(responseModel.message, isError: true);
-      }
-      return responseModel.isSuccess;
-    } catch (_) {
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
-      showCustomSnackBar('unable_to_accept_order_try_again'.tr, isError: true);
-      return false;
-    } finally {
-      _isLoading = false;
-      update();
+    ResponseModel responseModel = await orderServiceInterface.acceptOrder(orderID);
+    Get.back();
+    if(responseModel.isSuccess) {
+      _latestOrderList!.removeAt(index);
+      _currentOrderList!.add(orderModel);
+    }else {
+      showCustomSnackBar(responseModel.message, isError: true);
     }
+    _isLoading = false;
+    update();
+    return responseModel.isSuccess;
   }
 
   void getIgnoreList() {
@@ -579,7 +551,6 @@ class OrderController extends GetxController implements GetxService {
     }
     _isLoading = false;
   }
-
 
   void setHistoryOrderStatus(String status) {
     _selectedHistoryStatus = status;

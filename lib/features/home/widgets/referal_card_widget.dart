@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/features/refer_and_earn/screens/refer_and_earn_screen.dart';
 import 'package:sixam_mart_delivery/features/refer_and_earn/widgets/refer_bottom_sheet.dart';
+import 'package:sixam_mart_delivery/helper/image_cache_helper.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
@@ -12,6 +13,8 @@ class ReferralCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double widgetWidth = 100;
+
     return InkWell(
       onTap: () {
         Get.to(()=> const ReferAndEarnScreen());
@@ -49,7 +52,7 @@ class ReferralCardWidget extends StatelessWidget {
           ),
           const SizedBox(width: Dimensions.paddingSizeSmall),
 
-          Image.asset(Images.shareImage, width: 100,)
+          Image.asset(Images.shareImage, width: widgetWidth, cacheWidth: context.cacheSize(widgetWidth)),
         ]),
       ),
     );

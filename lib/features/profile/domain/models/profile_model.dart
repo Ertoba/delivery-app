@@ -1,5 +1,6 @@
 import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/domain/models/ride_categoty_model.dart';
 import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/domain/models/vehicle_brand_model.dart';
+import 'package:sixam_mart_delivery/helper/data_parser_helper.dart';
 
 
 class ProfileModel {
@@ -132,16 +133,16 @@ class ProfileModel {
     email = json['email'];
     identityNumber = json['identity_number'];
     identityType = json['identity_type'];
-    identityImageFullUrl = json['identity_image_full_url'].cast<String>();
+    identityImageFullUrl = json['identity_image_full_url']?.cast<String>();
     imageFullUrl = json['image_full_url'];
     fcmToken = json['fcm_token'];
     zoneId = json['zone_id'];
-    active = json['active'];
+    active = DataParserHelper.parseInt(json['active']);
     avgRating = json['avg_rating']?.toDouble();
-    ratingCount = json['rating_count'];
+    ratingCount = DataParserHelper.parseInt(json['rating_count']);
     memberSinceDays = json['member_since_days'];
-    orderCount = json['order_count'];
-    todaysOrderCount = json['todays_order_count'];
+    orderCount = DataParserHelper.parseInt(json['order_count']);
+    todaysOrderCount = DataParserHelper.parseInt(json['todays_order_count']);
     thisWeekOrderCount = json['this_week_order_count'];
     cashInHands = json['cash_in_hands']?.toDouble();
     earnings = int.tryParse(json['earning'].toString());
@@ -164,7 +165,7 @@ class ProfileModel {
     pendingWithdraw = json['pending_withdraw']?.toDouble();
     refCode = json['ref_code'];
     referalEarning = json['referal_earning']?.toDouble();
-    loyaltyPoint = json['loyalty_point'];
+    loyaltyPoint = DataParserHelper.parseInt(json['loyalty_point']);
     vehicle = json['rider_vehicle'] != null ? Vehicle.fromJson(json['rider_vehicle']) : null;
     wallet = json['wallet'] != null ? Wallet.fromJson(json['wallet']) : null;
     dynamicBalanceType = json['dynamic_balance_type'];

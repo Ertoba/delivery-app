@@ -38,19 +38,19 @@ class RegularOrderBottomView extends StatelessWidget {
 
     switch (orderState) {
       case RegularOrderState.waitingToProcess:
-        return _buildOrderWaitingStatus();
+        return const _OrderWaitingStatus();
 
       case RegularOrderState.readyToConfirm:
-        return _buildOrderConfirmationActions(orderController, controllerOrderModel);
+        return _OrderConfirmationActions(orderController: orderController, order: controllerOrderModel, orderId: orderId, fromLocationScreen: fromLocationScreen);
 
       case RegularOrderState.readyToPickup:
-        return _buildOrderPickupSlider(orderController, controllerOrderModel, total);
+        return _OrderPickupSlider(orderController: orderController, order: controllerOrderModel, total: total, fromLocationScreen: fromLocationScreen);
 
       case RegularOrderState.readyToDeliver:
-        return _buildOrderDeliverySlider(orderController, controllerOrderModel);
+        return _OrderDeliverySlider(orderController: orderController, order: controllerOrderModel, fromLocationScreen: fromLocationScreen);
 
       case RegularOrderState.completeDelivery:
-        return _buildCompleteDeliveryButton(orderController, controllerOrderModel);
+        return _CompleteDeliveryButton(orderController: orderController, order: controllerOrderModel, showDeliveryConfirmImage: showDeliveryConfirmImage, fromLocationScreen: fromLocationScreen);
 
       default:
         return const SizedBox();
@@ -87,23 +87,36 @@ class RegularOrderBottomView extends StatelessWidget {
         return RegularOrderState.completed;
     }
   }
+}
 
-  // Regular order waiting status
-  Widget _buildOrderWaitingStatus() {
+// Regular order waiting status
+class _OrderWaitingStatus extends StatelessWidget {
+  const _OrderWaitingStatus();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
       decoration: BoxDecoration(
-        color: Theme.of(Get.context!).cardColor,
+        color: Theme.of(context).cardColor,
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
       ),
       child: Text('order_waiting_for_process'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge), textAlign: TextAlign.center),
     );
   }
+}
 
-  // Regular order confirmation actions
-  Widget _buildOrderConfirmationActions(OrderController orderController, OrderModel controllerOrderModel) {
+// Regular order confirmation actions
+class _OrderConfirmationActions extends StatelessWidget {
+  final OrderController orderController;
+  final OrderModel order;
+  final int orderId;
+  final bool fromLocationScreen;
+  const _OrderConfirmationActions({required this.orderController, required this.order, required this.orderId, required this.fromLocationScreen});
 
+  @override
+  Widget build(BuildContext context) {
     final deliverymanConfModel = Get.find<SplashController>().configModel!.orderConfirmationModel == 'deliveryman';
     final cancelPermission = Get.find<SplashController>().configModel!.canceledByDeliveryman ?? false;
 
@@ -111,23 +124,30 @@ class RegularOrderBottomView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
       decoration: BoxDecoration(
-        color: Theme.of(Get.context!).cardColor,
+        color: Theme.of(context).cardColor,
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
       ),
       child: Row(children: [
         cancelPermission ? Expanded(
-          child: _buildOrderCancelButton(orderController),
-        ) : SizedBox(),
+          child: _OrderCancelButton(orderController: orderController, orderId: orderId),
+        ) : const SizedBox(),
         SizedBox(width: cancelPermission ? Dimensions.paddingSizeSmall : 0),
 
         deliverymanConfModel ? Expanded(
-          child: _buildOrderConfirmButton(orderController, controllerOrderModel),
-        ) : SizedBox(),
+          child: _OrderConfirmButton(orderController: orderController, order: order, fromLocationScreen: fromLocationScreen),
+        ) : const SizedBox(),
       ]),
     );
   }
+}
 
-  Widget _buildOrderCancelButton(OrderController orderController) {
+class _OrderCancelButton extends StatelessWidget {
+  final OrderController orderController;
+  final int orderId;
+  const _OrderCancelButton({required this.orderController, required this.orderId});
+
+  @override
+  Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
         orderController.setOrderCancelReason('');
@@ -137,152 +157,44 @@ class RegularOrderBottomView extends StatelessWidget {
         minimumSize: const Size(1170, 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-          side: BorderSide(color: Theme.of(Get.context!).textTheme.bodyLarge!.color!),
+          side: BorderSide(color: Theme.of(context).textTheme.bodyLarge!.color!),
         ),
       ),
       child: Text('cancel'.tr, style: robotoRegular.copyWith(
-        color: Theme.of(Get.context!).textTheme.bodyLarge!.color,
+        color: Theme.of(context).textTheme.bodyLarge!.color,
         fontSize: Dimensions.fontSizeLarge,
       )),
     );
   }
+}
 
-  Widget _buildOrderConfirmButton(OrderController orderController, OrderModel order) {
+class _OrderConfirmButton extends StatelessWidget {
+  final OrderController orderController;
+  final OrderModel order;
+  final bool fromLocationScreen;
+  const _OrderConfirmButton({required this.orderController, required this.order, required this.fromLocationScreen});
+
+  @override
+  Widget build(BuildContext context) {
     return CustomButtonWidget(
       buttonText: 'confirm'.tr,
-      onPressed: () => _handleOrderConfirmation(orderController, order),
+      onPressed: _handleOrderConfirmation,
     );
   }
 
-  // Regular order pickup slider
-  Widget _buildOrderPickupSlider(OrderController orderController, OrderModel controllerOrderModel, double total) {
-
-    bool partialPay = controllerOrderModel.paymentMethod == 'partial_payment' && (controllerOrderModel.payments?.isNotEmpty ?? false) && controllerOrderModel.payments![1].paymentMethod == 'cash_on_delivery';
-    double partialAmount = partialPay ? (controllerOrderModel.payments?[1].amount ?? 0) : 0;
-    bool showCollectCashAmount = controllerOrderModel.paymentMethod == "cash_on_delivery" || partialPay ;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-      decoration: BoxDecoration(
-        color: Theme.of(Get.context!).cardColor,
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
-      ),
-      child: Column(
-        children: [
-          showCollectCashAmount ? Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-            child: Row(children: [
-              Image.asset(Images.referCoin, width: 18,),
-              SizedBox(width: Dimensions.paddingSizeExtraSmall),
-              Text('amount_collect_from_customer'.tr),
-              const Spacer(),
-              Text(PriceConverterHelper.convertPrice(partialPay ? partialAmount : total), style: robotoBold),
-            ]),
-          ) : SizedBox(),
-
-          SizedBox(height: Dimensions.paddingSizeSmall),
-          SliderButton(
-            action: () => _handleOrderPickup(orderController, controllerOrderModel),
-            label: Text(
-              'swipe_to_pick_up_order'.tr,
-              style: robotoMedium.copyWith(
-                fontSize: Dimensions.fontSizeLarge,
-                color: Theme.of(Get.context!).primaryColor,
-              ),
-            ),
-            dismissThresholds: 0.5,
-            dismissible: false,
-            shimmer: true,
-            width: 1170,
-            height: 60,
-            buttonSize: 50,
-            radius: 10,
-            icon: _buildSliderIcon(),
-            isLtr: Get.find<LocalizationController>().isLtr,
-            boxShadow: const BoxShadow(blurRadius: 0),
-            buttonColor: Theme.of(Get.context!).primaryColor,
-            backgroundColor: const Color(0xffF4F7FC),
-            baseColor: Theme.of(Get.context!).primaryColor,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Regular order delivery slider
-  Widget _buildOrderDeliverySlider(OrderController orderController, OrderModel controllerOrderModel) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-      decoration: BoxDecoration(
-        color: Theme.of(Get.context!).cardColor,
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
-      ),
-      child: SliderButton(
-        action: () => _handleOrderDelivery(orderController, controllerOrderModel),
-        label: Text(
-          'swipe_to_deliver_order'.tr,
-          style: robotoMedium.copyWith(
-            fontSize: Dimensions.fontSizeLarge,
-            color: Theme.of(Get.context!).primaryColor,
-          ),
-        ),
-        dismissThresholds: 0.5,
-        dismissible: false,
-        shimmer: true,
-        width: 1170,
-        height: 60,
-        buttonSize: 50,
-        radius: 10,
-        icon: _buildSliderIcon(),
-        isLtr: Get.find<LocalizationController>().isLtr,
-        boxShadow: const BoxShadow(blurRadius: 0),
-        buttonColor: Theme.of(Get.context!).primaryColor,
-        backgroundColor: const Color(0xffF4F7FC),
-        baseColor: Theme.of(Get.context!).primaryColor,
-      ),
-    );
-  }
-
-  // Complete delivery button (when image confirmation is required)
-  Widget _buildCompleteDeliveryButton(OrderController orderController, OrderModel controllerOrderModel) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-      decoration: BoxDecoration(
-        color: Theme.of(Get.context!).cardColor,
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
-      ),
-      child: Column(
-        children: [
-          if (showDeliveryConfirmImage)
-            DeliveryConfirmationSection(),
-          SizedBox(height: showDeliveryConfirmImage ? Dimensions.paddingSizeSmall : 0),
-
-          CustomButtonWidget(
-            buttonText: 'complete_delivery'.tr,
-            onPressed: () => _handleCompleteDelivery(orderController, controllerOrderModel),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Regular order action handlers
-  void _handleOrderConfirmation(OrderController orderController, OrderModel order) {
+  void _handleOrderConfirmation() {
     Get.dialog(
       ConfirmationDialogWidget(
         icon: Images.warning,
         title: 'are_you_sure_to_confirm'.tr,
         description: 'you_want_to_confirm_this_order'.tr,
-        onYesPressed: () => _processOrderConfirmation(orderController, order),
+        onYesPressed: _processOrderConfirmation,
       ),
       barrierDismissible: false,
     );
   }
 
-  void _processOrderConfirmation(OrderController orderController, OrderModel order) {
+  void _processOrderConfirmation() {
     final orderVerificationActive = Get.find<SplashController>().configModel?.orderDeliveryVerification ?? false;
     final cod = order.paymentMethod == 'cash_on_delivery';
 
@@ -295,8 +207,72 @@ class RegularOrderBottomView extends StatelessWidget {
       );
     }
   }
+}
 
-  void _handleOrderPickup(OrderController orderController, OrderModel order) {
+// Regular order pickup slider
+class _OrderPickupSlider extends StatelessWidget {
+  final OrderController orderController;
+  final OrderModel order;
+  final double total;
+  final bool fromLocationScreen;
+  const _OrderPickupSlider({required this.orderController, required this.order, required this.total, required this.fromLocationScreen});
+
+  @override
+  Widget build(BuildContext context) {
+    bool partialPay = order.paymentMethod == 'partial_payment' && (order.payments?.isNotEmpty ?? false) && order.payments![1].paymentMethod == 'cash_on_delivery';
+    double partialAmount = partialPay ? (order.payments?[1].amount ?? 0) : 0;
+    bool showCollectCashAmount = order.paymentMethod == "cash_on_delivery" || partialPay ;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+      ),
+      child: Column(
+        children: [
+          showCollectCashAmount ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
+            child: Row(children: [
+              Image.asset(Images.referCoin, width: 18,),
+              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+              Text('amount_collect_from_customer'.tr),
+              const Spacer(),
+              Text(PriceConverterHelper.convertPrice(partialPay ? partialAmount : total), style: robotoBold),
+            ]),
+          ) : const SizedBox(),
+
+          const SizedBox(height: Dimensions.paddingSizeSmall),
+          SliderButton(
+            action: _handleOrderPickup,
+            label: Text(
+              'swipe_to_pick_up_order'.tr,
+              style: robotoMedium.copyWith(
+                fontSize: Dimensions.fontSizeLarge,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            dismissThresholds: 0.5,
+            dismissible: false,
+            shimmer: true,
+            width: 1170,
+            height: 60,
+            buttonSize: 50,
+            radius: 10,
+            icon: const _SliderIcon(),
+            isLtr: Get.find<LocalizationController>().isLtr,
+            boxShadow: const BoxShadow(blurRadius: 0),
+            buttonColor: Theme.of(context).primaryColor,
+            backgroundColor: const Color(0xffF4F7FC),
+            baseColor: Theme.of(context).primaryColor,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleOrderPickup() {
     if (Get.find<ProfileController>().profileModel!.active == 1) {
       orderController.updateOrderStatus(
         order,
@@ -308,8 +284,51 @@ class RegularOrderBottomView extends StatelessWidget {
       showCustomSnackBar('make_yourself_online_first'.tr);
     }
   }
+}
 
-  void _handleOrderDelivery(OrderController orderController, OrderModel order) {
+// Regular order delivery slider
+class _OrderDeliverySlider extends StatelessWidget {
+  final OrderController orderController;
+  final OrderModel order;
+  final bool fromLocationScreen;
+  const _OrderDeliverySlider({required this.orderController, required this.order, required this.fromLocationScreen});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+      ),
+      child: SliderButton(
+        action: _handleOrderDelivery,
+        label: Text(
+          'swipe_to_deliver_order'.tr,
+          style: robotoMedium.copyWith(
+            fontSize: Dimensions.fontSizeLarge,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        dismissThresholds: 0.5,
+        dismissible: false,
+        shimmer: true,
+        width: 1170,
+        height: 60,
+        buttonSize: 50,
+        radius: 10,
+        icon: const _SliderIcon(),
+        isLtr: Get.find<LocalizationController>().isLtr,
+        boxShadow: const BoxShadow(blurRadius: 0),
+        buttonColor: Theme.of(context).primaryColor,
+        backgroundColor: const Color(0xffF4F7FC),
+        baseColor: Theme.of(context).primaryColor,
+      ),
+    );
+  }
+
+  void _handleOrderDelivery() {
     final orderVerificationActive = Get.find<SplashController>().configModel?.orderDeliveryVerification ?? false;
     final cod = order.paymentMethod == 'cash_on_delivery';
 
@@ -332,8 +351,41 @@ class RegularOrderBottomView extends StatelessWidget {
       );
     }
   }
+}
 
-  void _handleCompleteDelivery(OrderController orderController, OrderModel order) {
+// Complete delivery button (when image confirmation is required)
+class _CompleteDeliveryButton extends StatelessWidget {
+  final OrderController orderController;
+  final OrderModel order;
+  final bool showDeliveryConfirmImage;
+  final bool fromLocationScreen;
+  const _CompleteDeliveryButton({required this.orderController, required this.order, required this.showDeliveryConfirmImage, required this.fromLocationScreen});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+      ),
+      child: Column(
+        children: [
+          if (showDeliveryConfirmImage)
+            const DeliveryConfirmationSection(),
+          SizedBox(height: showDeliveryConfirmImage ? Dimensions.paddingSizeSmall : 0),
+
+          CustomButtonWidget(
+            buttonText: 'complete_delivery'.tr,
+            onPressed: _handleCompleteDelivery,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleCompleteDelivery() {
     final orderVerificationActive = Get.find<SplashController>().configModel?.orderDeliveryVerification ?? false;
     final cod = order.paymentMethod == 'cash_on_delivery';
     final partialPay = order.paymentMethod == 'partial_payment';
@@ -377,8 +429,13 @@ class RegularOrderBottomView extends StatelessWidget {
       );
     }
   }
+}
 
-  Widget _buildSliderIcon() {
+class _SliderIcon extends StatelessWidget {
+  const _SliderIcon();
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Icon(
         Get.find<LocalizationController>().isLtr ? Icons.double_arrow_sharp : Icons.keyboard_arrow_left,
@@ -387,5 +444,4 @@ class RegularOrderBottomView extends StatelessWidget {
       ),
     );
   }
-
 }

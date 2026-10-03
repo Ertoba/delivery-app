@@ -11,14 +11,21 @@ class MessageModel {
   MessageModel({this.totalSize, this.limit, this.offset, this.messages,  this.status});
 
   MessageModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
+    if (json['pagination'] != null) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page'];
+      offset = json['pagination']['current_page'];
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
     status = json['status'] ?? false;
     conversation = json['conversation'] != null ? Conversation.fromJson(json['conversation']) : null;
-    if (json['messages'] != null) {
+    var messageList = json['data'] ?? json['messages'];
+    if (messageList != null) {
       messages = <Message>[];
-      json['messages'].forEach((v) {
+      messageList.forEach((v) {
         messages!.add(Message.fromJson(v));
       });
     }
@@ -66,7 +73,7 @@ class Message {
     conversationId = json['conversation_id'];
     senderId = json['sender_id'];
     message = json['message'];
-    filesFullUrl = json['file_full_url'].cast<String>();
+    filesFullUrl = json['file_full_url']?.cast<String>();
     isSeen = json['is_seen'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];

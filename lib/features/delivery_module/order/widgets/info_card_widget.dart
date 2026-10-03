@@ -1,4 +1,5 @@
 import 'package:sixam_mart_delivery/features/delivery_module/order/domain/models/order_model.dart';
+import 'package:sixam_mart_delivery/helper/image_cache_helper.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
@@ -53,7 +54,7 @@ class InfoCardWidget extends StatelessWidget {
                 showCustomSnackBar('invalid_phone_number_found');
               }
             },
-            child: Image.asset(Images.callIcon, width: 24),
+            child: Image.asset(Images.callIcon, width: 24, cacheWidth: context.cacheSize(50)),
           ),
         ]),
         const SizedBox(height: Dimensions.paddingSizeSmall),
@@ -63,7 +64,7 @@ class InfoCardWidget extends StatelessWidget {
           // Image
           ClipOval(child: CustomImageWidget(
             image: image,
-            height: 40, width: 40, fit: BoxFit.cover,
+            height: 40, width: 40, fit: BoxFit.cover, cacheWidth: context.cacheSize(40),
           )),
           const SizedBox(width: Dimensions.paddingSizeSmall),
 

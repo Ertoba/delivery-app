@@ -29,7 +29,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       body: GetBuilder<MyAccountController>(builder: (myAccountController) {
         return myAccountController.transactions != null ? myAccountController.transactions!.isNotEmpty ? ListView.builder(
           itemCount: myAccountController.transactions!.length,
-          shrinkWrap: true,
+          // Body-level list: no shrinkWrap so items build lazily (viewport-only).
           padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault, left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault),
           physics: const BouncingScrollPhysics(),
           itemBuilder: (context, index) {

@@ -28,7 +28,7 @@ class _RunningOrderScreenState extends State<RunningOrderScreen> {
       if (scrollController.position.pixels == scrollController.position.maxScrollExtent
           && Get.find<OrderController>().currentOrderList != null
           && !Get.find<OrderController>().paginate) {
-        int pageSize = (Get.find<OrderController>().pageSize! / 10).ceil();
+        int pageSize = Get.find<OrderController>().lastPage ?? (Get.find<OrderController>().pageSize! / 10).ceil();
         if (Get.find<OrderController>().offset < pageSize) {
           Get.find<OrderController>().setOffset(Get.find<OrderController>().offset+1);
           debugPrint('end of the page - running orders');

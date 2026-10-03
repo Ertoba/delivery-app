@@ -8,11 +8,12 @@ class PaginatedListViewWidget extends StatefulWidget {
   final ScrollController scrollController;
   final Function(int? offset) onPaginate;
   final int? totalSize;
+  final int? lastPage;
   final int? offset;
   final Widget productView;
   final bool enabledPagination;
   final bool showLoadingInUpper;
-  const PaginatedListViewWidget({super.key, required this.scrollController, required this.onPaginate, required this.totalSize,
+  const PaginatedListViewWidget({super.key, required this.scrollController, required this.onPaginate, required this.totalSize, this.lastPage,
     required this.offset, required this.productView, this.enabledPagination = true, this.showLoadingInUpper = false});
 
   @override
@@ -42,7 +43,7 @@ class _PaginatedListViewWidgetState extends State<PaginatedListViewWidget> {
   }
 
   void _paginate() async {
-    int pageSize = (widget.totalSize! / 10).ceil();
+    int pageSize = widget.lastPage ?? (widget.totalSize! / 10).ceil();
     if (_offset! < pageSize && !_offsetList.contains(_offset!+1)) {
 
       setState(() {

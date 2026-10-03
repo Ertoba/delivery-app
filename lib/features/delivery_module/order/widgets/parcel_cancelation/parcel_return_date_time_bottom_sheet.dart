@@ -52,22 +52,33 @@ class _ParcelReturnDateTimeBottomSheetState extends State<ParcelReturnDateTimeBo
           Padding(
             padding: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              _buildTopHandle(),
-              _buildHeader(),
-              _buildDateSelection(),
+              const _TopHandle(),
+              const _Header(),
+              const _DateSelection(),
               const SizedBox(height: Dimensions.paddingSizeLarge),
-              _buildTimeSelection(),
+              const _TimeSelection(),
               const SizedBox(height: 40),
-              _buildActionButtons(),
+              _ActionButtons(orderId: widget.orderId),
             ]),
           ),
-          _buildCloseButton(),
+          const _CloseButton(),
         ]),
       );
     });
   }
 
-  Widget _buildTopHandle() {
+  @override
+  void dispose() {
+    Get.delete<OrderController>();
+    super.dispose();
+  }
+}
+
+class _TopHandle extends StatelessWidget {
+  const _TopHandle();
+
+  @override
+  Widget build(BuildContext context) {
     return Column(children: [
       Center(
         child: Container(
@@ -81,8 +92,13 @@ class _ParcelReturnDateTimeBottomSheetState extends State<ParcelReturnDateTimeBo
       const SizedBox(height: Dimensions.paddingSizeLarge),
     ]);
   }
+}
 
-  Widget _buildHeader() {
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
     return Column(children: [
       Text(
         'set_return_date_and_estimated_time'.tr,
@@ -113,8 +129,13 @@ class _ParcelReturnDateTimeBottomSheetState extends State<ParcelReturnDateTimeBo
       const SizedBox(height: Dimensions.paddingSizeLarge),
     ]);
   }
+}
 
-  Widget _buildDateSelection() {
+class _DateSelection extends StatelessWidget {
+  const _DateSelection();
+
+  @override
+  Widget build(BuildContext context) {
     return GetBuilder<OrderController>(builder: (controller) {
       return Container(
         width: context.width,
@@ -168,8 +189,13 @@ class _ParcelReturnDateTimeBottomSheetState extends State<ParcelReturnDateTimeBo
       );
     });
   }
+}
 
-  Widget _buildTimeSelection() {
+class _TimeSelection extends StatelessWidget {
+  const _TimeSelection();
+
+  @override
+  Widget build(BuildContext context) {
     return GetBuilder<OrderController>(builder: (controller) {
       return Container(
         width: context.width,
@@ -267,8 +293,14 @@ class _ParcelReturnDateTimeBottomSheetState extends State<ParcelReturnDateTimeBo
       );
     });
   }
+}
 
-  Widget _buildActionButtons() {
+class _ActionButtons extends StatelessWidget {
+  final int orderId;
+  const _ActionButtons({required this.orderId});
+
+  @override
+  Widget build(BuildContext context) {
     return GetBuilder<OrderController>(builder: (controller) {
       return Row(children: [
         Expanded(
@@ -296,7 +328,7 @@ class _ParcelReturnDateTimeBottomSheetState extends State<ParcelReturnDateTimeBo
                 }else if(selectedDateTime.isBefore(DateTime.now().add(const Duration(minutes: 1)))){
                   showCustomSnackBar('return_date_and_time_must_be_in_future'.tr);
                 }else{
-                  controller.addParcelReturnDate(orderId: widget.orderId, returnDate: selectedDateTime.toString()).then((value) {
+                  controller.addParcelReturnDate(orderId: orderId, returnDate: selectedDateTime.toString()).then((value) {
                     if (Get.isBottomSheetOpen!) {
                       Get.back();
                     }
@@ -309,8 +341,13 @@ class _ParcelReturnDateTimeBottomSheetState extends State<ParcelReturnDateTimeBo
       ]);
     });
   }
+}
 
-  Widget _buildCloseButton() {
+class _CloseButton extends StatelessWidget {
+  const _CloseButton();
+
+  @override
+  Widget build(BuildContext context) {
     return Positioned(
       top: 0, right: 0,
       child: InkWell(
@@ -322,11 +359,5 @@ class _ParcelReturnDateTimeBottomSheetState extends State<ParcelReturnDateTimeBo
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    Get.delete<OrderController>();
-    super.dispose();
   }
 }

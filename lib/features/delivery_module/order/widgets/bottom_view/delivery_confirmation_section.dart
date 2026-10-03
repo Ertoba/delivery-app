@@ -24,13 +24,20 @@ class DeliveryConfirmationSection extends StatelessWidget {
           Text('completed_after_delivery_picture'.tr, style: robotoBold),
           const SizedBox(height: Dimensions.paddingSizeSmall),
 
-          _buildImagePickerList(context, orderController),
+          _ImagePickerList(orderController: orderController),
         ]),
       );
     });
   }
 
-  Widget _buildImagePickerList(BuildContext context, OrderController orderController) {
+}
+
+class _ImagePickerList extends StatelessWidget {
+  final OrderController orderController;
+  const _ImagePickerList({required this.orderController});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       height: 80,
       padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
@@ -42,17 +49,22 @@ class DeliveryConfirmationSection extends StatelessWidget {
           final isAddButton = index == orderController.pickedPrescriptions.length;
 
           if (isAddButton && index < 5) {
-            return _buildAddImageButton(context);
+            return const _AddImageButton();
           }
 
           final file = orderController.pickedPrescriptions[index];
-          return _buildImagePreview(file);
+          return _ImagePreview(file: file);
         },
       ),
     );
   }
+}
 
-  Widget _buildAddImageButton(BuildContext context) {
+class _AddImageButton extends StatelessWidget {
+  const _AddImageButton();
+
+  @override
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
         if (GetPlatform.isIOS) {
@@ -76,8 +88,14 @@ class DeliveryConfirmationSection extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildImagePreview(XFile? file) {
+class _ImagePreview extends StatelessWidget {
+  final XFile? file;
+  const _ImagePreview({required this.file});
+
+  @override
+  Widget build(BuildContext context) {
     if (file == null) return const SizedBox();
 
     return Container(
@@ -87,9 +105,8 @@ class DeliveryConfirmationSection extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-        child: Image.file(File(file.path), width: 60, height: 60, fit: BoxFit.cover),
+        child: Image.file(File(file!.path), width: 60, height: 60, fit: BoxFit.cover),
       ),
     );
   }
-
 }

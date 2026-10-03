@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_delivery/api/api_client.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/models/delivery_man_body_model.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/models/vehicle_model.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/repositories/auth_repository_interface.dart';
@@ -31,7 +32,9 @@ class AuthRepository implements AuthRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.vehiclesUri);
     if(response.statusCode == 200) {
       vehicles = [];
-      response.body.forEach((vehicle) => vehicles!.add(VehicleModel.fromJson(vehicle)));
+      for (var vehicle in response.contentList) {
+        vehicles.add(VehicleModel.fromJson(vehicle));
+      }
     }
     return vehicles;
   }
@@ -53,12 +56,25 @@ class AuthRepository implements AuthRepositoryInterface {
     }
     if(!GetPlatform.isWeb) {
       if(AppConstants.appMode == AppMode.delivery){
+        print("Starting subscription...");
         FirebaseMessaging.instance.subscribeToTopic(AppConstants.topicDeliveryman);
+        FirebaseMessaging.instance.subscribeToTopic(AppConstants.maintenanceModeDeliveryMan);
+        print("Successfully subscribed to Delivery Man: ${AppConstants.maintenanceModeDeliveryMan}");
       }else{
         FirebaseMessaging.instance.subscribeToTopic(AppConstants.topicRider);
+        FirebaseMessaging.instance.subscribeToTopic(AppConstants.maintenanceModeRider);
+        print("Successfully subscribed to Rider: ${AppConstants.maintenanceModeRider}");
+
       }
-      FirebaseMessaging.instance.subscribeToTopic(sharedPreferences.getString(AppConstants.zoneTopic)!);
-      FirebaseMessaging.instance.subscribeToTopic(sharedPreferences.getString(AppConstants.vehicleWiseTopic)!);
+      String? zoneTopic = sharedPreferences.getString(AppConstants.zoneTopic);
+      String? vehicleWiseTopic = sharedPreferences.getString(AppConstants.vehicleWiseTopic);
+
+      if(zoneTopic != null && zoneTopic.isNotEmpty) {
+        FirebaseMessaging.instance.subscribeToTopic(zoneTopic);
+      }
+      if(vehicleWiseTopic != null && vehicleWiseTopic.isNotEmpty) {
+        FirebaseMessaging.instance.subscribeToTopic(vehicleWiseTopic);
+      }
     }
     return await apiClient.postData(AppConstants.tokenUri, {"_method": "put", "token": getUserToken(), "fcm_token": deviceToken}, handleError: false);
   }
@@ -112,7 +128,6 @@ class AuthRepository implements AuthRepositoryInterface {
       apiClient.postData(AppConstants.tokenUri, {"_method": "put", "token": getUserToken()}, handleError: false);
     }
     await sharedPreferences.remove(AppConstants.token);
-    await sharedPreferences.remove(AppConstants.locationDisclosureConsent);
     await sharedPreferences.setStringList(AppConstants.ignoreList, []);
     await sharedPreferences.remove(AppConstants.userAddress);
     apiClient.updateHeader(null, null);

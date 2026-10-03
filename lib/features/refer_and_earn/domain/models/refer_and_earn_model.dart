@@ -7,12 +7,19 @@ class ReferEarningModel {
   ReferEarningModel({this.total, this.limit, this.offset, this.refrealEarnings});
 
   ReferEarningModel.fromJson(Map<String, dynamic> json) {
-    total = json['total'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['refrealEarnings'] != null) {
+    if (json['pagination'] != null) {
+      total = json['pagination']['total'];
+      limit = json['pagination']['per_page']?.toString();
+      offset = json['pagination']['current_page']?.toString();
+    } else {
+      total = json['total'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
+    var earningList = json['refrealEarnings'] ?? json['data'];
+    if (earningList != null) {
       refrealEarnings = <RefrealEarnings>[];
-      json['refrealEarnings'].forEach((v) {
+      earningList.forEach((v) {
         refrealEarnings!.add(RefrealEarnings.fromJson(v));
       });
     }

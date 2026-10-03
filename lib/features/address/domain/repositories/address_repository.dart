@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart_delivery/api/api_client.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:sixam_mart_delivery/features/address/domain/models/zone_model.dart';
 import 'package:sixam_mart_delivery/features/address/domain/repositories/address_repository_interface.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
@@ -16,7 +17,9 @@ class AddressRepository implements AddressRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.zoneListUri);
     if (response.statusCode == 200) {
       zoneList = [];
-      response.body.forEach((zone) => zoneList!.add(ZoneModel.fromJson(zone)));
+      for (var zone in response.contentList) {
+        zoneList.add(ZoneModel.fromJson(zone));
+      }
     }
     return zoneList;
   }

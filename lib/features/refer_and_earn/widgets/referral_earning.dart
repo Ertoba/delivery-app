@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_ink_well_widget.dart';
-import 'package:sixam_mart_delivery/common/widgets/paginated_list_view_widget.dart';
+import 'package:sixam_mart_delivery/common/widgets/paginated_sliver_list_view_widget.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/refer_and_earn/controllers/refer_and_earn_controller.dart';
 import 'package:sixam_mart_delivery/features/refer_and_earn/widgets/earning_card_widget.dart';
@@ -90,21 +90,18 @@ class ReferralEarningScreen extends StatelessWidget {
               Divider(thickness: .25,color: Theme.of(context).primaryColor.withValues(alpha: 0.25)),
 
               (referAndEarnController.referralModel?.refrealEarnings != null && !referAndEarnController.isLoading) ? (referAndEarnController.referralModel!.refrealEarnings!.isNotEmpty) ? Expanded(
-                child: SingleChildScrollView(
+                child: CustomScrollView(
                   controller: referAndEarnController.scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
-                  child: PaginatedListViewWidget(
-                    scrollController: referAndEarnController.scrollController,
-                    totalSize: referAndEarnController.referralModel!.total,
-                    offset: (referAndEarnController.referralModel?.offset != null) ? int.parse(referAndEarnController.referralModel!.offset.toString()) : null,
-                    onPaginate: (int? offset) async {
-                      await referAndEarnController.getEarningHistoryList(offset!);
-                    },
-                    productView: ListView.separated(
+                  slivers: [
+                    PaginatedSliverListViewWidget(
+                      scrollController: referAndEarnController.scrollController,
+                      totalSize: referAndEarnController.referralModel!.total,
+                      offset: (referAndEarnController.referralModel?.offset != null) ? int.parse(referAndEarnController.referralModel!.offset.toString()) : null,
+                      onPaginate: (int? offset) async {
+                        await referAndEarnController.getEarningHistoryList(offset!);
+                      },
                       itemCount: referAndEarnController.referralModel!.refrealEarnings!.length,
-                      padding: const EdgeInsets.all(0),
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
                       itemBuilder: (BuildContext context, int index) {
                         return EarningCartWidget(transaction: referAndEarnController.referralModel!.refrealEarnings![index]);
                       },
@@ -112,7 +109,7 @@ class ReferralEarningScreen extends StatelessWidget {
                         return Divider(height: 25, thickness: 0.5,color: Theme.of(context).hintColor.withValues(alpha: 0.75));
                       },
                     ),
-                  ),
+                  ],
                 ),
               ) : Center(child: Padding(
                 padding:  EdgeInsets.only(top: Get.height * 0.15),

@@ -7,12 +7,19 @@ class WalletPaymentModel {
   WalletPaymentModel({this.totalSize, this.limit, this.offset, this.transactions});
 
   WalletPaymentModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['transactions'] != null) {
+    if (json['pagination'] != null) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page'];
+      offset = json['pagination']['current_page'];
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
+    var transactionList = json['data'] ?? json['transactions'];
+    if (transactionList != null) {
       transactions = <Transactions>[];
-      json['transactions'].forEach((v) {
+      transactionList.forEach((v) {
         transactions!.add(Transactions.fromJson(v));
       });
     }

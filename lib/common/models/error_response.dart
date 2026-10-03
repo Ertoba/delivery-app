@@ -10,9 +10,19 @@ class ErrorResponse {
   ErrorResponse.fromJson(dynamic json) {
     if (json["errors"] != null) {
       _errors = [];
-      json["errors"].forEach((v) {
-        _errors!.add(Errors.fromJson(v));
-      });
+      if (json["errors"] is List) {
+        json["errors"].forEach((v) {
+          _errors!.add(Errors.fromJson(v));
+        });
+      } else if (json["errors"] is Map) {
+        /// Validation failures arrive keyed by field: {"return_otp": ["The return otp must be a number."]}
+        json["errors"].forEach((key, value) {
+          _errors!.add(Errors(
+            code: key.toString(),
+            message: (value is List && value.isNotEmpty) ? value.first.toString() : value.toString(),
+          ));
+        });
+      }
     }
   }
 

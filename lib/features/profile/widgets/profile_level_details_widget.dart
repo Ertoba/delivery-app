@@ -256,6 +256,7 @@ class ProfileLevelDetailsWidget extends StatelessWidget {
   }
 
   double _calculateProgressValue(double completeValue, double targetValue){
-    return (1 / targetValue) * completeValue;
+    if(targetValue <= 0) {return 0;}
+    return ((1 / targetValue) * completeValue).clamp(0, 1);
   }
 }

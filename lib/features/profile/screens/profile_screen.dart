@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_confirmation_bottom_sheet.dart';
 import 'package:sixam_mart_delivery/features/auth/controllers/auth_controller.dart';
+import 'package:sixam_mart_delivery/features/home/widgets/location_access_dialog.dart';
 import 'package:sixam_mart_delivery/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart_delivery/features/language/widgets/language_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/controllers/order_controller.dart';
@@ -120,7 +122,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 100, width: 100, fit: BoxFit.cover,
                 )),
 
-                if(isRideActive && config?.riderLevelStatus == 1 ) Positioned(
+                if(isRideActive && config?.riderLevelStatus == 1
+                    && (profileController.levelModel?.data?.currentLevel?.name?.isNotEmpty ?? false)) Positioned(
                   bottom: -5,
                   child: InkWell(
                     onTap: () {
@@ -137,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         boxShadow: [BoxShadow(color: Colors.grey[Get.isDarkMode ? 850 : 200]!, spreadRadius: 1, blurRadius: 5)],
                         borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                       ),
-                      child: Text('${profileController.levelModel?.data?.currentLevel?.name}',
+                      child: Text(profileController.levelModel?.data?.currentLevel?.name ?? '',
                           style: robotoRegular.copyWith(color: Theme.of(context).cardColor, fontSize: 12)),
                     ),
                   ),
@@ -186,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Row(children: [
 
-                  Icon(Icons.power_settings_new_outlined, size: 25, color: Theme.of(context).disabledColor),
+                  Image.asset(Images.online, height: 25, width: 25, color: Theme.of(context).disabledColor),
                   const SizedBox(width: Dimensions.paddingSizeSmall),
 
                   Expanded(child: Column(
@@ -284,7 +287,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     );
                                   }else {
-                                    profileController.checkLocationPermission(() => profileController.updateActiveStatus());
+                                    LocationPermission permission = await Geolocator.checkPermission();
+                                    if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
+                                      _checkPermission(() => profileController.updateActiveStatus());
+                                    }else {
+                                      profileController.updateActiveStatus();
+                                    }
                                   }
                                 }
                               },
@@ -305,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               GetBuilder<AuthController>(builder: (authController) {
                 return ProfileButtonWidget(
-                  icon: Icons.notifications_active_outlined,
+                  iconImage: Images.settingIcon,
                   title: 'system_notification'.tr,
                   isButtonActive: authController.notification, onTap: () {
                   showCustomBottomSheet(child: const NotificationStatusChangeBottomSheet());
@@ -330,7 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: Row(children: [
 
-                    Icon(Icons.notifications_outlined, size: 25, color: Theme.of(context).disabledColor),
+                    Image.asset(Images.notificationBall, height: 25, width: 25, color: Theme.of(context).disabledColor),
                     const SizedBox(width: Dimensions.paddingSizeSmall),
 
                     Expanded(child: Text('background_notification'.tr, style: robotoRegular)),
@@ -353,105 +361,114 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               if(profileController.profileModel?.vehicle != null && isRideActive) Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(icon: Icons.directions_car_outlined, title: 'vehicle_details'.tr, onTap: () {
+                child: ProfileButtonWidget(iconImage: Images.car, title: 'vehicle_details'.tr, onTap: () {
                   Get.to(()=>  VehicleDetailsScreen());
                 }),
               ),
 
-              ProfileButtonWidget(icon: Icons.lock_outline, title: 'change_password'.tr, onTap: () {
+              ProfileButtonWidget(iconImage: Images.security, title: 'change_password'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getResetPasswordRoute('', '', 'password-change'));
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              ProfileButtonWidget(icon: Icons.chat_bubble_outline, title: 'conversation'.tr, onTap: () {
+              ProfileButtonWidget(iconImage: Images.message, title: 'conversation'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getConversationListRoute());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              ProfileButtonWidget(icon: Icons.language_outlined, title: 'language'.tr, onTap: () {
+              ProfileButtonWidget(iconImage: Images.translation, title: 'language'.tr, onTap: () {
                 _manageLanguageFunctionality();
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              ProfileButtonWidget(icon: Icons.manage_accounts_outlined, title: 'edit_profile'.tr, onTap: () {
+              ProfileButtonWidget(iconImage: Images.editUser, title: 'edit_profile'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getUpdateProfileRoute());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
               if(isRideActive) Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(icon: Icons.rate_review_outlined, title: 'my_reviews'.tr, onTap: () {
+                child: ProfileButtonWidget(iconImage: Images.noReview, title: 'my_reviews'.tr, onTap: () {
                   Get.to(()=> const ReviewScreen());
                 }),
               ),
 
               if(isRideActive) Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(icon: Icons.emoji_events_outlined, title: 'leader_board'.tr, onTap: () {
+                child: ProfileButtonWidget(iconImage: Images.leaderBoardIcon, title: 'leader_board'.tr, onTap: () {
                   Get.to(()=> const LeaderboardScreen());
                 }),
               ),
 
-              ProfileButtonWidget(icon: Icons.support_agent_outlined, title: 'help_and_support'.tr, onTap: () {
-                Get.to(()=> const HelpAndSupportScreen());
-              }),
-              const SizedBox(height: Dimensions.paddingSizeSmall),
-
-              (profileController.profileModel != null && profileController.profileModel!.earnings == 1) ? Padding(
+              if(isRideActive) Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(icon: Icons.payments_outlined, title: 'my_earning'.tr, onTap: () {
+                child: ProfileButtonWidget(iconImage: Images.support, title: 'help_and_support'.tr, onTap: () {
+                  Get.to(()=> const HelpAndSupportScreen());
+                }),
+              ),
+
+              (profileController.profileModel != null && profileController.profileModel!.earnings == 1 && AppConstants.appMode == AppMode.delivery) && !isRideActive ? Padding(
+                padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                child: ProfileButtonWidget(iconImage: Images.earning, title: 'my_earning'.tr, onTap: () {
                   Get.toNamed(RouteHelper.getMyEarningRoute());
                 }),
               ) : const SizedBox(),
 
               (profileController.profileModel != null && profileController.profileModel!.earnings == 1) ? Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(icon: Icons.account_balance_wallet_outlined, title: 'my_account'.tr, onTap: () {
+                child: ProfileButtonWidget(iconImage: Images.earningReport, title: 'earning_report'.tr, onTap: () {
+                  Get.toNamed(RouteHelper.getEarningReportRoute());
+                }),
+              ) : const SizedBox(),
+
+              (profileController.profileModel != null && profileController.profileModel!.earnings == 1) ? Padding(
+                padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                child: ProfileButtonWidget(iconImage: Images.emptyWallet, title: 'my_account'.tr, onTap: () {
                   Get.toNamed(RouteHelper.getMyAccountRoute());
                 }),
               ) : const SizedBox(),
 
               Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(icon: Icons.account_balance_outlined, title: 'withdraw_method'.tr, onTap: () {
+                child: ProfileButtonWidget(icon: Icons.money, title: 'withdraw_method'.tr, onTap: () {
                   Get.toNamed(RouteHelper.getWithdrawMethodRoute());
                 }),
               ),
 
-              if(Get.find<SplashController>().configModel!.disbursementType == 'automated' && profileController.profileModel!.type != 'store_wise' && profileController.profileModel!.earnings != 0)
+              if(Get.find<SplashController>().configModel?.disbursementType == 'automated' && profileController.profileModel != null && profileController.profileModel!.type != 'store_wise' && profileController.profileModel!.earnings != 0)
                 Padding(
                   padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                  child: ProfileButtonWidget(icon: Icons.receipt_long_outlined, title: 'disbursement'.tr, onTap: () {
+                  child: ProfileButtonWidget(icon: Icons.payments, title: 'disbursement'.tr, onTap: () {
                     Get.toNamed(RouteHelper.getDisbursementRoute());
                   }),
                 ),
 
               if(showReferAndEarn)Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(icon: Icons.person_add_alt_1_outlined, title: 'refer_and_earn'.tr, onTap: () {
+                child: ProfileButtonWidget(iconImage: Images.earning, title: 'refer_and_earn'.tr, onTap: () {
                   Get.to(()=> const ReferAndEarnScreen());
                 }),
               ),
 
               if(isRideActive) Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                child: ProfileButtonWidget(icon: Icons.security_outlined, title: 'safety'.tr, onTap: () {
+                child: ProfileButtonWidget(iconImage: Images.shieldTick, title: 'safety'.tr, onTap: () {
                   Get.to(()=> const SafetyPolicyScreen());
                 }),
               ),
 
-              ProfileButtonWidget(icon: Icons.description_outlined, title: 'terms_condition'.tr, onTap: () {
+              ProfileButtonWidget(iconImage: Images.document, title: 'terms_condition'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getTermsRoute());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              ProfileButtonWidget(icon: Icons.policy_outlined, title: 'privacy_policy'.tr, onTap: () {
+              ProfileButtonWidget(iconImage: Images.document, title: 'privacy_policy'.tr, onTap: () {
                 Get.toNamed(RouteHelper.getPrivacyRoute());
               }),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
               ProfileButtonWidget(
-                icon: Icons.delete_outline, title: 'delete_account'.tr,
+                iconImage: Images.trash, title: 'delete_account'.tr,
                 onTap: () {
                   Get.dialog(ConfirmationDialogWidget(icon: Images.warning, title: 'are_you_sure_to_delete_account'.tr,
                     description: 'it_will_remove_your_all_information'.tr, isLogOut: true,
@@ -518,9 +535,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: Dimensions.paddingSizeLarge),
             
-          _buildInfoText("you_will_be_able_to_get_order_notification_even_if_you_are_not_in_the_app".tr),
-          _buildInfoText("${AppConstants.appName} ${!allow ? 'will_run_notification_service_in_the_background_always'.tr : 'will_not_run_notification_service_in_the_background_always'.tr}"),
-          _buildInfoText(!allow ? "notification_will_always_send_alert_from_the_background".tr : 'notification_will_not_always_send_alert_from_the_background'.tr),
+          _InfoText(text: "you_will_be_able_to_get_order_notification_even_if_you_are_not_in_the_app".tr),
+          _InfoText(text: "${AppConstants.appName} ${!allow ? 'will_run_notification_service_in_the_background_always'.tr : 'will_not_run_notification_service_in_the_background_always'.tr}"),
+          _InfoText(text: !allow ? "notification_will_always_send_alert_from_the_background".tr : 'notification_will_not_always_send_alert_from_the_background'.tr),
           const SizedBox(height: 20.0),
             
           Row(
@@ -561,21 +578,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  Widget _buildInfoText(String text) {
-    return Container(
-      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-      margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-      decoration: BoxDecoration(
-        color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: Text(
-        text,
-        style: robotoRegular,
-      ),
-    );
-  }
-
   void _manageLanguageFunctionality() {
     Get.find<LocalizationController>().saveCacheLanguage(null);
     Get.find<LocalizationController>().searchSelectedLanguage();
@@ -595,4 +597,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ).then((value) => Get.find<LocalizationController>().setLanguage(Get.find<LocalizationController>().getCacheLocaleFromSharedPref()));
   }
 
+  void _checkPermission(Function callback) async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    permission = await Geolocator.checkPermission();
+
+    while(Get.isDialogOpen == true) {
+      Get.back();
+    }
+
+    if(permission == LocationPermission.denied) {
+      Get.dialog(LocationAccessDialog(onConfirm: () async {
+        Get.back();
+        final perm = await Geolocator.requestPermission();
+        if(perm == LocationPermission.deniedForever) await Geolocator.openAppSettings();
+        if(GetPlatform.isAndroid) _checkPermission(callback);
+      }));
+    }else if(permission == LocationPermission.deniedForever || (GetPlatform.isIOS ? false : permission == LocationPermission.whileInUse)) {
+      Get.dialog(LocationAccessDialog(onConfirm: () async {
+        Get.back();
+        await Geolocator.openAppSettings();
+        Future.delayed(const Duration(seconds: 3), () {
+          if(GetPlatform.isAndroid) _checkPermission(callback);
+        });
+      },
+      ));
+    }else {
+      callback();
+    }
+  }
+
+}
+
+class _InfoText extends StatelessWidget {
+  final String text;
+  const _InfoText({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+      margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+      decoration: BoxDecoration(
+        color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Text(
+        text,
+        style: robotoRegular,
+      ),
+    );
+  }
 }

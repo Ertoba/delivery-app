@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:sixam_mart_delivery/api/api_client.dart';
+import 'package:sixam_mart_delivery/api/api_response_extension.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/models/delivery_man_body_model.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
 import 'package:sixam_mart_delivery/features/auth/domain/models/vehicle_model.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart_delivery/helper/api_error_helper.dart';
 import 'package:sixam_mart_delivery/helper/pusher_helper.dart';
 import 'package:sixam_mart_delivery/helper/route_helper.dart';
 import 'package:get/get.dart';
@@ -86,34 +86,22 @@ class AuthController extends GetxController implements GetxService {
   Future<ResponseModel> login(String phone, String password, String type) async {
     _isLoading = true;
     update();
+    Response response = await authServiceInterface.login(phone, password, type);
     ResponseModel responseModel;
-    try {
-      Response response = await authServiceInterface.login(phone, password, type);
-      if (response.statusCode == 200) {
-        if(Get.find<SplashController>().configModel?.webSocketStatus ?? false){
-          PusherHelper.initializePusher();
-        }
-        authServiceInterface.saveUserToken(response.body['token'], response.body['zone_topic'], response.body['topic']);
-        try {
-          await authServiceInterface.updateToken();
-        } catch (_) {}
-        responseModel = ResponseModel(true, 'successful');
-      } else {
-        responseModel = ResponseModel(
-          false,
-          ApiErrorHelper.userMessage(
-            response.statusText,
-            statusCode: response.statusCode,
-            errorCode: ApiErrorHelper.firstErrorCode(response.body),
-          ),
-        );
+    if (response.statusCode == 200) {
+
+      if(Get.find<SplashController>().configModel?.webSocketStatus ?? false){
+        PusherHelper.initializePusher();
       }
-    } catch (_) {
-      responseModel = ResponseModel(false, ApiErrorHelper.networkErrorMessage);
-    } finally {
-      _isLoading = false;
-      update();
+
+      authServiceInterface.saveUserToken('${response.content['token'] ?? ''}', '${response.content['zone_topic'] ?? ''}', '${response.content['topic'] ?? ''}');
+      await authServiceInterface.updateToken();
+      responseModel = ResponseModel(true, 'successful');
+    } else {
+      responseModel = ResponseModel(false, response.statusText);
     }
+    _isLoading = false;
+    update();
     return responseModel;
   }
 
