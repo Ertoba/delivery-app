@@ -33,6 +33,7 @@ class ConfigModel {
   bool? toggleRiderRegistration;
   int? scheduleOrderSlotDuration;
   int? digitAfterDecimalPoint;
+  String? distanceUnit;
   double? parcelPerKmShippingCharge;
   double? parcelMinimumShippingCharge;
   ModuleConfig? moduleConfig;
@@ -106,6 +107,7 @@ class ConfigModel {
     this.toggleRiderRegistration,
     this.scheduleOrderSlotDuration,
     this.digitAfterDecimalPoint,
+    this.distanceUnit,
     this.moduleConfig,
     this.parcelPerKmShippingCharge,
     this.parcelMinimumShippingCharge,
@@ -186,6 +188,7 @@ class ConfigModel {
     toggleRiderRegistration = json['toggle_rider_registration'];
     scheduleOrderSlotDuration = json['schedule_order_slot_duration'] == 0 ? 30 : json['schedule_order_slot_duration'];
     digitAfterDecimalPoint = json['digit_after_decimal_point'];
+    distanceUnit = json['distance_unit'];
     moduleConfig = json['module_config'] != null ? ModuleConfig.fromJson(json['module_config']) : null;
     parcelPerKmShippingCharge = json['parcel_per_km_shipping_charge']?.toDouble();
     parcelMinimumShippingCharge = json['parcel_minimum_shipping_charge']?.toDouble();
@@ -277,6 +280,7 @@ class ConfigModel {
     data['toggle_dm_registration'] = toggleDmRegistration;
     data['schedule_order_slot_duration'] = scheduleOrderSlotDuration;
     data['digit_after_decimal_point'] = digitAfterDecimalPoint;
+    data['distance_unit'] = distanceUnit;
     if (moduleConfig != null) {
       data['module_config'] = moduleConfig!.toJson();
     }
