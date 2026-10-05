@@ -667,6 +667,25 @@
   "support_chat": "সহায়তা চ্যাট",
   "support_chat_description": "সহায়তা দলকে সরাসরি বার্তা পাঠান",
   "support_conversation_empty_title": "MILI সহায়তার সঙ্গে কথোপকথন শুরু করুন",
-  "support_conversation_empty_description": "নিচে আপনার প্রশ্ন লিখুন। বার্তাটি অ্যাডমিন সহায়তা দলের কাছে পৌঁছে যাবে।"
+  "support_conversation_empty_description": "নিচে আপনার প্রশ্ন লিখুন। বার্তাটি অ্যাডমিন সহায়তা দলের কাছে পৌঁছে যাবে।",
+  "start_date": "শুরুর তারিখ",
+  "end_date": "শেষের তারিখ",
+  "select_range": "একটি সঠিক তারিখের পরিসর নির্বাচন করুন",
+  "earning_report": "আয় প্রতিবেদন",
+  "all_the_time": "সর্বদা",
+  "previous_year": "গত বছর",
+  "custom": "কাস্টম",
+  "total_earning_with_admin_commission": "অ্যাডমিন কমিশনসহ মোট আয়",
+  "commission_paid": "প্রদত্ত কমিশন",
+  "net_income": "নিট আয়",
+  "recent_transactions": "সাম্প্রতিক লেনদেন",
+  "ride": "রাইড",
+  "total_expense": "মোট ব্যয়",
+  "delivery_charge": "ডেলিভারি চার্জ",
+  "incentive": "প্রণোদনা",
+  "ride_cost": "রাইড খরচ",
+  "tips": "বখশিশ",
+  "ride_charge": "রাইড চার্জ",
+  "total_tips": "মোট বখশিশ"
 
 }

@@ -1079,5 +1079,19 @@
   "auth_ui_use_code": "ერთჯერადი კოდით შესვლა",
   "auth_ui_send_code": "გაგრძელება",
   "auth_ui_phone_hint": "ტელეფონის ნომერი",
-  "auth_ui_role": "კურიერი"
+  "auth_ui_role": "კურიერი",
+  "start_date": "დაწყების თარიღი",
+  "end_date": "დასრულების თარიღი",
+  "select_range": "აირჩიეთ თარიღების სწორი შუალედი",
+  "earning_report": "შემოსავლის ანგარიში",
+  "all_the_time": "მთელი პერიოდი",
+  "previous_year": "წინა წელი",
+  "custom": "სასურველი პერიოდი",
+  "total_earning_with_admin_commission": "მთლიანი შემოსავალი ადმინისტრატორის საკომისიოს ჩათვლით",
+  "commission_paid": "გადახდილი საკომისიო",
+  "net_income": "წმინდა შემოსავალი",
+  "recent_transactions": "ბოლო ტრანზაქციები",
+  "total_expense": "მთლიანი ხარჯი",
+  "incentive": "ბონუსი",
+  "ride_charge": "მგზავრობის საფასური"
 }

@@ -2392,5 +2392,19 @@
   "auth_ui_use_code": "Войти с кодом",
   "auth_ui_send_code": "Продолжить",
   "auth_ui_phone_hint": "Номер телефона",
-  "auth_ui_role": "Курьер"
+  "auth_ui_role": "Курьер",
+  "start_date": "Дата начала",
+  "end_date": "Дата окончания",
+  "select_range": "Выберите корректный диапазон дат",
+  "earning_report": "Отчет о доходах",
+  "all_the_time": "За все время",
+  "previous_year": "Предыдущий год",
+  "custom": "Произвольный период",
+  "total_earning_with_admin_commission": "Общий доход с учетом комиссии администратора",
+  "commission_paid": "Уплаченная комиссия",
+  "net_income": "Чистый доход",
+  "recent_transactions": "Последние транзакции",
+  "total_expense": "Общие расходы",
+  "incentive": "Бонус",
+  "ride_charge": "Стоимость поездки"
 }

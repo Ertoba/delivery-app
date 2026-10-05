@@ -1053,5 +1053,19 @@
   "auth_ui_use_code": "Sign in with a code",
   "auth_ui_send_code": "Continue",
   "auth_ui_phone_hint": "Phone number",
-  "auth_ui_role": "Courier"
+  "auth_ui_role": "Courier",
+  "start_date": "Start Date",
+  "end_date": "End Date",
+  "select_range": "Select a valid date range",
+  "earning_report": "Earning Report",
+  "all_the_time": "All the Time",
+  "previous_year": "Previous Year",
+  "custom": "Custom",
+  "total_earning_with_admin_commission": "Total Earning with Admin Commission",
+  "commission_paid": "Commission Paid",
+  "net_income": "Net Income",
+  "recent_transactions": "Recent Transactions",
+  "total_expense": "Total Expense",
+  "incentive": "Incentive",
+  "ride_charge": "Ride Charge"
 }

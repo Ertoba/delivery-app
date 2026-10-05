@@ -80,6 +80,7 @@ class Images {
   static const String notificationBall = 'assets/image/notification-bing.png';
   static const String message = 'assets/image/messages.png';
   static const String earning = 'assets/image/earning_menu.png';
+  static const String earningReport = 'assets/image/earning_reports.png';
   static const String security = 'assets/image/shield-security.png';
   static const String editUser = 'assets/image/user-edit.png';
   static const String document = 'assets/image/document-text.png';

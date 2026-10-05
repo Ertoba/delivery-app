@@ -989,5 +989,19 @@
   "support_chat": "دردشة الدعم",
   "support_chat_description": "راسل فريق الدعم مباشرة",
   "support_conversation_empty_title": "ابدأ محادثة مع دعم MILI",
-  "support_conversation_empty_description": "اكتب سؤالك أدناه. سيتم إرسال الرسالة إلى فريق دعم الإدارة."
+  "support_conversation_empty_description": "اكتب سؤالك أدناه. سيتم إرسال الرسالة إلى فريق دعم الإدارة.",
+  "start_date": "تاريخ البدء",
+  "end_date": "تاريخ الانتهاء",
+  "select_range": "حدد نطاقًا زمنيًا صالحًا",
+  "earning_report": "تقرير الأرباح",
+  "all_the_time": "طوال الوقت",
+  "previous_year": "السنة السابقة",
+  "custom": "مخصص",
+  "total_earning_with_admin_commission": "إجمالي الأرباح مع عمولة المشرف",
+  "commission_paid": "العمولة المدفوعة",
+  "net_income": "صافي الدخل",
+  "recent_transactions": "المعاملات الأخيرة",
+  "total_expense": "إجمالي المصروف",
+  "incentive": "حافز",
+  "ride_charge": "رسوم الرحلة"
 }

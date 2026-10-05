@@ -406,6 +406,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               (profileController.profileModel != null && profileController.profileModel!.earnings == 1) ? Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                child: ProfileButtonWidget(iconImage: Images.earningReport, title: 'earning_report'.tr, onTap: () {
+                  Get.toNamed(RouteHelper.getEarningReportRoute());
+                }),
+              ) : const SizedBox(),
+
+              (profileController.profileModel != null && profileController.profileModel!.earnings == 1) ? Padding(
+                padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
                 child: ProfileButtonWidget(icon: Icons.account_balance_wallet_outlined, title: 'my_account'.tr, onTap: () {
                   Get.toNamed(RouteHelper.getMyAccountRoute());
                 }),
