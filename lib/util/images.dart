@@ -83,6 +83,7 @@ class Images {
   static const String security = 'assets/image/shield-security.png';
   static const String editUser = 'assets/image/user-edit.png';
   static const String document = 'assets/image/document-text.png';
+  static const String noteIcon = 'assets/image/note-icon.png';
   static const String trash = 'assets/image/trash.png';
   static const String home = 'assets/image/home.png';
   static const String request = 'assets/image/request.png';
@@ -113,6 +114,8 @@ class Images {
   static const String fileIcon = 'assets/image/clip.png';
   static const String coinIcon = 'assets/image/coin_icon.png';
   static const String totalIncome = 'assets/image/rider/total_income.png';
+  static const String dollerIcon = 'assets/image/doller_icon.png';
+  static const String walletIconSign = 'assets/image/wallet_icon_sign.png';
   static const String rideIncome = 'assets/image/rider/ride_income.png';
   static const String deliveryIncome = 'assets/image/rider/delivery_income.png';
   static const String totalTips = 'assets/image/rider/total_tips.png';

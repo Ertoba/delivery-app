@@ -80,6 +80,10 @@ class AppConstants {
   static const String firebaseAuthVerify =
       '/api/v1/auth/delivery-man/firebase-verify-token';
   static const String earningReportUri = '/api/v1/delivery-man/earning-report';
+  static const String newEarningReportUri =
+      '/api/v1/delivery-man/new-earning-report';
+  static const String riderEarningReportUri =
+      '/api/v1/rideshare/rider/earning-report';
   static const String earningReportInvoiceUri =
       '/deliveryman-earning-report-invoice';
   static const String getParcelCancellationReasons =
