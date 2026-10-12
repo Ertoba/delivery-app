@@ -1,0 +1,58 @@
+name: Generate MILI Brand Assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'branding/mili-mark.svg'
+      - 'branding/build_assets.py'
+      - '.github/workflows/mili-brand-assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install image processing dependencies
+        run: python -m pip install --disable-pip-version-check Pillow==12.0.0 cairosvg==2.8.2
+      - name: Generate app logos, launch images, and icon densities
+        run: python branding/build_assets.py
+      - name: Verify all generated PNG files
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          paths = [
+              *Path('assets/image').glob('logo.png'),
+              *Path('android/app/src/main/res').glob('mipmap-*/ic_launcher.png'),
+              *Path('ios/Runner/Assets.xcassets/AppIcon.appiconset').glob('*.png'),
+          ]
+          if not paths:
+              raise SystemExit('No branding outputs found')
+          for path in paths:
+              with Image.open(path) as im:
+                  im.verify()
+          print('BRAND_IMAGE_VALIDATION_OK', len(paths))
+          PY
+      - name: Commit the generated binary branding assets
+        run: |
+          git add -u -- assets/image android/app/src/main/res ios/Runner/Assets.xcassets web
+          if git diff --cached --quiet; then
+            echo "No binary brand changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Generate verified MILI app icon and splash assets from monogram"
+          git push origin HEAD:main
