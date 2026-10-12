@@ -182,7 +182,7 @@ class SplashScreenState extends State<SplashScreen> {
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Image.asset(Images.logo, width: 200),
             const SizedBox(height: Dimensions.paddingSizeSmall),
-            Text('suffix_name'.tr, style: robotoMedium, textAlign: TextAlign.center),
+            Text(AppConstants.appName, style: robotoMedium, textAlign: TextAlign.center),
           ]),
         ),
       ),
