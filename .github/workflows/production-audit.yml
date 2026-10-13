@@ -10,11 +10,32 @@ on:
 permissions:
   contents: read
 
+# Only the newest audit for a branch needs to consume the hosted runner.
+concurrency:
+  group: delivery-production-qa-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 75
     steps:
+      # GitHub hosted runners include large optional toolchains which are not
+      # needed by this Flutter / Android build. Remove them before provisioning
+      # Flutter and Gradle to avoid Jetifier failing with ENOSPC.
+      - name: Reclaim disk space for Flutter Android QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Disk before cleanup"
+          df -h /
+          for directory in /usr/share/dotnet /usr/local/share/powershell /opt/hostedtoolcache/CodeQL; do
+            if [ -d "$directory" ]; then
+              sudo rm -rf -- "$directory"
+            fi
+          done
+          echo "Disk after cleanup"
+          df -h /
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
