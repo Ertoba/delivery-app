@@ -5,7 +5,7 @@ import 'package:sixam_mart_delivery/util/images.dart';
 
 class AppConstants {
   static const String appName = 'მილი კურიერი';
-  static const double appVersion = 3.8;
+  static const double appVersion = 4.2;
 
   ///Flutter sdk 3.41.6
   static const String fontFamily = MiliTypography.bodyFamily;
