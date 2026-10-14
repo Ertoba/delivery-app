@@ -22,7 +22,13 @@ class NotificationRepository implements NotificationRepositoryInterface {
     );
     if (response.statusCode == 200) {
       notificationList = [];
-      response.body.forEach((notification) {
+      final dynamic payload = response.body;
+      final List<dynamic> notifications = payload is List
+          ? payload
+          : payload is Map && payload['data'] is List
+              ? List<dynamic>.from(payload['data'] as List)
+              : <dynamic>[];
+      notifications.forEach((notification) {
         NotificationModel notify = NotificationModel.fromJson(notification);
         notify.title = _localizedNotificationText(
           notification['data']['title'],
