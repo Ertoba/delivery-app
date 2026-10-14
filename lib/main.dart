@@ -33,13 +33,14 @@ Future<void> main() async {
   // from appearing. Android Firebase settings come from google-services.json.
   bool firebaseReady = false;
   try {
-    if (!GetPlatform.isWeb) {
+    if (!GetPlatform.isWeb && Firebase.apps.isEmpty) {
       await Firebase.initializeApp().timeout(const Duration(seconds: 15));
-      firebaseReady = Firebase.apps.isNotEmpty;
     }
+    firebaseReady = Firebase.apps.isNotEmpty;
   } catch (error, stackTrace) {
     debugPrint('Firebase initialization unavailable: $error');
     debugPrintStack(stackTrace: stackTrace);
+    firebaseReady = Firebase.apps.isNotEmpty;
   }
 
   Map<String, Map<String, String>> languages = await di.init();
