@@ -76,11 +76,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = if (hasReleaseKeystore) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
-            }
+            // A Play release must never silently fall back to debug signing.
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
