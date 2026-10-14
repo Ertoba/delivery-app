@@ -1,6 +1,18 @@
 import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/domain/models/ride_categoty_model.dart';
 import 'package:sixam_mart_delivery/features/ride_module/add_vehicle/domain/models/vehicle_brand_model.dart';
 
+int? _asInt(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.toInt();
+  }
+  return int.tryParse(value.toString());
+}
 
 class ProfileModel {
   int? id;
@@ -125,7 +137,7 @@ class ProfileModel {
   });
 
   ProfileModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = _asInt(json['id']);
     fName = json['f_name'];
     lName = json['l_name'];
     phone = json['phone'];
@@ -135,16 +147,16 @@ class ProfileModel {
     identityImageFullUrl = json['identity_image_full_url'].cast<String>();
     imageFullUrl = json['image_full_url'];
     fcmToken = json['fcm_token'];
-    zoneId = json['zone_id'];
-    active = json['active'];
+    zoneId = _asInt(json['zone_id']);
+    active = _asInt(json['active']);
     avgRating = json['avg_rating']?.toDouble();
-    ratingCount = json['rating_count'];
-    memberSinceDays = json['member_since_days'];
-    orderCount = json['order_count'];
-    todaysOrderCount = json['todays_order_count'];
-    thisWeekOrderCount = json['this_week_order_count'];
+    ratingCount = _asInt(json['rating_count']);
+    memberSinceDays = _asInt(json['member_since_days']);
+    orderCount = _asInt(json['order_count']);
+    todaysOrderCount = _asInt(json['todays_order_count']);
+    thisWeekOrderCount = _asInt(json['this_week_order_count']);
     cashInHands = json['cash_in_hands']?.toDouble();
-    earnings = int.tryParse(json['earning'].toString());
+    earnings = _asInt(json['earning']);
     type = json['type'];
     balance = json['balance']?.toDouble();
     todaysEarning = json['todays_earning']?.toDouble();
@@ -164,7 +176,7 @@ class ProfileModel {
     pendingWithdraw = json['pending_withdraw']?.toDouble();
     refCode = json['ref_code'];
     referalEarning = json['referal_earning']?.toDouble();
-    loyaltyPoint = json['loyalty_point'];
+    loyaltyPoint = _asInt(json['loyalty_point']);
     vehicle = json['rider_vehicle'] != null ? Vehicle.fromJson(json['rider_vehicle']) : null;
     wallet = json['wallet'] != null ? Wallet.fromJson(json['wallet']) : null;
     dynamicBalanceType = json['dynamic_balance_type'];
@@ -176,9 +188,9 @@ class ProfileModel {
     totalTips = json['total_tips']?.toDouble();
     isDeliveryOn = json['is_delivery'].toString() == '1';
     isRideOn = json['is_ride'].toString() == '1';
-    totalRides = json['ride_count'];
-    todayRideCount = json['todays_ride_count'];
-    thisWeekRideCount = json['this_week_ride_count'];
+    totalRides = _asInt(json['ride_count']);
+    todayRideCount = _asInt(json['todays_ride_count']);
+    thisWeekRideCount = _asInt(json['this_week_ride_count']);
     totalReferralEarn = json['total_referral_earning']?.toDouble();
     timeTrack = json['time_track'] != null
         ? TimeTrack.fromJson(json['time_track'])
