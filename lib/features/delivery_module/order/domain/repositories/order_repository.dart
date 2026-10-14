@@ -69,7 +69,15 @@ class OrderRepository implements OrderRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.latestOrdersUri + _getUserToken());
     if(response.statusCode == 200) {
       latestOrderList = [];
-      response.body.forEach((order) => latestOrderList!.add(OrderModel.fromJson(order)));
+      final dynamic payload = response.body;
+      final List<dynamic> orders = payload is List
+          ? payload
+          : payload is Map && payload['data'] is List
+              ? List<dynamic>.from(payload['data'] as List)
+              : payload is Map && payload['orders'] is List
+                  ? List<dynamic>.from(payload['orders'] as List)
+                  : <dynamic>[];
+      orders.forEach((order) => latestOrderList!.add(OrderModel.fromJson(order)));
     }
     return latestOrderList;
   }

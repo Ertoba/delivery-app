@@ -48,7 +48,7 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     if(response.statusCode == 200) {
       transactions = [];
       WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.body);
-      transactions.addAll(walletPaymentModel.transactions!);
+      transactions.addAll(walletPaymentModel.transactions ?? <Transactions>[]);
     }
     return transactions;
   }
@@ -60,7 +60,7 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     if(response.statusCode == 200) {
       walletProvidedTransactions = [];
       WalletPaymentModel walletPaymentModel = WalletPaymentModel.fromJson(response.body);
-      walletProvidedTransactions.addAll(walletPaymentModel.transactions!);
+      walletProvidedTransactions.addAll(walletPaymentModel.transactions ?? <Transactions>[]);
     }
     return walletProvidedTransactions;
   }
@@ -150,7 +150,15 @@ class MyAccountRepository implements MyAccountRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.getWithdrawList}?token=${_getUserToken()}');
     if (response.statusCode == 200) {
       withdrawRequestList = [];
-      withdrawRequestList = (response.body as List).map((e) => WithdrawRequestModel.fromJson(e)).toList();
+      final dynamic payload = response.body;
+      final List<dynamic> requests = payload is List
+          ? payload
+          : payload is Map && payload['data'] is List
+              ? List<dynamic>.from(payload['data'] as List)
+              : payload is Map && payload['withdrawals'] is List
+                  ? List<dynamic>.from(payload['withdrawals'] as List)
+                  : <dynamic>[];
+      withdrawRequestList = requests.map((e) => WithdrawRequestModel.fromJson(e)).toList();
     }
     return withdrawRequestList;
   }

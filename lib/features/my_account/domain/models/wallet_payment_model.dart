@@ -10,9 +10,10 @@ class WalletPaymentModel {
     totalSize = json['total_size'];
     limit = json['limit'];
     offset = json['offset'];
-    if (json['transactions'] != null) {
+    final dynamic rawTransactions = json['transactions'] ?? json['data'];
+    if (rawTransactions is List) {
       transactions = <Transactions>[];
-      json['transactions'].forEach((v) {
+      rawTransactions.forEach((v) {
         transactions!.add(Transactions.fromJson(v));
       });
     }

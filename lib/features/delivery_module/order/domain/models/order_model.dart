@@ -10,9 +10,10 @@ class PaginatedOrderModel {
     totalSize = json['total_size'];
     limit = json['limit'].toString();
     offset = json['offset'].toString();
-    if (json['orders'] != null) {
+    final dynamic rawOrders = json['orders'] ?? json['data'];
+    if (rawOrders is List) {
       orders = [];
-      json['orders'].forEach((v) {
+      rawOrders.forEach((v) {
         orders!.add(OrderModel.fromJson(v));
       });
     }
