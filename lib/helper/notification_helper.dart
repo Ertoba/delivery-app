@@ -40,7 +40,7 @@ class NotificationHelper {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   ) async {
     var androidInitialize = const AndroidInitializationSettings(
-      'notification_icon',
+      'mili_notification_icon',
     );
     var iOSInitialize = const DarwinInitializationSettings();
     var initializationsSettings = InitializationSettings(
@@ -760,7 +760,7 @@ class NotificationHelper {
   ) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-          'portal_notifications',
+          'mili_order_notifications',
           AppConstants.appName,
           playSound: true,
           importance: Importance.max,
@@ -793,7 +793,7 @@ class NotificationHelper {
     );
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-          'portal_notifications',
+          'mili_order_notifications',
           AppConstants.appName,
           importance: Importance.max,
           styleInformation: bigTextStyleInformation,
@@ -838,7 +838,7 @@ class NotificationHelper {
         );
     final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-          'portal_notifications',
+          'mili_order_notifications',
           AppConstants.appName,
           largeIcon: FilePathAndroidBitmap(largeIconPath),
           priority: Priority.max,

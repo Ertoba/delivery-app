@@ -44,6 +44,12 @@
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/mili_notification_icon" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="mili_order_notifications" />
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCaCSJ0BZItSyXqBv8vpD1N4WBffJeKhLQ"/>
 
@@ -74,7 +80,7 @@
               />
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
-                android:value="6ammart" />
+                android:value="mili_order_notifications" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
