@@ -290,3 +290,30 @@ class MultipartDocument {
   FilePickerResult? file;
   MultipartDocument(this.key, this.file);
 }
+
+extension ApiResponsePayload on Response {
+  List<dynamic> get dataList {
+    final dynamic payload = body;
+    if (payload is List) return payload;
+    if (payload is Map) {
+      for (final String key in const [
+        'data', 'items', 'orders', 'categories', 'banners', 'campaigns',
+        'coupons', 'addons', 'methods', 'transactions', 'disbursements',
+        'reviews', 'zones', 'vehicles', 'withdrawals',
+      ]) {
+        final dynamic value = payload[key];
+        if (value is List) return value;
+      }
+    }
+    return <dynamic>[];
+  }
+
+  Map<String, dynamic> get contentMap {
+    if (body is Map) {
+      final dynamic data = body['data'];
+      if (data is Map) return Map<String, dynamic>.from(data);
+      return Map<String, dynamic>.from(body);
+    }
+    return <String, dynamic>{};
+  }
+}

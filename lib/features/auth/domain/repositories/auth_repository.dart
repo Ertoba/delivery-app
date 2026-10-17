@@ -31,7 +31,7 @@ class AuthRepository implements AuthRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.vehiclesUri);
     if(response.statusCode == 200) {
       vehicles = [];
-      response.body.forEach((vehicle) => vehicles!.add(VehicleModel.fromJson(vehicle)));
+      response.dataList.forEach((vehicle) => vehicles!.add(VehicleModel.fromJson(vehicle)));
     }
     return vehicles;
   }

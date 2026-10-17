@@ -20,12 +20,23 @@ class EarningReportModel {
   });
 
   EarningReportModel.fromJson(Map<String, dynamic> json) {
-    earning = json['earning'] != null ? Earning.fromJson(json['earning']) : null;
+    if (json['earning'] != null) {
+      earning = Earning.fromJson(json['earning']);
+    } else if (json['data'] is List) {
+      earning = Earning(
+        data: (json['data'] as List).map((v) => Data.fromJson(v)).toList(),
+        total: json['pagination']?['total'],
+      );
+    }
     totalDmTips = json['total_dm_tips']?.toDouble();
     totalDeliveryCharge = json['total_delivery_charge']?.toDouble();
     type = json['type'];
-    limit = json['limit'];
-    offset = json['offset'];
+    limit = json['pagination'] != null
+        ? json['pagination']['per_page']?.toString()
+        : json['limit'];
+    offset = json['pagination'] != null
+        ? json['pagination']['current_page']?.toString()
+        : json['offset'];
     totalLoyaltyPointEarning = json['total_loyalty_point_earning']?.toDouble();
     totalReferal = json['total_referal']?.toDouble();
   }

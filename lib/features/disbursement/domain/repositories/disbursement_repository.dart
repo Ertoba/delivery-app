@@ -82,7 +82,7 @@ class DisbursementRepository implements DisbursementRepositoryInterface {
     );
     if (response.statusCode == 200) {
       widthDrawMethods = [];
-      response.body.forEach((method) {
+      response.dataList.forEach((method) {
         WidthDrawMethodModel withdrawMethod = WidthDrawMethodModel.fromJson(
           method,
         );

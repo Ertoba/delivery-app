@@ -16,7 +16,7 @@ class AddressRepository implements AddressRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.zoneListUri);
     if (response.statusCode == 200) {
       zoneList = [];
-      response.body.forEach((zone) => zoneList!.add(ZoneModel.fromJson(zone)));
+      response.dataList.forEach((zone) => zoneList!.add(ZoneModel.fromJson(zone)));
     }
     return zoneList;
   }

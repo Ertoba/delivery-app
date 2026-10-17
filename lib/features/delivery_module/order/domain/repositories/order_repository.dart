@@ -112,7 +112,7 @@ class OrderRepository implements OrderRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.orderDetailsUri}${_getUserToken()}&order_id=$orderID');
     if (response.statusCode == 200) {
       orderDetailsModel = [];
-      response.body.forEach((orderDetails) => orderDetailsModel!.add(OrderDetailsModel.fromJson(orderDetails)));
+      response.dataList.forEach((orderDetails) => orderDetailsModel!.add(OrderDetailsModel.fromJson(orderDetails)));
     }
     return orderDetailsModel;
   }

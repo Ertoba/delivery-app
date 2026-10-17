@@ -24,21 +24,26 @@ class LoyaltyReportModel {
   });
 
   LoyaltyReportModel.fromJson(Map<String, dynamic> json) {
-    if (json['loyalityPoints'] != null) {
+    final dynamic pointList = json['loyalityPoints'] ?? json['data'];
+    if (pointList is List) {
       loyalityPoints = <LoyalityPoints>[];
-      json['loyalityPoints'].forEach((v) {
+      pointList.forEach((v) {
         loyalityPoints!.add(LoyalityPoints.fromJson(v));
       });
     }
-    total = json['total'];
+    total = json['pagination'] != null ? json['pagination']['total'] : json['total'];
     totalLoyaltyPointEarning = json['total_loyalty_point_earning']?.toDouble();
     totalReferal = json['total_referal']?.toDouble();
     totalDmTips = json['total_dm_tips']?.toDouble();
     totalDeliveryCharge = json['total_delivery_charge']?.toDouble();
     totalAdminCommission = json['total_admin_commission']?.toDouble();
     type = json['type'];
-    limit = json['limit'];
-    offset = json['offset'];
+    limit = json['pagination'] != null
+        ? json['pagination']['per_page']?.toString()
+        : json['limit'];
+    offset = json['pagination'] != null
+        ? json['pagination']['current_page']?.toString()
+        : json['offset'];
   }
 
   Map<String, dynamic> toJson() {

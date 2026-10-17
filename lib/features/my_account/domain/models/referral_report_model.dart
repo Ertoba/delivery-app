@@ -24,9 +24,10 @@ class ReferralReportModel {
   });
 
   ReferralReportModel.fromJson(Map<String, dynamic> json) {
-    if (json['refrealEarnings'] != null) {
+    final dynamic earningList = json['refrealEarnings'] ?? json['data'];
+    if (earningList is List) {
       refrealEarnings = <RefrealEarnings>[];
-      json['refrealEarnings'].forEach((v) {
+      earningList.forEach((v) {
         refrealEarnings!.add(RefrealEarnings.fromJson(v));
       });
     }
@@ -36,9 +37,13 @@ class ReferralReportModel {
     totalDeliveryCharge = json['total_delivery_charge']?.toDouble();
     totalAdminCommission = json['total_admin_commission']?.toDouble();
     type = json['type'];
-    limit = json['limit'];
-    offset = json['offset'];
-    total = json['total'];
+    limit = json['pagination'] != null
+        ? json['pagination']['per_page']?.toString()
+        : json['limit'];
+    offset = json['pagination'] != null
+        ? json['pagination']['current_page']?.toString()
+        : json['offset'];
+    total = json['pagination'] != null ? json['pagination']['total'] : json['total'];
   }
 
   Map<String, dynamic> toJson() {

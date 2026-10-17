@@ -69,7 +69,7 @@ class OrderRepository implements OrderRepositoryInterface {
     Response response = await apiClient.getData(AppConstants.latestOrdersUri + _getUserToken());
     if(response.statusCode == 200) {
       latestOrderList = [];
-      response.body.forEach((order) => latestOrderList!.add(OrderModel.fromJson(order)));
+      response.dataList.forEach((order) => latestOrderList!.add(OrderModel.fromJson(order)));
     }
     return latestOrderList;
   }
@@ -104,7 +104,7 @@ class OrderRepository implements OrderRepositoryInterface {
     Response response = await apiClient.getData('${AppConstants.orderDetailsUri}${_getUserToken()}&order_id=$orderID');
     if (response.statusCode == 200) {
       orderDetailsModel = [];
-      response.body.forEach((orderDetails) => orderDetailsModel!.add(OrderDetailsModel.fromJson(orderDetails)));
+      response.dataList.forEach((orderDetails) => orderDetailsModel!.add(OrderDetailsModel.fromJson(orderDetails)));
     }
     return orderDetailsModel;
   }
