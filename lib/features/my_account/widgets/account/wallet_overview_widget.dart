@@ -5,13 +5,18 @@ import 'package:sixam_mart_delivery/common/widgets/custom_bottom_sheet_widget.da
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/amount_card_widget.dart';
+import 'package:sixam_mart_delivery/features/my_account/widgets/empty_state_bottom_sheet.dart';
+import 'package:sixam_mart_delivery/features/my_account/widgets/payment_method_bottom_sheet_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/tab_section_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/transaction_section_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/wallet_attention_alert_widget.dart';
 import 'package:sixam_mart_delivery/features/my_account/widgets/withdrawal_bottomsheet.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/helper/price_converter_helper.dart';
+import 'package:sixam_mart_delivery/util/app_constants.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
+import 'package:sixam_mart_delivery/util/enums.dart';
 import 'package:sixam_mart_delivery/util/images.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 
@@ -382,36 +387,48 @@ class WalletOverviewWidget extends StatelessWidget {
                                                     if (isPayable)
                                                       InkWell(
                                                         onTap: () {
-                                                          final double
-                                                          payableBalance =
+                                                          final config =
+                                                              Get.find<SplashController>()
+                                                                  .configModel;
+                                                          final bool noPaymentMethod =
+                                                              config?.activePaymentMethodList ==
+                                                                  null ||
+                                                              config!.activePaymentMethodList!
+                                                                  .isEmpty ||
+                                                              config.digitalPayment != true;
+                                                          final bool isRideActive =
+                                                              AppConstants.appMode ==
+                                                                  AppMode.ride;
+                                                          final double minimumPayableAmount =
+                                                              isRideActive
+                                                                  ? (config?.minAmountToPayRider ??
+                                                                      0)
+                                                                  : (config?.minAmountToPayDm ??
+                                                                      0);
+                                                          final double payableBalance =
                                                               profileController
-                                                                  .profileModel
-                                                                  ?.payableBalance ??
-                                                              0;
+                                                                      .profileModel
+                                                                      ?.payableBalance ??
+                                                                  0;
 
-                                                          Get.dialog(
-                                                            AlertDialog(
-                                                              title: Text(
-                                                                'cash_handover'
-                                                                    .tr,
+                                                          if (noPaymentMethod) {
+                                                            showCustomBottomSheet(
+                                                              child: EmptyStateBottomSheet(
+                                                                noPaymentMethod: true,
                                                               ),
-                                                              content: Text(
-                                                                '${'cash_handover_instruction'.tr}\n\n${'pay_able_balance'.tr}: ${PriceConverterHelper.convertPrice(payableBalance)}',
-                                                                textDirection:
-                                                                    TextDirection
-                                                                        .ltr,
-                                                              ),
-                                                              actions: [
-                                                                TextButton(
-                                                                  onPressed: () =>
-                                                                      Get.back(),
-                                                                  child: Text(
-                                                                    'ok'.tr,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          );
+                                                            );
+                                                          } else if (minimumPayableAmount >
+                                                              payableBalance) {
+                                                            showCustomBottomSheet(
+                                                              child:
+                                                                  const EmptyStateBottomSheet(),
+                                                            );
+                                                          } else {
+                                                            showCustomBottomSheet(
+                                                              child:
+                                                                  const PaymentMethodBottomSheetWidget(),
+                                                            );
+                                                          }
                                                         },
                                                         child: Container(
                                                           width: 100,

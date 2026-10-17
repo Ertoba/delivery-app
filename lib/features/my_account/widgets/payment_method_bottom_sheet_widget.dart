@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart_delivery/common/models/config_model.dart';
 import 'package:sixam_mart_delivery/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart_delivery/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart_delivery/features/my_account/controllers/my_account_controller.dart';
-import 'package:sixam_mart_delivery/features/my_account/helpers/payment_method_filter_helper.dart';
 import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
@@ -36,9 +36,10 @@ class _PaymentMethodBottomSheetWidgetState
       ),
       child: GetBuilder<MyAccountController>(
         builder: (myAccountController) {
-          final paymentMethods = PaymentMethodFilterHelper.nonKeepzMethods(
-            Get.find<SplashController>().configModel?.activePaymentMethodList,
-          );
+          final paymentMethods = Get.find<SplashController>()
+                  .configModel
+                  ?.activePaymentMethodList ??
+              <PaymentBody>[];
 
           return Column(
             mainAxisSize: MainAxisSize.min,
