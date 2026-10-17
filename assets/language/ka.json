@@ -457,7 +457,6 @@
   "all_types_earning": "ყველა ტიპის შემოსავალი",
   "result_found": "შედეგი ნაპოვნია",
   "vat_tax_inc": "(დღგ/გადასახადი შედის)",
-  "or": "ან",
   "log_in": "შესვლა",
   "phone_number": "ტელეფონის ნომერი",
   "registration_successful": "თქვენი რეგისტრაციის მოთხოვნა\nწარმატებით გაიგზავნა!",
@@ -1093,5 +1092,8 @@
   "recent_transactions": "ბოლო ტრანზაქციები",
   "total_expense": "მთლიანი ხარჯი",
   "incentive": "ბონუსი",
-  "ride_charge": "მგზავრობის საფასური"
+  "ride_charge": "მგზავრობის საფასური",
+  "coupon_amount": "კუპონის თანხა",
+  "mi_aprox": "მიახლოებით მილი",
+  "mi_away_from_you": "მილი თქვენგან"
 }
