@@ -256,7 +256,13 @@ class OrderController extends GetxController implements GetxService {
       isParcel: parcel, comment: comment, reasons: reasons,
     );
     ResponseModel responseModel = await orderServiceInterface.updateOrderStatus(updateStatusBody, multiParts);
-    Get.back(result: responseModel.isSuccess);
+    // Close only the verification dialog/sheet that initiated the request.
+    // Calling Get.back unconditionally here popped the order screen as well;
+    // with back=true that became a second pop and could close the Android
+    // activity, leaving the app on SplashScreen after it was reopened.
+    if ((Get.isDialogOpen ?? false) || (Get.isBottomSheetOpen ?? false)) {
+      Get.back(result: responseModel.isSuccess);
+    }
     if(responseModel.isSuccess) {
       if(back) {
         Get.back();
