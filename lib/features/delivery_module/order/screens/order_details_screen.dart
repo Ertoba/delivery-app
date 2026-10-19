@@ -20,6 +20,9 @@ import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_app_bar_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_image_widget.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/widgets/order_item_widget.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/widgets/bogo_order_item_widget.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/widgets/bundle_order_item_widget.dart';
+import 'package:sixam_mart_delivery/features/delivery_module/order/widgets/estimated_delivery_widget.dart';
 import 'package:sixam_mart_delivery/features/delivery_module/order/widgets/info_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -142,6 +145,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
             double additionalCharge = 0;
             double extraPackagingAmount = 0;
             double referrerBonusAmount = 0;
+            final List<Object> groupedItems = groupBundleOrderDetails(groupedOrderDetails(orderController.orderDetailsModel ?? []));
             bool? isPrescriptionOrder = false;
             bool? taxIncluded = false;
             bool showChatPermission = true;
@@ -163,7 +167,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
               }else {
                 for (OrderDetailsModel orderDetails in orderController.orderDetailsModel!) {
                   for (AddOn addOn in orderDetails.addOns!) {
-                    addOns = addOns + (addOn.price! * addOn.quantity!);
+                    if(!orderDetails.isBogoItem && !orderDetails.isBundleItem) {
+                      addOns = addOns + (addOn.price! * addOn.quantity!);
+                    }
                   }
                   itemsPrice = itemsPrice + (orderDetails.price! * orderDetails.quantity!);
                 }
@@ -247,7 +253,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                       Text('${digitalyPaid == true && controllerOrderModel.chargePayer != null ? 'paid_by'.tr : parcel ? 'charge_payer'.tr : 'item'.tr}:', style: robotoRegular),
                       const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                       Text(
-                        digitalyPaid == true && controllerOrderModel.chargePayer != null ? controllerOrderModel.chargePayer! : parcel ? controllerOrderModel.chargePayer!.tr : orderController.orderDetailsModel!.length.toString(),
+                        digitalyPaid == true && controllerOrderModel.chargePayer != null ? controllerOrderModel.chargePayer! : parcel ? controllerOrderModel.chargePayer!.tr : groupedItems.length.toString(),
                         style: robotoMedium.copyWith(color: Theme.of(context).primaryColor),
                       ),
                     ],
@@ -261,6 +267,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                       )
                     )
                   ]),
+
+                  EstimatedDeliveryWidget(order: controllerOrderModel!),
 
                   orderController.orderDetailsModel!.isNotEmpty && orderController.orderDetailsModel![0].itemDetails != null && orderController.orderDetailsModel![0].itemDetails!.moduleType == 'food' ? Column(children: [
                     const SizedBox(height: Dimensions.paddingSizeLarge),
@@ -412,9 +420,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> with WidgetsBin
                         ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: orderController.orderDetailsModel!.length,
+                          itemCount: groupedItems.length,
                           itemBuilder: (context, index) {
-                            return OrderItemWidget(order: controllerOrderModel, orderDetails: orderController.orderDetailsModel![index]);
+                            final Object item = groupedItems[index];
+                            return item is BogoOrderItemGroup
+                                ? BogoOrderItemWidget(group: item)
+                                : item is BundleOrderItemGroup
+                                ? BundleOrderItemWidget(group: item)
+                                : OrderItemWidget(order: controllerOrderModel, orderDetails: item as OrderDetailsModel);
                           },
                           separatorBuilder: (context, index){
                             return Divider(height: 25,);
