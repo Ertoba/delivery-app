@@ -4,17 +4,29 @@ class DisbursementMethodBody {
   String? offset;
   List<Methods>? methods;
 
-  DisbursementMethodBody({this.totalSize, this.limit, this.offset, this.methods});
+  DisbursementMethodBody({
+    this.totalSize,
+    this.limit,
+    this.offset,
+    this.methods,
+  });
 
   DisbursementMethodBody.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['methods'] != null) {
+    if (json['pagination'] is Map) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page']?.toString();
+      offset = json['pagination']['current_page']?.toString();
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
+    final dynamic methodList = json['data'] ?? json['methods'];
+    if (methodList is List) {
       methods = <Methods>[];
-      json['methods'].forEach((v) {
+      for (final dynamic v in methodList) {
         methods!.add(Methods.fromJson(v));
-      });
+      }
     }
   }
 
@@ -65,7 +77,9 @@ class Methods {
         methodFields!.add(MethodField.fromJson(v));
       });
     }
-    isDefault = json['is_default'];
+    isDefault = json['is_default'] is bool
+        ? json['is_default']
+        : json['is_default'] == 1;
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -90,18 +104,33 @@ class Methods {
 class MethodField {
   String? userInput;
   String? userData;
+  String? inputType;
+  String? placeholder;
+  int? isRequired;
 
-  MethodField({this.userInput, this.userData});
+  MethodField({
+    this.userInput,
+    this.userData,
+    this.inputType,
+    this.placeholder,
+    this.isRequired,
+  });
 
   MethodField.fromJson(Map<String, dynamic> json) {
-    userInput = json['user_input'];
-    userData = json['user_data'];
+    userInput = json['user_input'] ?? json['input_name'];
+    userData = json['user_data'] ?? json['value'];
+    inputType = json['input_type'];
+    placeholder = json['placeholder'];
+    isRequired = json['is_required'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['user_input'] = userInput;
     data['user_data'] = userData;
+    data['input_type'] = inputType;
+    data['placeholder'] = placeholder;
+    data['is_required'] = isRequired;
     return data;
   }
 }

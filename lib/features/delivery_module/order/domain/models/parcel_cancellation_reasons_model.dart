@@ -4,17 +4,33 @@ class ParcelCancellationReasonsModel {
   int? offset;
   List<Reason>? data;
 
-  ParcelCancellationReasonsModel({this.totalSize, this.limit, this.offset, this.data});
+  ParcelCancellationReasonsModel({
+    this.totalSize,
+    this.limit,
+    this.offset,
+    this.data,
+  });
 
   ParcelCancellationReasonsModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = int.parse(json['limit']);
-    offset = int.parse(json['offset']);
-    if (json['data'] != null) {
+    if (json['pagination'] is Map) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page'];
+      offset = json['pagination']['current_page'];
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'] != null
+          ? int.tryParse(json['limit'].toString())
+          : null;
+      offset = json['offset'] != null
+          ? int.tryParse(json['offset'].toString())
+          : null;
+    }
+    final dynamic reasons = json['data'];
+    if (reasons is List) {
       data = <Reason>[];
-      json['data'].forEach((v) {
+      for (final dynamic v in reasons) {
         data!.add(Reason.fromJson(v));
-      });
+      }
     }
   }
 

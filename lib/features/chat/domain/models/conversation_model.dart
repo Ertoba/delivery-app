@@ -4,17 +4,29 @@ class ConversationsModel {
   int? offset;
   List<Conversation>? conversations;
 
-  ConversationsModel({this.totalSize, this.limit, this.offset, this.conversations});
+  ConversationsModel({
+    this.totalSize,
+    this.limit,
+    this.offset,
+    this.conversations,
+  });
 
   ConversationsModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['conversation'] != null) {
+    if (json['pagination'] is Map) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page'];
+      offset = json['pagination']['current_page'];
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
+    final dynamic conversationList = json['data'] ?? json['conversation'];
+    if (conversationList is List) {
       conversations = <Conversation>[];
-      json['conversation'].forEach((v) {
+      for (final dynamic v in conversationList) {
         conversations!.add(Conversation.fromJson(v));
-      });
+      }
     }
   }
 
@@ -73,8 +85,12 @@ class Conversation {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     sender = json['sender'] != null ? User.fromJson(json['sender']) : null;
-    receiver = json['receiver'] != null ? User.fromJson(json['receiver']) : null;
-    lastMessage = json['last_message'] != null ? LastMessage.fromJson(json['last_message']) : null;
+    receiver = json['receiver'] != null
+        ? User.fromJson(json['receiver'])
+        : null;
+    lastMessage = json['last_message'] != null
+        ? LastMessage.fromJson(json['last_message'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {

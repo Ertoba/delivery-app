@@ -4,17 +4,29 @@ class ReferEarningModel {
   String? offset;
   List<RefrealEarnings>? refrealEarnings;
 
-  ReferEarningModel({this.total, this.limit, this.offset, this.refrealEarnings});
+  ReferEarningModel({
+    this.total,
+    this.limit,
+    this.offset,
+    this.refrealEarnings,
+  });
 
   ReferEarningModel.fromJson(Map<String, dynamic> json) {
-    total = json['total'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['refrealEarnings'] != null) {
+    if (json['pagination'] is Map) {
+      total = json['pagination']['total'];
+      limit = json['pagination']['per_page']?.toString();
+      offset = json['pagination']['current_page']?.toString();
+    } else {
+      total = json['total'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
+    final dynamic earningList = json['refrealEarnings'] ?? json['data'];
+    if (earningList is List) {
       refrealEarnings = <RefrealEarnings>[];
-      json['refrealEarnings'].forEach((v) {
+      for (final dynamic v in earningList) {
         refrealEarnings!.add(RefrealEarnings.fromJson(v));
-      });
+      }
     }
   }
 
@@ -24,7 +36,9 @@ class ReferEarningModel {
     data['limit'] = limit;
     data['offset'] = offset;
     if (refrealEarnings != null) {
-      data['refrealEarnings'] = refrealEarnings!.map((v) => v.toJson()).toList();
+      data['refrealEarnings'] = refrealEarnings!
+          .map((v) => v.toJson())
+          .toList();
     }
     return data;
   }

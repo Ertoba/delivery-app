@@ -4,17 +4,29 @@ class OrderCancellationBody {
   String? offset;
   List<CancellationData>? reasons;
 
-  OrderCancellationBody({this.totalSize, this.limit, this.offset, this.reasons});
+  OrderCancellationBody({
+    this.totalSize,
+    this.limit,
+    this.offset,
+    this.reasons,
+  });
 
   OrderCancellationBody.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'];
-    offset = json['offset'];
-    if (json['data'] != null) {
+    if (json['pagination'] is Map) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page']?.toString();
+      offset = json['pagination']['current_page']?.toString();
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit'];
+      offset = json['offset'];
+    }
+    final dynamic reasonList = json['data'];
+    if (reasonList is List) {
       reasons = <CancellationData>[];
-      json['data'].forEach((v) {
+      for (final dynamic v in reasonList) {
         reasons!.add(CancellationData.fromJson(v));
-      });
+      }
     }
   }
 

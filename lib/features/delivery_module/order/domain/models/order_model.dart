@@ -2,20 +2,34 @@ class PaginatedOrderModel {
   int? totalSize;
   String? limit;
   String? offset;
+  int? lastPage;
   List<OrderModel>? orders;
 
-  PaginatedOrderModel({this.totalSize, this.limit, this.offset, this.orders});
+  PaginatedOrderModel({
+    this.totalSize,
+    this.limit,
+    this.offset,
+    this.lastPage,
+    this.orders,
+  });
 
   PaginatedOrderModel.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = json['limit'].toString();
-    offset = json['offset'].toString();
-    final dynamic rawOrders = json['orders'] ?? json['data'];
+    if (json['pagination'] is Map) {
+      totalSize = json['pagination']['total'];
+      limit = json['pagination']['per_page']?.toString();
+      offset = json['pagination']['current_page']?.toString();
+      lastPage = json['pagination']['last_page'];
+    } else {
+      totalSize = json['total_size'];
+      limit = json['limit']?.toString();
+      offset = json['offset']?.toString();
+    }
+    final dynamic rawOrders = json['data'] ?? json['orders'];
     if (rawOrders is List) {
       orders = [];
-      rawOrders.forEach((v) {
+      for (final dynamic v in rawOrders) {
         orders!.add(OrderModel.fromJson(v));
-      });
+      }
     }
   }
 
@@ -24,12 +38,12 @@ class PaginatedOrderModel {
     data['total_size'] = totalSize;
     data['limit'] = limit;
     data['offset'] = offset;
+    data['last_page'] = lastPage;
     if (orders != null) {
       data['orders'] = orders!.map((v) => v.toJson()).toList();
     }
     return data;
   }
-
 }
 
 class OrderModel {
@@ -51,6 +65,8 @@ class OrderModel {
   String? updatedAt;
   double? deliveryCharge;
   double? originalDeliveryCharge;
+  String? deliveryType;
+  double? deliveryTypeCharge;
   String? scheduleAt;
   bool? scheduled;
   String? storeName;
@@ -88,6 +104,8 @@ class OrderModel {
   String? canceled;
   ParcelCancellation? parcelCancellation;
   double? bringChangeAmount;
+  EtaModel? eta;
+  double? proDiscount;
 
   OrderModel({
     this.id,
@@ -108,6 +126,8 @@ class OrderModel {
     this.updatedAt,
     this.deliveryCharge,
     this.originalDeliveryCharge,
+    this.deliveryType,
+    this.deliveryTypeCharge,
     this.scheduleAt,
     this.scheduled,
     this.storeName,
@@ -145,6 +165,8 @@ class OrderModel {
     this.canceled,
     this.parcelCancellation,
     this.bringChangeAmount,
+    this.proDiscount,
+    this.eta,
   });
 
   OrderModel.fromJson(Map<String, dynamic> json) {
@@ -166,6 +188,8 @@ class OrderModel {
     updatedAt = json['updated_at'];
     deliveryCharge = json['delivery_charge']?.toDouble();
     originalDeliveryCharge = json['original_delivery_charge']?.toDouble();
+    deliveryType = json['delivery_type'];
+    deliveryTypeCharge = json['delivery_type_charge']?.toDouble();
     scheduleAt = json['schedule_at'];
     scheduled = json['scheduled'] == 1 ? true : false;
     storeName = json['store_name'];
@@ -182,15 +206,23 @@ class OrderModel {
     if (json['order_attachment_full_url'] != null) {
       orderAttachmentFullUrl = <String>[];
       json['order_attachment_full_url'].forEach((v) {
-        if(v != null){
+        if (v != null) {
           orderAttachmentFullUrl!.add(v.toString());
         }
       });
     }
-    deliveryAddress = json['delivery_address'] != null ? DeliveryAddress.fromJson(json['delivery_address']) : null;
-    receiverDetails = json['receiver_details'] != null ? DeliveryAddress.fromJson(json['receiver_details']) : null;
-    parcelCategory = json['parcel_category'] != null ? ParcelCategory.fromJson(json['parcel_category']) : null;
-    customer = json['customer'] != null ? Customer.fromJson(json['customer']) : null;
+    deliveryAddress = json['delivery_address'] != null
+        ? DeliveryAddress.fromJson(json['delivery_address'])
+        : null;
+    receiverDetails = json['receiver_details'] != null
+        ? DeliveryAddress.fromJson(json['receiver_details'])
+        : null;
+    parcelCategory = json['parcel_category'] != null
+        ? ParcelCategory.fromJson(json['parcel_category'])
+        : null;
+    customer = json['customer'] != null
+        ? Customer.fromJson(json['customer'])
+        : null;
     dmTips = json['dm_tips']?.toDouble();
     cutlery = json['cutlery'];
     unavailableItemNote = json['unavailable_item_note'];
@@ -198,7 +230,7 @@ class OrderModel {
     if (json['order_proof_full_url'] != null) {
       orderProofFullUrl = <String>[];
       json['order_proof_full_url'].forEach((v) {
-        if(v != null){
+        if (v != null) {
           orderProofFullUrl!.add(v.toString());
         }
       });
@@ -213,15 +245,23 @@ class OrderModel {
     taxStatus = json['tax_status'] == 'included' ? true : false;
     additionalCharge = json['additional_charge']?.toDouble() ?? 0;
     isGuest = json['is_guest'];
-    flashAdminDiscountAmount = json['flash_admin_discount_amount']?.toDouble() ?? 0;
-    flashStoreDiscountAmount = json['flash_store_discount_amount']?.toDouble() ?? 0;
+    flashAdminDiscountAmount =
+        json['flash_admin_discount_amount']?.toDouble() ?? 0;
+    flashStoreDiscountAmount =
+        json['flash_store_discount_amount']?.toDouble() ?? 0;
     extraPackagingAmount = json['extra_packaging_amount']?.toDouble();
     referrerBonusAmount = json['ref_bonus_amount']?.toDouble();
     storeBusinessModel = json['store_business_model'];
     storeChatPermission = json['chat_permission'];
     canceled = json['canceled'];
-    parcelCancellation = json['parcel_cancellation'] != null ? ParcelCancellation.fromJson(json['parcel_cancellation']) : null;
+    parcelCancellation = json['parcel_cancellation'] != null
+        ? ParcelCancellation.fromJson(json['parcel_cancellation'])
+        : null;
     bringChangeAmount = json['bring_change_amount']?.toDouble();
+    eta = json['eta'] != null
+        ? EtaModel.fromJson(Map<String, dynamic>.from(json['eta']))
+        : null;
+    proDiscount = json['pro_discount']?.toDouble();
   }
 
   Map<String, dynamic> toJson() {
@@ -244,6 +284,8 @@ class OrderModel {
     data['updated_at'] = updatedAt;
     data['delivery_charge'] = deliveryCharge;
     data['original_delivery_charge'] = originalDeliveryCharge;
+    data['delivery_type'] = deliveryType;
+    data['delivery_type_charge'] = deliveryTypeCharge;
     data['schedule_at'] = scheduleAt;
     data['scheduled'] = scheduled;
     data['store_name'] = storeName;
@@ -292,7 +334,73 @@ class OrderModel {
       data['parcel_cancellation'] = parcelCancellation!.toJson();
     }
     data['bring_change_amount'] = bringChangeAmount;
+    data['pro_discount'] = proDiscount;
+    if (eta != null) {
+      data['eta'] = eta!.toJson();
+    }
     return data;
+  }
+}
+
+class EtaModel {
+  int? min;
+  int? max;
+  String? unit;
+  String? text;
+  bool? overdue;
+  String? from;
+  String? to;
+  String? window;
+  String? fromAt;
+  String? toAt;
+  String? timezone;
+  String? stage;
+
+  EtaModel({
+    this.min,
+    this.max,
+    this.unit,
+    this.text,
+    this.overdue,
+    this.from,
+    this.to,
+    this.window,
+    this.fromAt,
+    this.toAt,
+    this.timezone,
+    this.stage,
+  });
+
+  EtaModel.fromJson(Map<String, dynamic> json) {
+    min = json['min'];
+    max = json['max'];
+    unit = json['unit'];
+    text = json['text'];
+    overdue = json['overdue'];
+    from = json['from'];
+    to = json['to'];
+    window = json['window'];
+    fromAt = json['from_at'];
+    toAt = json['to_at'];
+    timezone = json['timezone'];
+    stage = json['stage'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'min': min,
+      'max': max,
+      'unit': unit,
+      'text': text,
+      'overdue': overdue,
+      'from': from,
+      'to': to,
+      'window': window,
+      'from_at': fromAt,
+      'to_at': toAt,
+      'timezone': timezone,
+      'stage': stage,
+    };
   }
 }
 
@@ -340,7 +448,9 @@ class DeliveryAddress {
     contactPersonName = json['contact_person_name'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    zoneId = json['zone_id'] != null && json['zone_id'] != 'null' ? int.parse(json['zone_id'].toString()) : null;
+    zoneId = json['zone_id'] != null && json['zone_id'] != 'null'
+        ? int.parse(json['zone_id'].toString())
+        : null;
     streetNumber = json['road'];
     house = json['house'];
     floor = json['floor'];
@@ -531,17 +641,29 @@ class ParcelCancellation {
   ParcelCancellation.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     orderId = json['order_id'];
-    reason = json['reason'] != null ? (json['reason'] is List
-    ? List<String>.from(json['reason'])
-    : json['reason'].toString().replaceAll('[', '').replaceAll(']', '').split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList())
-    : null;
+    reason = json['reason'] != null
+        ? (json['reason'] is List
+              ? List<String>.from(json['reason'])
+              : json['reason']
+                    .toString()
+                    .replaceAll('[', '')
+                    .replaceAll(']', '')
+                    .split(',')
+                    .map((e) => e.trim())
+                    .where((e) => e.isNotEmpty)
+                    .toList())
+        : null;
     cancelBy = json['cancel_by'];
     note = json['note'];
     returnOtp = json['return_otp'];
-    returnFee = json['return_fee'] != null ? double.tryParse(json['return_fee'].toString()) : null;
+    returnFee = json['return_fee'] != null
+        ? double.tryParse(json['return_fee'].toString())
+        : null;
     returnFeePaymentStatus = json['return_fee_payment_status'];
     returnDate = json['return_date'];
-    dmPenaltyFee = json['dm_penalty_fee'] != null ? double.tryParse(json['dm_penalty_fee'].toString()) : null;
+    dmPenaltyFee = json['dm_penalty_fee'] != null
+        ? double.tryParse(json['dm_penalty_fee'].toString())
+        : null;
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     beforePickup = json['before_pickup'];
