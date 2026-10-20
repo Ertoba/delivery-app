@@ -38,7 +38,7 @@
 
     <application
         tools:replace="android:label"
-        android:label="მილი კურიერი"
+        android:label="კურიერი"
         android:name="${applicationName}"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
