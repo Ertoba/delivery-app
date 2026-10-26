@@ -1,0 +1,26 @@
+name: iOS Firebase Release Preflight
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "ios/GoogleService-Info.plist"
+      - "ios/Runner.xcodeproj/project.pbxproj"
+      - "android/app/google-services.json"
+      - "scripts/check-ios-firebase-release.py"
+      - ".github/workflows/ios-firebase-release-preflight.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  firebase-ios-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check actual Firebase app registration and target identifiers
+        run: python scripts/check-ios-firebase-release.py
