@@ -27,7 +27,7 @@ if not errors:
     android_project = android.get("project_info", {}).get("project_id")
     pbx_text = pbx_path.read_text()
     target_ids = set(re.findall(
-        r"PRODUCT_BUNDLE_IDENTIFIER\\s*=\\s*([^;]+);", pbx_text
+        r"PRODUCT_BUNDLE_IDENTIFIER\s*=\s*([^;]+);", pbx_text
     ))
     app_target_ids = {s.strip().strip('"') for s in target_ids if ".RunnerTests" not in s}
 
