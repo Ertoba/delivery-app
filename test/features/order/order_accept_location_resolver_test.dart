@@ -12,7 +12,8 @@ void main() {
 
   test('fresh accurate tracked location avoids another GPS wait', () async {
     int gpsCalls = 0;
-    final cached = position(age: 3);
+    // The live indoor courier trace reported a recent 64 m fix.
+    final cached = position(age: 3, accuracy: 64);
     final resolver = OrderAcceptLocationResolver(
       lastKnownPosition: () async => cached,
       currentPosition: () async { gpsCalls++; return position(); },
@@ -22,7 +23,7 @@ void main() {
     expect(gpsCalls, 0);
   });
 
-  for (final cached in [position(age: 60), position(accuracy: 80),
+  for (final cached in [position(age: 60), position(accuracy: 150),
     position(age: -30), position(latitude: double.nan)]) {
     test('stale/inaccurate/future/invalid cache requires fresh GPS: $cached', () async {
       final fresh = position();

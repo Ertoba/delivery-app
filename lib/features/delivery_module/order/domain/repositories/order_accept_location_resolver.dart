@@ -45,7 +45,7 @@ class OrderAcceptLocationResolver {
               age <= const Duration(seconds: 15) &&
               position.accuracy.isFinite &&
               position.accuracy > 0 &&
-              position.accuracy <= 50
+              position.accuracy <= 100
           ? position
           : null;
     } catch (_) {
