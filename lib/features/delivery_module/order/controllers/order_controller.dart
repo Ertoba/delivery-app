@@ -171,8 +171,10 @@ class OrderController extends GetxController implements GetxService {
     _refreshingOrderIds.add(orderId);
     try {
       if (showLoading) {
+        if (_orderModel?.id != orderId) {
+          _orderDetailsModel = null;
+        }
         _orderModel = null;
-        _orderDetailsModel = null;
         update();
       }
       final Response response = await orderServiceInterface.getOrderWithId(

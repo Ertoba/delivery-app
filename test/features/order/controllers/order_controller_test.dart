@@ -70,6 +70,31 @@ void main() {
       expect(controller.orderModel?.orderStatus, 'handover');
     },
   );
+
+  test('same-order reload keeps items; switching order discards old items', () async {
+    final service = _FakeOrderService();
+    final controller = OrderController(orderServiceInterface: service);
+    final first = controller.getOrderWithId(1, popOnError: false);
+    service.orderResponses[1]!.complete(const Response(
+      statusCode: 200, body: {'id': 1, 'order_status': 'handover'},
+    ));
+    expect(await first, isTrue);
+    await controller.getOrderDetails(1, true);
+    final items = controller.orderDetailsModel;
+    expect(items, isNotNull);
+
+    // Parcel-return and cancellation callers refresh the same order without
+    // fetching item details again. They must not lose the already loaded list.
+    expect(await controller.getOrderWithId(1, popOnError: false), isTrue);
+    expect(controller.orderDetailsModel, same(items));
+
+    final second = controller.getOrderWithId(2, popOnError: false);
+    expect(controller.orderDetailsModel, isNull);
+    service.orderResponses[2]!.complete(const Response(
+      statusCode: 200, body: {'id': 2, 'order_status': 'processing'},
+    ));
+    expect(await second, isTrue);
+  });
 }
 
 class _FakeOrderService implements OrderServiceInterface {
