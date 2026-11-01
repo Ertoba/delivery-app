@@ -28,7 +28,11 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   void initState() {
     super.initState();
     _initializeControllers();
-    _loadInitialData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadInitialData();
+      }
+    });
   }
 
   void _initializeControllers() {
@@ -37,7 +41,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   }
 
   void _loadInitialData() {
-    _profileController.getProfile();
+    _accountController.refreshIncomeStatements();
     _accountController.getWithdrawRequestList();
     _accountController.getWalletPaymentList();
     _accountController.getWalletProvidedEarningList();
@@ -52,8 +56,6 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
       transactionType:
           Get.find<MyAccountController>().selectedTransactionType ?? 'both',
     );
-    _accountController.getRideIncomeStatement(1);
-    _accountController.getDeliveryIncomeStatement(1);
   }
 
   Future<void> _refreshData() async {
@@ -75,10 +77,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             Get.find<MyAccountController>().selectedTransactionType ?? 'both',
       );
     } else {
-      await Future.wait([
-        _accountController.getRideIncomeStatement(1),
-        _accountController.getDeliveryIncomeStatement(1),
-      ]);
+      await _accountController.refreshIncomeStatements();
     }
   }
 
@@ -158,8 +157,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             selectedIndex == 0
                 ? const WalletOverviewWidget()
                 : selectedIndex == 1
-                    ? const MyPointView()
-                    : const IncomeStatementView(),
+                ? const MyPointView()
+                : const IncomeStatementView(),
           ],
         ),
       ),

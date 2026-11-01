@@ -530,12 +530,24 @@ class MyAccountController extends GetxController implements GetxService {
     update();
   }
 
+  Future<void> refreshIncomeStatements() async {
+    // Capabilities must come from the resolved profile, not an assumed module.
+    await Get.find<ProfileController>().getProfile();
+    await Future.wait([
+      getRideIncomeStatement(1),
+      getDeliveryIncomeStatement(1),
+    ]);
+  }
+
   Future<void> getRideIncomeStatement(int offset) async {
+    if (Get.find<ProfileController>().profileModel?.isRideOn != true) {
+      return;
+    }
     _isLoading = true;
     update();
 
-    final Response response =
-        await myAccountServiceInterface.getRideIncomeStatement(offset);
+    final Response response = await myAccountServiceInterface
+        .getRideIncomeStatement(offset);
     if (response.statusCode == 200) {
       final TripModel page = TripModel.fromJson(response.body);
       if (offset == 1) {
@@ -554,19 +566,23 @@ class MyAccountController extends GetxController implements GetxService {
   }
 
   Future<void> getDeliveryIncomeStatement(int offset) async {
+    if (Get.find<ProfileController>().profileModel?.isDeliveryOn != true) {
+      return;
+    }
     _isLoading = true;
     update();
 
-    final Response response =
-        await myAccountServiceInterface.getDeliveryIncomeStatement(offset);
+    final Response response = await myAccountServiceInterface
+        .getDeliveryIncomeStatement(offset);
     if (response.statusCode == 200) {
       final DeliveryIncomeStatementModel page =
           DeliveryIncomeStatementModel.fromJson(response.body);
       if (offset == 1) {
         _deliveryIncomeStatementModel = page;
       } else {
-        _deliveryIncomeStatementModel?.transactions
-            ?.addAll(page.transactions ?? []);
+        _deliveryIncomeStatementModel?.transactions?.addAll(
+          page.transactions ?? [],
+        );
         _deliveryIncomeStatementModel?.offset = page.offset;
         _deliveryIncomeStatementModel?.totalSize = page.totalSize;
       }
