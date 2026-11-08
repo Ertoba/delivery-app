@@ -1,4 +1,7 @@
 {
+  "cash_payment_status_pending": "Payment is not confirmed yet. Check its status before starting another transfer.",
+  "cash_payment_verifying": "Verifying payment and balance settlement…",
+  "cash_payment_unavailable": "Unable to open payment. Please try again later.",
   "location_disclosure_title": "How MILI Courier uses your location",
   "location_disclosure_body": "MILI Courier collects, transmits, and stores your precise location on MILI servers to assign and track deliveries, show your live delivery progress to customers, participating stores, and MILI administrators, and calculate routes and arrival times, even when the app is closed or not in use.",
   "location_disclosure_usage_limit": "Location is used only for delivery operations. It is not used for advertising or sold.",

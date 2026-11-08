@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart_delivery/api/api_checker.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
+import 'package:sixam_mart_delivery/features/my_account/domain/models/collect_cash_payment.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/delivery_income_statement_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/earning_report_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/loyalty_point_model.dart';
@@ -185,17 +186,70 @@ class MyAccountController extends GetxController implements GetxService {
     return response;
   }
 
-  Future<ResponseModel> makeCollectCashPayment(
+  bool _creatingCashPayment = false;
+  CollectCashPayment? _activeCashPayment;
+  int? _cashPaymentOwnerId;
+
+  CollectCashPayment? get activeCashPayment {
+    final owner = Get.find<ProfileController>().profileModel?.id;
+    return owner != null && owner == _cashPaymentOwnerId
+        ? _activeCashPayment
+        : null;
+  }
+
+  void finishCashPayment(
+    CollectCashPayment payment,
+    CollectCashPaymentState state,
+  ) {
+    if (state != CollectCashPaymentState.pending &&
+        activeCashPayment?.paymentId == payment.paymentId) {
+      _activeCashPayment = null;
+    }
+  }
+
+  Future<CollectCashPaymentResult> makeCollectCashPayment(
     double amount,
     String paymentGatewayName,
   ) async {
+    final existing = activeCashPayment;
+    if (existing != null) return CollectCashPaymentResult.success(existing);
+    if (_creatingCashPayment || !amount.isFinite || amount <= 0) {
+      return CollectCashPaymentResult.failure('cash_payment_unavailable'.tr);
+    }
+    _creatingCashPayment = true;
+    final initiatingOwner = Get.find<ProfileController>().profileModel?.id;
     _isLoading = true;
     update();
-    ResponseModel responseModel = await myAccountServiceInterface
-        .makeCollectCashPayment(amount, paymentGatewayName);
-    _isLoading = false;
-    update();
-    return responseModel;
+    try {
+      final result = await myAccountServiceInterface.makeCollectCashPayment(
+        amount,
+        paymentGatewayName,
+      );
+      if (result.isSuccess) {
+        _activeCashPayment = result.payment;
+        _cashPaymentOwnerId = initiatingOwner;
+      }
+      return result;
+    } catch (_) {
+      return CollectCashPaymentResult.failure('cash_payment_unavailable'.tr);
+    } finally {
+      _creatingCashPayment = false;
+      _isLoading = false;
+      update();
+    }
+  }
+
+  Future<CollectCashPaymentStatus> getCollectCashPaymentStatus(
+    CollectCashPayment payment,
+  ) => myAccountServiceInterface.getCollectCashPaymentStatus(payment);
+
+  Future<void> refreshSettledCashPayment() async {
+    // Never reset a balance locally: fetch the authoritative settled balance
+    // and its transaction list only after payment-specific confirmation.
+    await Future.wait([
+      Get.find<ProfileController>().getProfile(),
+      getWalletPaymentList(),
+    ]);
   }
 
   Future<void> getWalletPaymentList() async {

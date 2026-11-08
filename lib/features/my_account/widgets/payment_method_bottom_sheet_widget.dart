@@ -8,6 +8,8 @@ import 'package:sixam_mart_delivery/util/dimensions.dart';
 import 'package:sixam_mart_delivery/util/styles.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_button_widget.dart';
 import 'package:sixam_mart_delivery/common/widgets/custom_image_widget.dart';
+import 'package:sixam_mart_delivery/features/my_account/domain/models/collect_cash_payment.dart';
+import 'package:sixam_mart_delivery/features/my_account/widgets/collect_cash_payment_sheet.dart';
 
 class PaymentMethodBottomSheetWidget extends StatefulWidget {
   const PaymentMethodBottomSheetWidget({super.key});
@@ -19,8 +21,30 @@ class PaymentMethodBottomSheetWidget extends StatefulWidget {
 
 class _PaymentMethodBottomSheetWidgetState
     extends State<PaymentMethodBottomSheetWidget> {
+  CollectCashPayment? _payment;
+  bool _starting = false;
+  String? _error;
+  bool _statusOnly = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _payment = Get.find<MyAccountController>().activeCashPayment;
+    _statusOnly = _payment != null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<MyAccountController>();
+    if (_payment != null) {
+      return CollectCashPaymentSheet(
+        payment: _payment!,
+        verify: controller.getCollectCashPaymentStatus,
+        refreshAccount: controller.refreshSettledCashPayment,
+        statusOnly: _statusOnly,
+        onTerminal: controller.finishCashPayment,
+      );
+    }
     return Container(
       padding: const EdgeInsets.only(
         top: Dimensions.paddingSizeSmall,
@@ -36,7 +60,8 @@ class _PaymentMethodBottomSheetWidgetState
       ),
       child: GetBuilder<MyAccountController>(
         builder: (myAccountController) {
-          final paymentMethods = Get.find<SplashController>()
+          final paymentMethods =
+              Get.find<SplashController>()
                   .configModel
                   ?.activePaymentMethodList ??
               <PaymentBody>[];
@@ -189,8 +214,9 @@ class _PaymentMethodBottomSheetWidgetState
                   child: CustomButtonWidget(
                     radius: Dimensions.radiusDefault,
                     buttonText: 'select'.tr,
-                    onPressed: () {
-                      if (paymentMethods.isEmpty) {
+                    isLoading: _starting,
+                    onPressed: () async {
+                      if (paymentMethods.isEmpty || _starting) {
                         return;
                       }
 
@@ -207,17 +233,42 @@ class _PaymentMethodBottomSheetWidgetState
                         );
                       }
 
-                      double amount = Get.find<ProfileController>()
-                          .profileModel!
-                          .payableBalance!;
-                      myAccountController.makeCollectCashPayment(
-                        amount,
-                        myAccountController.digitalPaymentName!,
-                      );
+                      final amount = Get.find<ProfileController>()
+                          .profileModel
+                          ?.payableBalance;
+                      if (amount == null || !amount.isFinite || amount <= 0) {
+                        return;
+                      }
+                      setState(() {
+                        _starting = true;
+                        _error = null;
+                      });
+                      final result = await myAccountController
+                          .makeCollectCashPayment(
+                            amount,
+                            myAccountController.digitalPaymentName!,
+                          );
+                      if (!mounted) return;
+                      setState(() {
+                        _starting = false;
+                        _payment = result.payment;
+                        if (!result.isSuccess) _error = result.message;
+                      });
                     },
                   ),
                 ),
               ),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    _error!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ),
             ],
           );
         },

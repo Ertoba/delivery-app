@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:sixam_mart_delivery/common/models/response_model.dart';
+import 'package:sixam_mart_delivery/features/my_account/domain/models/collect_cash_payment.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/earning_report_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/loyalty_report_model.dart';
 import 'package:sixam_mart_delivery/features/my_account/domain/models/referral_report_model.dart';
@@ -13,8 +14,21 @@ class MyAccountService implements MyAccountServiceInterface {
   MyAccountService({required this.myAccountRepositoryInterface});
 
   @override
-  Future<ResponseModel> makeCollectCashPayment(double amount, String paymentGatewayName) async {
-    return await myAccountRepositoryInterface.makeCollectCashPayment(amount, paymentGatewayName);
+  Future<CollectCashPaymentResult> makeCollectCashPayment(
+    double amount,
+    String paymentGatewayName,
+  ) async {
+    return await myAccountRepositoryInterface.makeCollectCashPayment(
+      amount,
+      paymentGatewayName,
+    );
+  }
+
+  @override
+  Future<CollectCashPaymentStatus> getCollectCashPaymentStatus(
+    CollectCashPayment payment,
+  ) {
+    return myAccountRepositoryInterface.getCollectCashPaymentStatus(payment);
   }
 
   @override
@@ -33,23 +47,65 @@ class MyAccountService implements MyAccountServiceInterface {
   }
 
   @override
-  Future<EarningReportModel?> getEarningReport({String? offset, String? type, String? dateRange, String? startDate, String? endDate}) async {
-    return await myAccountRepositoryInterface.getEarningReport(offset: offset, type: type, dateRange: dateRange, startDate: startDate, endDate: endDate);
+  Future<EarningReportModel?> getEarningReport({
+    String? offset,
+    String? type,
+    String? dateRange,
+    String? startDate,
+    String? endDate,
+  }) async {
+    return await myAccountRepositoryInterface.getEarningReport(
+      offset: offset,
+      type: type,
+      dateRange: dateRange,
+      startDate: startDate,
+      endDate: endDate,
+    );
   }
 
   @override
-  Future<ReferralReportModel?> getReferralReport({String? offset, String? type, String? dateRange, String? startDate, String? endDate}) async {
-    return await myAccountRepositoryInterface.getReferralReport(offset: offset, type: type, dateRange: dateRange, startDate: startDate, endDate: endDate);
+  Future<ReferralReportModel?> getReferralReport({
+    String? offset,
+    String? type,
+    String? dateRange,
+    String? startDate,
+    String? endDate,
+  }) async {
+    return await myAccountRepositoryInterface.getReferralReport(
+      offset: offset,
+      type: type,
+      dateRange: dateRange,
+      startDate: startDate,
+      endDate: endDate,
+    );
   }
 
   @override
-  Future<LoyaltyReportModel?> getLoyaltyReport({String? offset, String? type, String? dateRange, String? startDate, String? endDate}) async {
-    return await myAccountRepositoryInterface.getLoyaltyReport(offset: offset, type: type, dateRange: dateRange, startDate: startDate, endDate: endDate);
+  Future<LoyaltyReportModel?> getLoyaltyReport({
+    String? offset,
+    String? type,
+    String? dateRange,
+    String? startDate,
+    String? endDate,
+  }) async {
+    return await myAccountRepositoryInterface.getLoyaltyReport(
+      offset: offset,
+      type: type,
+      dateRange: dateRange,
+      startDate: startDate,
+      endDate: endDate,
+    );
   }
 
   @override
-  Future<Response> downloadEarningInvoice({required int dmId, String? earningType}) async {
-    return await myAccountRepositoryInterface.downloadEarningInvoice(dmId: dmId, earningType: earningType);
+  Future<Response> downloadEarningInvoice({
+    required int dmId,
+    String? earningType,
+  }) async {
+    return await myAccountRepositoryInterface.downloadEarningInvoice(
+      dmId: dmId,
+      earningType: earningType,
+    );
   }
 
   @override
@@ -58,13 +114,33 @@ class MyAccountService implements MyAccountServiceInterface {
   }
 
   @override
-  Future<Response?> getLoyaltyPointList({String? offset, String? dateRange, String? startDate, String? endDate, String? transactionType, bool? fromFilter}) async {
-    return await myAccountRepositoryInterface.getLoyaltyPointList(offset: offset, dateRange: dateRange, startDate: startDate, endDate: endDate, transactionType: transactionType, fromFilter: fromFilter);
+  Future<Response?> getLoyaltyPointList({
+    String? offset,
+    String? dateRange,
+    String? startDate,
+    String? endDate,
+    String? transactionType,
+    bool? fromFilter,
+  }) async {
+    return await myAccountRepositoryInterface.getLoyaltyPointList(
+      offset: offset,
+      dateRange: dateRange,
+      startDate: startDate,
+      endDate: endDate,
+      transactionType: transactionType,
+      fromFilter: fromFilter,
+    );
   }
 
   @override
-  Future<Response> convertPoint(String point, {required bool isRideActive}) async {
-    return await myAccountRepositoryInterface.convertPoint(point, isRideActive: isRideActive);
+  Future<Response> convertPoint(
+    String point, {
+    required bool isRideActive,
+  }) async {
+    return await myAccountRepositoryInterface.convertPoint(
+      point,
+      isRideActive: isRideActive,
+    );
   }
 
   @override
@@ -74,7 +150,8 @@ class MyAccountService implements MyAccountServiceInterface {
 
   @override
   Future<Response> getDeliveryIncomeStatement(int offset) async {
-    return (await myAccountRepositoryInterface.getDeliveryIncomeStatement(offset))!;
+    return (await myAccountRepositoryInterface.getDeliveryIncomeStatement(
+      offset,
+    ))!;
   }
-
 }

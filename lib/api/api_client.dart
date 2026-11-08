@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:sixam_mart_delivery/api/api_checker.dart';
 import 'package:sixam_mart_delivery/common/models/error_response.dart';
 import 'package:sixam_mart_delivery/util/app_constants.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,7 +26,6 @@ class ApiClient extends GetxService {
 
   ApiClient({required this.appBaseUrl, required this.sharedPreferences}) {
     token = sharedPreferences.getString(AppConstants.token);
-    debugPrint('Token: $token');
 
     updateHeader(token, sharedPreferences.getString(AppConstants.languageCode));
   }
@@ -50,7 +48,6 @@ class ApiClient extends GetxService {
     bool handleError = true,
   }) async {
     try {
-      debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
       http.Response response = await http
           .get(Uri.parse(appBaseUrl + uri), headers: headers ?? _mainHeaders)
           .timeout(Duration(seconds: timeoutInSeconds));
@@ -67,8 +64,6 @@ class ApiClient extends GetxService {
     bool handleError = true,
   }) async {
     try {
-      debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
-      debugPrint('====> API Body: $body');
       http.Response response = await http
           .post(
             Uri.parse(appBaseUrl + uri),
@@ -90,8 +85,6 @@ class ApiClient extends GetxService {
     bool handleError = true,
   }) async {
     try {
-      debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
-      debugPrint('====> API Body: $body with ${multipartBody.length} files');
       http.MultipartRequest request = http.MultipartRequest(
         'POST',
         Uri.parse(appBaseUrl + uri),
@@ -139,8 +132,6 @@ class ApiClient extends GetxService {
     bool handleError = true,
   }) async {
     try {
-      debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
-      debugPrint('====> API Body: $body');
       http.Response response = await http
           .put(
             Uri.parse(appBaseUrl + uri),
@@ -160,7 +151,6 @@ class ApiClient extends GetxService {
     bool handleError = true,
   }) async {
     try {
-      debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
       http.Response response = await http
           .delete(Uri.parse(appBaseUrl + uri), headers: headers ?? _mainHeaders)
           .timeout(Duration(seconds: timeoutInSeconds));
@@ -187,7 +177,10 @@ class ApiClient extends GetxService {
     }
     // New API responses wrap the real payload in "content".
     // Preserve the raw body for callers that require the original JSON.
-    final String? envelopeMessage = envelopeMessageOf(body, response.statusCode);
+    final String? envelopeMessage = envelopeMessageOf(
+      body,
+      response.statusCode,
+    );
     body = unwrapEnvelope(body, response.statusCode);
     Response response0 = Response(
       body: isBinaryResponse ? null : body ?? response.body,
@@ -224,11 +217,7 @@ class ApiClient extends GetxService {
     } else if (!isSuccessCode(response0.statusCode) && response0.body == null) {
       response0 = const Response(statusCode: 0, statusText: noInternetMessage);
     }
-    debugPrint(
-      '====> API Response: [${response0.statusCode}] $uri\n'
-      '${isBinaryResponse ? '<binary ${response.bodyBytes.length} bytes>' : response0.body}',
-    );
-    // debugPrint('====> API Response: [${response0.statusCode}] $uri}');
+    // Never copy token-bearing requests, payment URLs or response bodies into logs.
     if (handleError) {
       if (isSuccessCode(response0.statusCode)) {
         return response0;
@@ -240,6 +229,7 @@ class ApiClient extends GetxService {
       return response0;
     }
   }
+
   /// Treat any successful 2xx HTTP status as success.
   static bool isSuccessCode(int? statusCode) =>
       statusCode != null && statusCode >= 200 && statusCode < 300;
@@ -248,13 +238,17 @@ class ApiClient extends GetxService {
   /// successful new-format response with a non-null content payload.
   static dynamic unwrapEnvelope(dynamic body, int? statusCode) {
     if (!isSuccessCode(statusCode) || body is! Map) return body;
-    if (!body.containsKey('identical_code') || body['content'] == null) return body;
+    if (!body.containsKey('identical_code') || body['content'] == null) {
+      return body;
+    }
     return body['content'];
   }
 
   static String? envelopeMessageOf(dynamic body, int? statusCode) {
     if (!isSuccessCode(statusCode) || body is! Map) return null;
-    if (!body.containsKey('identical_code') || body['content'] == null) return null;
+    if (!body.containsKey('identical_code') || body['content'] == null) {
+      return null;
+    }
     final dynamic message = body['message'];
     return message is String ? message : null;
   }
@@ -297,9 +291,21 @@ extension ApiResponsePayload on Response {
     if (payload is List) return payload;
     if (payload is Map) {
       for (final String key in const [
-        'data', 'items', 'orders', 'categories', 'banners', 'campaigns',
-        'coupons', 'addons', 'methods', 'transactions', 'disbursements',
-        'reviews', 'zones', 'vehicles', 'withdrawals',
+        'data',
+        'items',
+        'orders',
+        'categories',
+        'banners',
+        'campaigns',
+        'coupons',
+        'addons',
+        'methods',
+        'transactions',
+        'disbursements',
+        'reviews',
+        'zones',
+        'vehicles',
+        'withdrawals',
       ]) {
         final dynamic value = payload[key];
         if (value is List) return value;
