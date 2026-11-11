@@ -5,9 +5,12 @@ on:
   pull_request:
     paths:
       - "ios/GoogleService-Info.plist"
+      - "ios/Runner/Info.plist"
+      - "ios/Runner/GoogleService-Info.plist"
       - "ios/Runner.xcodeproj/project.pbxproj"
       - "android/app/google-services.json"
       - "scripts/check-ios-firebase-release.py"
+      - "scripts/check-ios-url-schemes.py"
       - ".github/workflows/ios-firebase-release-preflight.yml"
 
 permissions:
@@ -24,3 +27,5 @@ jobs:
           python-version: "3.12"
       - name: Check actual Firebase app registration and target identifiers
         run: python scripts/check-ios-firebase-release.py
+      - name: Check URL type structure and current Firebase callbacks
+        run: python scripts/check-ios-url-schemes.py

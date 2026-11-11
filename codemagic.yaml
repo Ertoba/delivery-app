@@ -1,34 +1,24 @@
+# Manual device builds only. This workflow never signs or publishes an app.
 workflows:
-  ios-unsigned:
-    name: Delivery iOS Unsigned IPA
-    max_build_duration: 60
+  ios-sideloadly:
+    name: MILI Courier - Unsigned Sideloadly IPA
     instance_type: mac_mini_m2
+    max_build_duration: 90
     environment:
-      flutter: stable
+      flutter: 3.47.5
       xcode: latest
-      cocoapods: default
+      cocoapods: 1.16.2
+      vars:
+        MILI_IOS_APP_SLUG: delivery
+        MILI_IOS_BUNDLE_ID: ge.mili.delivery
+        FLUTTER_SUPPRESS_ANALYTICS: "true"
+        DART_SUPPRESS_ANALYTICS: "true"
     scripts:
-      - name: Get Flutter packages
-        script: flutter pub get
-
-      - name: Install CocoaPods
-        script: |
-          flutter pub get
-          cd ios
-          rm -f Podfile.lock
-          pod install --repo-update
-
-      - name: Build iOS (no code sign)
-        script: |
-          flutter build ios --release --no-codesign
-
-      - name: Package as IPA
-        script: |
-          mkdir -p build/ios/ipa/Payload
-          cp -r build/ios/iphoneos/Runner.app build/ios/ipa/Payload/
-          cd build/ios/ipa
-          zip -r ../app-unsigned.ipa Payload
-          echo "IPA created"
-
+      - name: Verify configuration and build unsigned device IPA
+        script: bash scripts/build-ios-sideloadly.sh
     artifacts:
-      - build/ios/app-unsigned.ipa
+      - build/ios/sideloadly/*.ipa
+      - build/ios/sideloadly/provenance.json
+      - build/ios/sideloadly/Podfile.before.lock
+      - build/ios/sideloadly/Podfile.lock
+      - build/ios/sideloadly/firebase-preflight.log

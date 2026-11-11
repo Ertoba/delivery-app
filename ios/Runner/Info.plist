@@ -81,5 +81,16 @@
                 </array>
             </dict>
         </dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app-1-294177416704-ios-dd089861d2092eee9e5ae5</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
