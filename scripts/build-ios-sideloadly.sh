@@ -89,7 +89,9 @@ if [[ ! -d "$app_path" ]]; then
   echo "The expected iPhone device application was not produced." >&2
   exit 1
 fi
-lipo -verify_arch arm64 "$app_path/Runner"
+# -verify_arch consumes every following argument as an architecture, so the
+# executable must precede the operation (Apple lipo's documented syntax).
+lipo "$app_path/Runner" -verify_arch arm64
 
 staging_path="$artifact_dir/staging"
 if [[ -e "$staging_path" ]]; then
